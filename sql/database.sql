@@ -15,7 +15,7 @@ create table "Book"
 	rating float not null default 0.0,
 	status int not null default 0
 	    constraint status_constraint
-            check ( status = any ('{0,1}'::int[])),
+            check ( status = any ('{-1,0,1}'::int[])),
 	search_number int not null default 0
 );
 
@@ -103,23 +103,23 @@ create table "Chapter"
 
 create table "History"
 (
-    endpoint varchar(255) not null,
     book_endpoint varchar(255) not null,
 	username varchar(50) not null
 		constraint username_fk
 			references "Account"
 				on update cascade,
+	chapter_endpoint varchar(255) not null,
 	time timestamp not null default (localtimestamp at time zone 'GMT+7'),
 	constraint history_pk
-        primary key (endpoint, book_endpoint, username),
+        primary key (book_endpoint, username),
     constraint chapter_fk
-		foreign key (book_endpoint, endpoint) references "Chapter" (book_endpoint, endpoint)
+		foreign key (book_endpoint, chapter_endpoint) references "Chapter" (book_endpoint, endpoint)
 			on update cascade
 );
 
 create table "Comment"
 (
-    id int not null
+    id bigserial not null
         constraint comment_pk
             primary key,
     username varchar(50) not null
@@ -127,10 +127,11 @@ create table "Comment"
 			references "Account"
 				on update cascade,
 	endpoint varchar(255) not null,
-	id_reply int not null
+	id_reply int
 	    constraint reply_constraint
 	        references "Comment"
-	            on update cascade,
+	            on update cascade
+                on delete cascade,
 	content text not null,
 	time timestamp not null default (localtimestamp at time zone 'GMT+7'),
 	files varchar[] not null
@@ -171,12 +172,23 @@ create table "Report"
 
 --TEST--
 delete from "Book" where true;
-select * from "Notify";
+delete from "Account" where true;
+delete from "BookFollows" where true;
+delete from "Chapter" where true;
+delete from "History" where true;
+delete from "Comment" where true;
+delete from "Notify" where true;
+
+select * from "Comment";
 
 insert into "Book"(endpoint, title, type) values ('b', 'a', 'Comic');
 insert into "Account" values ('a', 'a', 1, 'a', 1);
 insert into "BookFollows" values ('b', 'a');
 insert into "Chapter"(endpoint, book_endpoint, title, images) values ('1', 'b', 'a', '{"a", "b", "c"}');
-insert into "History" (endpoint, book_endpoint, username) values ('1', 'b', 'a');
-insert into "Comment"(id, username, endpoint, id_reply, content, files) values (1, 'a', 'a', 1, 'a', '{}');
+insert into "History" (chapter_endpoint, book_endpoint, username) values ('1', 'b', 'a');
+insert into "Comment"(username, endpoint, id_reply, content, files) values ('a', 'a', null, 'a', '{}');
 insert into "Notify" (endpoint, username, content) values ('a', 'a', 'ê');
+
+delete from "Comment" where id = 1;
+
+drop table "Comment";
