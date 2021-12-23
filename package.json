@@ -1,0 +1,33 @@
+{
+  "name": "onereadapi",
+  "version": "1.0.0",
+  "description": "-\tLưu text tìm kiếm của user vào local\r -\tSearch_number của sách khi thực hiện click ở giao diện tìm kiếm\r ## Đọc sách\r -\tTăng view của sách từ book_endpoint trong bảng chapter\r -\tTăng view trong bảng ViewStatistic dựa theo ngày tháng năm và endpoint của sách\r ## Đánh dấu chapter\r -\tLưu chapter_endpoint cùng book_endpoint vào local\r ## Follow sách\r -\tCập nhật bảng BookFollow\r ## Gợi ý sách\r -\tViết câu truy vấn từ 4 bảng BookFollows, Book, BookGenres để lấy danh sách các thể loại và tổng số lần xuất hiện của chúng để biết người dùng thường yêu thích thể loại nào.\r -\tDựa vào top 5 kết quả ở trên truy vấn đến bảng sách và lấy ra top 10 sách có chứa thể loại đấy với nhiều lượt xem nhất. (bài toán đặt ra: Cho trước mảng a, và dãy các mảng xi, hãy xắp sếp dãy các mảng sau theo điều kiện các phần tử trong mảng thứ I trùng với các phần tử ở mảng a từ nhiều nhất đến thấp nhất)(bonus: cho thêm số y ở mỗi mảng xi nếu số phẩn tử trùng bằng nhau khi xắp sếp thì xắp sếp theo y giảm dần)(xi đại diện cho sách thứ i trong bảng sách, các phần tử trong mảng xi đại diện cho genre của 1 cuốn sách, y đại diện cho số lượt xem của sách)\r ## Top view\r -\tTruy vấn từ Book và ViewStatistic\r ## Top rating\r -\tTruy vấn từ Book\r ## Last update\r -\tTruy vấn từ Book và Chapter và xắp sếp theo ngày cập nhật của chapter\r ## Thông báo sách đã hoàn thành\r -\tThông báo tới các user đang follow sách \r ## Thông báo chapter mới\r -\tThông báo tới các user đang follow sách \r ## Lịch sử xem\r -\tCập nhật chapter_endpoint trong bảng history khi người dùng đọc (bắt sự kiện từ click ở danh sách chapter và cả click ở button next)\r ## Report user\r -\tUser report user khác với lí do và chờ admin xem xét\r -\tNếu user đã bị report và chưa được xem xét thì cập nhật num, time và nối thêm text “reason \\n” và giới hạn số lượng kí tự của cả text\r -\tSau khi xem xét xong admin xoá report hoặc đánh dấu đã đọc và nhấn nút xoá tất cả các report đã đọc\r ## Ban/unban user\r -\tAdmin set trạng thái ban/unban cho user và thông báo cho user qua mail\r -\tUser sau khi bị ban không thể thực hiện comment hoặc report\r ## Comment\r -\tComment được hiển thị theo chapter và book từ mới nhất\r -\tUser có thể comment emotion, image, gif\r ## Reply comment\r ## Report comment\r ## Tag user/ thông báo tag\r -\tKhi insert comment tìm trong content các nơi có @username thực hiện thông báo tới user\r ## Hash password trong đăng kí, đăng nhập (email của từng account là duy nhất)\r ## Lấy lại mật khẩu\r -\tGửi token đã mã hoá từ email mà user nhập vào và thời gian mã hết hạn qua email",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tiennhot23/OneReadAPI.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/tiennhot23/OneReadAPI/issues"
+  },
+  "homepage": "https://github.com/tiennhot23/OneReadAPI#readme",
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  },
+  "dependencies": {
+    "bcrypt": "^5.0.1",
+    "cors": "^2.8.5",
+    "dotenv": "^10.0.0",
+    "express": "^4.17.2",
+    "jsonwebtoken": "^8.5.1",
+    "nodemailer": "^6.7.2",
+    "pg": "^8.7.1",
+    "postgres-pool": "^5.0.8",
+    "slugify": "^1.6.4"
+  }
+}

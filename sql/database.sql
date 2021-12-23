@@ -13,6 +13,7 @@ create table "Book"
             check ( type = any ('{"Comic", "Novel", "Literature"}'::varchar[]) ),
 	view int not null default 0,
 	rating float not null default 0.0,
+	rate_count int not null default 0,
 	status int not null default 0
 	    constraint status_constraint
             check ( status = any ('{-1,0,1}'::int[])),
@@ -99,6 +100,18 @@ create table "Chapter"
 	images varchar[] not null,
 	constraint chapter_pk
         primary key (endpoint, book_endpoint)
+);
+
+create table "ChapterDetail"
+(
+    chapter_endpoint varchar(255) not null,
+    book_endpoint varchar(255) not null,
+    images varchar[] not null,
+    constraint chapter_endpoint
+        foreign key (chapter_endpoint, book_endpoint)
+            references "Chapter"(endpoint, book_endpoint)
+                on update cascade
+                on delete cascade
 );
 
 create table "History"
