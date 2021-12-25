@@ -1,0 +1,24 @@
+### thêm genre
+POST http://localhost:3000/genre/
+Content-Type: application/json
+
+{
+    "title": "Trinh thám"
+}
+
+### cập nhật genre
+PATCH http://localhost:3000/genre/trinh-tham
+Content-Type: application/json
+
+{
+    "title": "Trinh Thám"
+}
+
+### xoá genre
+DELETE http://localhost:3000/genre/trinh-tham
+
+### lấy thông tin genre
+GET http://localhost:3000/genre/trinh-tham
+
+### Lấy danh sách genre
+GET http://localhost:3000/genre/list-genre

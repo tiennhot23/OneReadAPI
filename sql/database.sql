@@ -1,6 +1,6 @@
 create table "Book"
 (
-	endpoint varchar(255) not null
+    endpoint varchar(255) not null
 		constraint book_pk
 			primary key,
 	title nchar(500) not null,
@@ -14,16 +14,21 @@ create table "Book"
 	view int not null default 0,
 	rating float not null default 0.0,
 	rate_count int not null default 0,
-	status int not null default 0
+	/*
+	    -1  :   đã xoá
+	    0   :   đang tiến hành
+	    1   :   đã hoàn thành
+	*/
+	status smallint not null default 0
 	    constraint status_constraint
-            check ( status = any ('{-1,0,1}'::int[])),
+            check ( status = any ('{-1,0,1}'::smallint[])),
 	search_number int not null default 0
 );
 
 create table "Genre"
 (
-	endpoint varchar(255) not null
-		constraint book_pk
+    endpoint varchar(255) not null
+		constraint genre_pk
 			primary key,
 	title nchar(500) not null,
 	description nchar(500) not null default 'Không có mô tả nào'
@@ -38,14 +43,20 @@ create table "BookGenres"
 	genre_endpoint varchar(255) not null
 		constraint genre_fk
 			references "Genre"
-				on update cascade,
+				on update cascade
+                on delete cascade,
 	constraint book_genres_pk
 		primary key (genre_endpoint, book_endpoint)
 );
 
 create table "ViewStatistic"
 (
-    num int not null,
+    /*
+        day: 1 -> 30
+        month: 1-> 12
+        year: ...
+    */
+    num smallint not null,
     type char(1) not null
         constraint type_constraint
             check ( type = any ('{"D", "M", "Y"}'::char[]) ),
@@ -65,13 +76,21 @@ create table "Account"
             primary key,
     password varchar(100) not null,
     avatar varchar(255) not null default 'default-avatar',
-    status int not null
+    /*
+        -1  :   banned
+        1   :   default
+    */
+    status smallint not null default 1
         constraint status_constraint
-            check ( status = any ('{1,-1}'::int[])),
+            check ( status = any ('{1,-1}'::smallint[])),
     email varchar(100) not null unique,
-    role int not null
+    /*
+        0   :   user
+        1   :   admin
+    */
+    role smallint not null default 0
         constraint role_constraint
-            check ( role = any ('{0,1}'::int[]))
+            check ( role = any ('{0,1}'::smallint[]))
 );
 
 create table "BookFollows"
@@ -90,16 +109,15 @@ create table "BookFollows"
 
 create table "Chapter"
 (
-    endpoint varchar(255) not null,
+    chapter_endpoint varchar(255) not null,
     book_endpoint varchar(255) not null
 		constraint book_fk
-			references "Book"
+			references "Book"(endpoint)
 				on update cascade,
 	title nchar(255) not null,
 	time date not null default (date(localtimestamp at time zone 'GMT+7')),
-	images varchar[] not null,
 	constraint chapter_pk
-        primary key (endpoint, book_endpoint)
+        primary key (chapter_endpoint, book_endpoint)
 );
 
 create table "ChapterDetail"
@@ -107,9 +125,9 @@ create table "ChapterDetail"
     chapter_endpoint varchar(255) not null,
     book_endpoint varchar(255) not null,
     images varchar[] not null,
-    constraint chapter_endpoint
+    constraint chapter_detail_fk
         foreign key (chapter_endpoint, book_endpoint)
-            references "Chapter"(endpoint, book_endpoint)
+            references "Chapter"(chapter_endpoint, book_endpoint)
                 on update cascade
                 on delete cascade
 );
@@ -126,8 +144,9 @@ create table "History"
 	constraint history_pk
         primary key (book_endpoint, username),
     constraint chapter_fk
-		foreign key (book_endpoint, chapter_endpoint) references "Chapter" (book_endpoint, endpoint)
+		foreign key (book_endpoint, chapter_endpoint) references "Chapter" (book_endpoint, chapter_endpoint)
 			on update cascade
+            on delete cascade
 );
 
 create table "Comment"
@@ -152,15 +171,22 @@ create table "Comment"
 
 create table "Notify"
 (
+    /*
+        endpoint: endpoint of comment or book
+    */
     endpoint varchar(255) not null,
     username varchar(50) not null
 		constraint username_fk
 			references "Account"
 				on update cascade,
 	content text not null,
-	status int not null default 0
+	/*
+	    0   :   chưa xem
+	    1   :   đã xem
+	*/
+	status smallint not null default 0
 	    constraint status_constraint
-            check ( status = any ('{0,1}'::int[])),
+            check ( status = any ('{0,1}'::smallint[])),
 	time timestamp not null default (localtimestamp at time zone 'GMT+7'),
 	constraint notify_pk
         primary key (endpoint, username)
@@ -168,16 +194,27 @@ create table "Notify"
 
 create table "Report"
 (
+    /*
+        endpoint: endpoint of comment or user
+    */
     endpoint varchar(255) not null,
+    /*
+        A   :   Account
+        C   :   Comment
+    */
     type char(1) not null
         constraint type_constraint
             check ( type = any ('{"A", "C"}'::char[]) ),
     num int not null default 0,
     reason text not null,
     time timestamp not null default (localtimestamp at time zone 'GMT+7'),
-    status int not null default 0
+    /*
+	    0   :   chưa xủ lí
+	    1   :   đã xủ lí
+	*/
+    status smallint not null default 0
 	    constraint status_constraint
-            check ( status = any ('{0,1}'::int[])),
+            check ( status = any ('{0,1}'::smallint[])),
     constraint report_pk
         primary key (endpoint, type)
 );
@@ -191,17 +228,35 @@ delete from "Chapter" where true;
 delete from "History" where true;
 delete from "Comment" where true;
 delete from "Notify" where true;
+delete from "Genre" where true;
 
-select * from "Comment";
+select * from "Genre";
+select * from "Genre" where endpoint = 'trinh-tham' limit 1;
 
 insert into "Book"(endpoint, title, type) values ('b', 'a', 'Comic');
 insert into "Account" values ('a', 'a', 1, 'a', 1);
 insert into "BookFollows" values ('b', 'a');
-insert into "Chapter"(endpoint, book_endpoint, title, images) values ('1', 'b', 'a', '{"a", "b", "c"}');
 insert into "History" (chapter_endpoint, book_endpoint, username) values ('1', 'b', 'a');
 insert into "Comment"(username, endpoint, id_reply, content, files) values ('a', 'a', null, 'a', '{}');
 insert into "Notify" (endpoint, username, content) values ('a', 'a', 'ê');
+insert into "Genre" values ('a', 'a', '');
 
 delete from "Comment" where id = 1;
 
+drop table "BookGenres";
+drop table "Genre";
+drop table "Notify";
+drop table "Report";
+drop table "ViewStatistic";
 drop table "Comment";
+drop table "History";
+drop table "BookFollows";
+drop table "ChapterDetail";
+drop table "Chapter";
+drop table "Account";
+drop table "Book";
+
+
+
+
+
