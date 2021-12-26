@@ -1,0 +1,25 @@
+### thêm book
+POST http://localhost:3000/book/
+Content-Type: application/json
+
+{
+    "title": "Sherlock Holme",
+    "type": "Novel"
+}
+
+### cập nhật book
+PATCH http://localhost:3000/book/sherlock-holme
+Content-Type: application/json
+
+{
+    
+}
+
+### xoá book
+DELETE http://localhost:3000/book/sherlock-holme
+
+### lấy thông tin book
+GET http://localhost:3000/book/sherlock-holme
+
+### Lấy danh sách book
+GET http://localhost:3000/book/all
