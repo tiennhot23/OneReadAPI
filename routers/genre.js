@@ -6,7 +6,7 @@ const GenreController = require('../controllers/GenreController')
 const slugify = require('../middlewares/slugify')
 const message = require('../configs/messages')
 
-router.get('/list-genre', async (req, res, next) => {
+router.get('/all', async (req, res, next) => {
     var genres
     try {
         genres = await GenreController.list()
@@ -52,6 +52,14 @@ router.post('/', slugify.get_endpoint, async (req, res, next) => {
             res.status(400).json({message: message.genre.missing_title})
         }
     } catch (err) {
+        if (err.constraint){
+            switch (err.constraint) {
+                case 'genre_pk': {
+                    res.status(400).json({message: message.genre.genre_pk})
+                    break
+                }
+            }
+        }
         res.status(500).json({message: err.message})
     }
 })

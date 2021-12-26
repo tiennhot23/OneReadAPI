@@ -21,4 +21,4 @@ DELETE http://localhost:3000/genre/trinh-tham
 GET http://localhost:3000/genre/trinh-tham
 
 ### Lấy danh sách genre
-GET http://localhost:3000/genre/list-genre
+GET http://localhost:3000/genre/all
