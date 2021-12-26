@@ -28,7 +28,7 @@ db.list = () => {
 db.add = (genre) => {
     return new Promise((resolve, reject) => {
         let query = 'insert into "Genre" (endpoint, title' 
-        + (genre.description?', discription':'') 
+        + (genre.description?', description':'') 
         + ') values ($1, $2' 
         + (genre.description?', $3':'')
         + ') returning *'

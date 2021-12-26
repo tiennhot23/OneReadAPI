@@ -3,6 +3,7 @@ module.exports = {
         missing_title: 'Thiếu title',
         missing_endpoint: 'Thiếu endpoint',
         missing_type: 'Thiếu thể loại',
+        missing_genre: 'Thêm ít nhất một thể loại cho sách',
         not_found: 'Sách này không tồn tại',
         exist: 'Sách này đã tồn tại',
         book_pk: 'Tên sách bị trùng',

@@ -3,11 +3,11 @@ create table "Book"
     endpoint varchar(255) not null
 		constraint book_pk
 			primary key,
-	title nchar(500) not null,
-	author nchar(100) not null default 'unknown',
+	title text not null,
+	author text not null default 'unknown',
 	thumb varchar(255) not null default 'default-image',
 	theme varchar(255) not null default 'default-image',
-	description nchar(500) not null default 'Không có mô tả nào',
+	description text not null default 'Không có mô tả nào',
 	type varchar(100) not null
 	    constraint type_constraint
             check ( type = any ('{"Comic", "Novel", "Literature"}'::varchar[]) ),
@@ -30,8 +30,8 @@ create table "Genre"
     endpoint varchar(255) not null
 		constraint genre_pk
 			primary key,
-	title nchar(500) not null,
-	description nchar(500) not null default 'Không có mô tả nào'
+	title text not null,
+	description text not null default 'Không có mô tả nào'
 );
 
 create table "BookGenres"
@@ -114,7 +114,7 @@ create table "Chapter"
 		constraint book_fk
 			references "Book"(endpoint)
 				on update cascade,
-	title nchar(255) not null,
+	title text not null,
 	time date not null default (date(localtimestamp at time zone 'GMT+7')),
 	constraint chapter_pk
         primary key (chapter_endpoint, book_endpoint)
@@ -221,25 +221,31 @@ create table "Report"
 
 
 --TEST--
-delete from "Book" where true;
-delete from "Account" where true;
-delete from "BookFollows" where true;
-delete from "Chapter" where true;
-delete from "History" where true;
-delete from "Comment" where true;
-delete from "Notify" where true;
+delete from "BookGenres" where true;
 delete from "Genre" where true;
+delete from "Notify" where true;
+delete from "Report" where true;
+delete from "ViewStatistic" where true;
+delete from "Comment" where true;
+delete from "History" where true;
+delete from "BookFollows" where true;
+delete from "ChapterDetail" where true;
+delete from "Chapter" where true;
+delete from "Account" where true;
+delete from "Book" where true;
 
 select * from "Genre";
 select * from "Genre" where endpoint = 'trinh-tham' limit 1;
 
-insert into "Book"(endpoint, title, type) values ('b', 'a', 'Comic');
+insert into "Book"(endpoint, title, type) values ('one-punch-man', 'One punch man', 'Comic');
 insert into "Account" values ('a', 'a', 1, 'a', 1);
 insert into "BookFollows" values ('b', 'a');
 insert into "History" (chapter_endpoint, book_endpoint, username) values ('1', 'b', 'a');
 insert into "Comment"(username, endpoint, id_reply, content, files) values ('a', 'a', null, 'a', '{}');
 insert into "Notify" (endpoint, username, content) values ('a', 'a', 'ê');
-insert into "Genre" values ('a', 'a', '');
+insert into "Genre" (endpoint, title) values ('manga', 'Manga');
+insert into "BookGenres" values ('one-punch-man', 'action');
+insert into "Report" (endpoint, type, reason) values ('a', 'A', 'a') returning *;
 
 delete from "Comment" where id = 1;
 
@@ -255,6 +261,19 @@ drop table "ChapterDetail";
 drop table "Chapter";
 drop table "Account";
 drop table "Book";
+
+
+update "Genre" set description = 'truyện tranh nhật' where endpoint = 'manga';
+
+
+select * from (select * from "Book" b where endpoint = 'one-punch-man' limit 1) b,
+(select json_agg(jsonb_build_object('endpoint', endpoint,
+                                    'title', btrim(title),
+                                    'description', btrim(description))) genres
+from "Genre" g,
+     (select * from "BookGenres" where book_endpoint = 'one-punch-man') bg
+where g.endpoint = bg.genre_endpoint) g;
+
 
 
 

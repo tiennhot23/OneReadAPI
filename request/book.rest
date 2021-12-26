@@ -3,8 +3,12 @@ POST http://localhost:3000/book/
 Content-Type: application/json
 
 {
-    "title": "Sherlock Holme",
-    "type": "Novel"
+    "title": "One piece",
+    "type": "Comic",
+    "genres": [
+        "comedy",
+        "manga"
+    ]
 }
 
 ### cập nhật book
@@ -19,7 +23,7 @@ Content-Type: application/json
 DELETE http://localhost:3000/book/sherlock-holme
 
 ### lấy thông tin book
-GET http://localhost:3000/book/sherlock-holme
+GET http://localhost:3000/book/one-punch-man
 
 ### Lấy danh sách book
-GET http://localhost:3000/book/all
+GET http://localhost:3000/book/all/1

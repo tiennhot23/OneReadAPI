@@ -3,7 +3,8 @@ POST http://localhost:3000/genre/
 Content-Type: application/json
 
 {
-    "title": "Trinh thám"
+    "title": "Action",
+    "description": "Hành động"
 }
 
 ### cập nhật genre

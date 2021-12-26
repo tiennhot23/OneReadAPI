@@ -1,10 +1,18 @@
+const { query } = require('express')
 const conn = require('../connection')
 
 const db = {}
 
 db.get = (endpoint) => {
     return new Promise((resolve, reject) => {
-        let query = 'select * from "Book" where endpoint = $1 limit 1'
+        let query = `select * from (select * from "Book" b where endpoint = $1 limit 1) b,
+        (select json_agg(jsonb_build_object('endpoint', endpoint,
+                                            'title', btrim(title),
+                                            'description', btrim(description))) genres
+        from "Genre" g,
+             (select * from "BookGenres" where book_endpoint = $1) bg
+        where g.endpoint = bg.genre_endpoint) g,
+        (select count(username) follow from "BookFollows" where book_endpoint = $1) n`
 
         var params = [endpoint]
         conn.query(query, params, (err, res) => {
@@ -14,9 +22,36 @@ db.get = (endpoint) => {
     })
 }
 
-db.list = () => {
+db.list = (filter, page) => {
     return new Promise((resolve, reject) => {
-        let query = 'select * from "book"'
+        let num = 1
+        let query = 'select * from "Book" where'
+        if (filter.author) {
+            if(num > 1) query += ','
+            query += ' author = $' + num
+            num += 1
+            params.push(filter.author)
+        }
+        if (filter.type) {
+            if(num > 1) query += ','
+            query += ' type = $' + num
+            num += 1
+            params.push(filter.type)
+        }
+        if (filter.genre) {
+            if(num > 1) query += ','
+            query += ' genre in $' + num
+            num += 1
+            params.push(filter.genre)
+        }
+        if (filter.status) {
+            if(num > 1) query += ','
+            query += ' status = $' + num
+            num += 1
+            params.push(filter.status)
+        }
+
+        if (num == 1) query = 'select * from "Book"'
 
         conn.query(query, (err, res) => {
             if(err) return reject(err)
@@ -62,11 +97,36 @@ db.add = (book) => {
             num += 1
             params.push(book.type)
         }
-        query += ') returning *'
+        query += ') returning *;'
 
         conn.query(query, params, (err, res) => {
-            if (err) return reject(err)
-            return resolve(res.rows[0])
+            if (err) {
+                return reject(err)
+            } else {
+                return resolve(res.rows[0])
+            }
+        })
+    })
+}
+
+db.add_book_genres = (book_endpoint, genres) => {
+    return new Promise((resolve, reject) => {
+        let num = 2
+        let params = [book_endpoint]
+        let query = 'insert into "BookGenres" values'
+        genres.forEach(genre_endpoint => {
+            if (num > 2) query += ','
+            query += ' ($1, $' + num + ')'
+            num += 1
+            params.push(genre_endpoint)
+        })
+        
+        conn.query(query, params, (err, res) => {
+            if (err) {
+                return reject(err)
+            } else {
+                return resolve(res.rows)
+            }
         })
     })
 }
@@ -75,7 +135,7 @@ db.update = (book, endpoint) => {
     return new Promise((resolve, reject) => {
         let num = 1
         let params = []
-        let query = 'update "book" set '
+        let query = 'update "Book" set '
         if (book.endpoint) {
             if (num > 1) query += ','
             query += ' endpoint = $' + num
@@ -98,7 +158,7 @@ db.update = (book, endpoint) => {
         query += ' where endpoint = $' + num + ' returning *'
         params.push(endpoint)
 
-        if (num == 1) query = 'select * from "book" where endpoint = $1 limit 1'
+        if (num == 1) query = 'select * from "Book" where endpoint = $1 limit 1'
 
         conn.query(query, params, (err, res) => {
             if (err) return reject(err)
