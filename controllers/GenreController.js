@@ -9,7 +9,7 @@ db.get = (endpoint) => {
         var params = [endpoint]
         conn.query(query, params, (err, res) => {
             if (err) return reject(err)
-            return resolve(res.rows[0])
+            else return resolve(res.rows[0])
         })
     })
 }
@@ -20,7 +20,7 @@ db.list = () => {
 
         conn.query(query, (err, res) => {
             if(err) return reject(err)
-            return resolve(res.rows)
+            else return resolve(res.rows)
         })
     })
 }
@@ -40,7 +40,7 @@ db.add = (genre) => {
 
         conn.query(query, params, (err, res) => {
             if (err) return reject(err)
-            return resolve(res.rows[0])
+            else return resolve(res.rows[0])
         })
     })
 }
@@ -76,7 +76,7 @@ db.update = (genre, endpoint) => {
 
         conn.query(query, params, (err, res) => {
             if (err) return reject(err)
-            return resolve(res.rows[0])
+            else return resolve(res.rows[0])
         })
     })
 }
@@ -89,7 +89,7 @@ db.delete = (endpoint) => {
 
         conn.query(query, params, (err, res) => {
             if (err) return reject(err)
-            return resolve(res.rows[0])
+            else return resolve(res.rows[0])
         })
     })
 }

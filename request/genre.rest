@@ -3,16 +3,17 @@ POST http://localhost:3000/genre/
 Content-Type: application/json
 
 {
-    "title": "Action",
-    "description": "Hành động"
+    "title": "One shot",
+    "description": "Những truyện ngắn, thường là 1 chapter"
 }
 
 ### cập nhật genre
-PATCH http://localhost:3000/genre/trinh-tham
+PATCH http://localhost:3000/genre/shonen
 Content-Type: application/json
 
 {
-    "title": "Trinh Thám"
+    "title": "Shounen",
+    "description": "Đối tượng hướng tới của thể loại này là phái nam. Nội dung của những bộ manga này thường liên quan đến đánh nhau và/hoặc bạo lực (ở mức bình thường, không thái quá)"
 }
 
 ### xoá genre

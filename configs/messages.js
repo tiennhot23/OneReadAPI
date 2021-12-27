@@ -17,6 +17,15 @@ module.exports = {
         exist: 'Thể loại này đã tồn tại',
         genre_pk: 'Tên thể loại bị trùng'
     },
+    report: {
+        missing_endpoint: 'Thiếu endpoint',
+        missing_type: 'Thiếu loại report',
+        missing_reason: 'Thiếu lí do',
+        not_found: 'Không tìm thấy report',
+        report_pk: 'Report này đã tồn tại',
+        type_constraint: 'Loại report chỉ có thể là "A": report account hoặc "C": report comment',
+        status_constraint: 'Trạng thái của report là 0: chưa xử lí hoặc 1: đã xử lí'
+    },
     file:{
         not_exist: 'File not exist',
         choose_file: 'BAD REQUEST: please choose files'

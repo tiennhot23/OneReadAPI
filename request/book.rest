@@ -3,11 +3,10 @@ POST http://localhost:3000/book/
 Content-Type: application/json
 
 {
-    "title": "One piece",
+    "title": "Grand blue",
     "type": "Comic",
     "genres": [
-        "comedy",
-        "manga"
+        "comedy", "seinen", "school-life", "slice-of-life"
     ]
 }
 

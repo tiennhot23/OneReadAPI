@@ -30,7 +30,7 @@ router.get('/:endpoint', async (req, res, next) => {
         if (endpoint) {
             book = await BookController.get(endpoint)
             if (book) res.status(200).json(book)
-            else res.status(200).json({message: message.book.not_found})
+            else res.status(404).json({message: message.book.not_found})
         } else {
             res.status(400).json({message: message.book.missing_endpoint})
         }
@@ -53,13 +53,11 @@ router.post('/', slugify.get_endpoint, async (req, res, next) => {
             res.status(400).json({message: message.book.missing_title})
         } else if (!book.type) {
             res.status(400).json({message: message.book.missing_type})
-        } else if (!book.genres || book.genres.length == 0) {
-            res.status(400).json({message: message.book.missing_genre})
         } else {
             await TransactionController.begin()
             let genres = book.genres
             book = await BookController.add(book)
-            await BookController.add_book_genres(book.endpoint, genres)
+            if (genres) await BookController.add_book_genres(book.endpoint, genres)
             await TransactionController.commit()
             res.status(200).json(book)
         }

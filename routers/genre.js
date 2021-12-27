@@ -22,7 +22,8 @@ router.get('/:endpoint', async (req, res, next) => {
     try {
         if (endpoint) {
             genre = await GenreController.get(endpoint)
-            res.status(200).json(genre)
+            if (genre) res.status(200).json(genre)
+            else res.status(404).json({message: message.genre.not_found})
         } else {
             res.status(400).json({message: message.genre.missing_endpoint})
         }
@@ -58,9 +59,13 @@ router.post('/', slugify.get_endpoint, async (req, res, next) => {
                     res.status(400).json({message: message.genre.genre_pk})
                     break
                 }
+                default: {
+                    res.status(500).json({message: err.message})
+                    break;
+                }
             }
         }
-        res.status(500).json({message: err.message})
+        else res.status(500).json({message: err.message})
     }
 })
 
