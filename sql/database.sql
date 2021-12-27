@@ -5,8 +5,8 @@ create table "Book"
 			primary key,
 	title text not null,
 	author text not null default 'unknown',
-	thumb varchar(255) not null default 'default-image',
-	theme varchar(255) not null default 'default-image',
+	thumb varchar(255) not null default 'https://lh3.googleusercontent.com/proxy/2tSbUwA5fzMnQ7Jh85LXp4_QwOCwYQtv1yrqoW7Fpgvav1WXRJPqFNXClbRFOMIKtP6mDAgJG1y1pac0sxENIA78BrntCd5DrlQnCPxwzvM8QHoYipIc8X62T3-o',
+	theme varchar(255) not null default 'https://lh3.googleusercontent.com/proxy/2tSbUwA5fzMnQ7Jh85LXp4_QwOCwYQtv1yrqoW7Fpgvav1WXRJPqFNXClbRFOMIKtP6mDAgJG1y1pac0sxENIA78BrntCd5DrlQnCPxwzvM8QHoYipIc8X62T3-o',
 	description text not null default 'Không có mô tả nào',
 	type varchar(100) not null
 	    constraint type_constraint
@@ -75,14 +75,15 @@ create table "Account"
         constraint account_pk
             primary key,
     password varchar(100) not null,
-    avatar varchar(255) not null default 'default-avatar',
+    avatar varchar(255) not null default 'https://thumbs.dreamstime.com/b/default-avatar-profile-icon-social-media-user-vector-default-avatar-profile-icon-social-media-user-vector-portrait-176194876.jpg',
     /*
         -1  :   banned
-        1   :   default
+        0   :   not verify (default)
+        1   :   verified
     */
-    status smallint not null default 1
+    status smallint not null default 0
         constraint status_constraint
-            check ( status = any ('{1,-1}'::smallint[])),
+            check ( status = any ('{1,0,-1}'::smallint[])),
     email varchar(100) not null unique,
     /*
         0   :   user
@@ -219,6 +220,16 @@ create table "Report"
         primary key (endpoint, type)
 );
 
+create table "Token"
+(
+    token text not null primary key,
+    username varchar(50) not null
+		constraint username_fk
+			references "Account"
+				on update cascade,
+	createAt timestamp not null default (localtimestamp at time zone 'GMT+7')
+);
+
 
 --TEST--
 delete from "BookGenres" where true;
@@ -234,9 +245,6 @@ delete from "Chapter" where true;
 delete from "Account" where true;
 delete from "Book" where true;
 
-select * from "Genre";
-select * from "Genre" where endpoint = 'trinh-tham' limit 1;
-
 insert into "Book"(endpoint, title, type) values ('one-punch-man', 'One punch man', 'Comic');
 insert into "Account" values ('a', 'a', 1, 'a', 1);
 insert into "BookFollows" values ('b', 'a');
@@ -244,10 +252,8 @@ insert into "History" (chapter_endpoint, book_endpoint, username) values ('1', '
 insert into "Comment"(username, endpoint, id_reply, content, files) values ('a', 'a', null, 'a', '{}');
 insert into "Notify" (endpoint, username, content) values ('a', 'a', 'ê');
 insert into "Genre" (endpoint, title) values ('manga', 'Manga');
-insert into "BookGenres" values ('one-punch-man', 'action');
+insert into "BookGenres" values ('one-punch-man', 'comedy');
 insert into "Report" (endpoint, type, reason) values ('a', 'A', 'a') returning *;
-
-delete from "Comment" where id = 1;
 
 drop table "BookGenres";
 drop table "Genre";
@@ -263,16 +269,26 @@ drop table "Account";
 drop table "Book";
 
 
-update "Genre" set description = 'truyện tranh nhật' where endpoint = 'manga';
-
-
 select * from (select * from "Book" b where endpoint = 'one-punch-man' limit 1) b,
 (select json_agg(jsonb_build_object('endpoint', endpoint,
                                     'title', btrim(title),
                                     'description', btrim(description))) genres
 from "Genre" g,
      (select * from "BookGenres" where book_endpoint = 'one-punch-man') bg
-where g.endpoint = bg.genre_endpoint) g;
+where g.endpoint = bg.genre_endpoint) g,
+(select count(username) follow from "BookFollows" where book_endpoint = 'one-punch-man') n;
+
+select  * from "Account";
+
+update "Report" set status = 0, num = num + 1,
+                    time = localtimestamp at time zone 'GMT+7', reason = reason + '\n' + time + '\nreason'
+where endpoint = 'a' and type = 'C' returning *;
+
+update "Report" set reason = 'reason\nreason' where endpoint = 'a' returning *;
+
+delete from "Report" where true;
+alter table "Account" add constraint status_constraint check ( status = any ('{1,0,-1}'::smallint[]));
+
 
 
 

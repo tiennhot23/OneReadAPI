@@ -27,21 +27,33 @@ module.exports = {
         status_constraint: 'Trạng thái của report là 0: chưa xử lí hoặc 1: đã xử lí'
     },
     file:{
-        not_exist: 'File not exist',
-        choose_file: 'BAD REQUEST: please choose files'
+        not_exist: 'File không tồn tại',
+        choose_file: 'Vui lòng chọn file'
     },
     user:{
-        not_found: 'User not found',
-        not_empty: 'BAD REQUEST: please fill required fields',
-        incorrect_account: 'ERROR: username and password not correct',
-        can_not_follow_user: 'Can not follow current user',
-        can_not_unfollow_user: 'Can not unfollow current user',
+        not_found: 'User không tồn tại',
+        missing_username: 'Thiếu username',
+        missing_password: 'Thiếu password',
+        missing_avatar: 'Thiếu avatar',
+        missing_email: 'Thiếu email',
+        missing_status: 'Thiếu status',
+        incorrect_account: 'Username và password không trùng khớp',
+        email_exist: 'Email đã được sử dụng',
+        email_veified: 'Email đã được xác minh',
+        can_not_follow_book: 'Không thể follow sách',
+        can_not_unfollow_book: 'Không thể unfollow sách',
+        account_pk: 'Username đã được sử dụng',
+        status_constraint: 'Trạng thái của user là -1: banned, 1: default',
+        role_constraint: 'Quyền của user là 0: user hoặc 1: admin'
     },
     auth:{
-        unauthorized: 'UNAUTHORIZED: You need login to do this action',
-        forbidden: 'FORBIDDEN: You need permission to do this action'
+        unauthorized: 'Cần tài khoản để có thể thực hiện chức năng này',
+        forbidden: 'Tài khoản không được phép thực hiện chức năng này',
+        verify_email: 'Vui lòng vào email vừa đăng kí để xác minh',
+        token_expired: 'Token này đã hết hạn sử dụng',
+        token_invalid: 'Token không khả dụng'
     },
     encypt:{
-        password_required: 'Password required'
+        password_required: 'Yêu cầu password'
     }
 }

@@ -1,0 +1,35 @@
+### đăng nhập
+POST http://localhost:3000/user/login
+Content-Type: application/json
+
+{
+    "username": "sai",
+    "password": "123"
+}
+
+### đăng kí tài khoản với role luôn mặc định là 0
+POST http://localhost:3000/user/register
+Content-Type: application/json
+
+{
+    "username": "sai",
+    "password": "123",
+    "email": "imagesaitama@gmail.com"
+}
+
+
+### gủi link xác thực email
+POST http://localhost:3000/user/verify-email
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJuYW1lIjoic2FpIiwiYXZhdGFyIjoiaHR0cHM6Ly90aHVtYnMuZHJlYW1zdGltZS5jb20vYi9kZWZhdWx0LWF2YXRhci1wcm9maWxlLWljb24tc29jaWFsLW1lZGlhLXVzZXItdmVjdG9yLWRlZmF1bHQtYXZhdGFyLXByb2ZpbGUtaWNvbi1zb2NpYWwtbWVkaWEtdXNlci12ZWN0b3ItcG9ydHJhaXQtMTc2MTk0ODc2LmpwZyIsImVtYWlsIjoiaW1hZ2VzYWl0YW1hQGdtYWlsLmNvbSIsInN0YXR1cyI6MCwicm9sZSI6MCwicGFzc3dvcmQiOiIifSwiaWF0IjoxNjQwNjMxODk2LCJleHAiOjE2NDA3MTgyOTZ9.3pdSW2wwZ88cjd7uP3LEB7I9LLiVc7M_25p6nn77_TM
+Content-Type: application/json
+
+{
+    "username": "sai"
+}
+
+###
+http://localhost:3000/user/verify-email?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJuYW1lIjoic2FpIiwiYXZhdGFyIjoiaHR0cHM6Ly90aHVtYnMuZHJlYW1zdGltZS5jb20vYi9kZWZhdWx0LWF2YXRhci1wcm9maWxlLWljb24tc29jaWFsLW1lZGlhLXVzZXItdmVjdG9yLWRlZmF1bHQtYXZhdGFyLXByb2ZpbGUtaWNvbi1zb2NpYWwtbWVkaWEtdXNlci12ZWN0b3ItcG9ydHJhaXQtMTc2MTk0ODc2LmpwZyIsImVtYWlsIjoiaW1hZ2VzYWl0YW1hQGdtYWlsLmNvbSIsInN0YXR1cyI6MCwicm9sZSI6MCwicGFzc3dvcmQiOiIifSwiaWF0IjoxNjQwNjMxODk2LCJleHAiOjE2NDA3MTgyOTZ9.3pdSW2wwZ88cjd7uP3LEB7I9LLiVc7M_25p6nn77_TM
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJuYW1lIjoic2FpIiwiYXZhdGFyIjoiaHR0cHM6Ly90aHVtYnMuZHJlYW1zdGltZS5jb20vYi9kZWZhdWx0LWF2YXRhci1wcm9maWxlLWljb24tc29jaWFsLW1lZGlhLXVzZXItdmVjdG9yLWRlZmF1bHQtYXZhdGFyLXByb2ZpbGUtaWNvbi1zb2NpYWwtbWVkaWEtdXNlci12ZWN0b3ItcG9ydHJhaXQtMTc2MTk0ODc2LmpwZyIsImVtYWlsIjoiaW1hZ2VzYWl0YW1hQGdtYWlsLmNvbSIsInN0YXR1cyI6MCwicm9sZSI6MCwicGFzc3dvcmQiOiIifSwiaWF0IjoxNjQwNjMxODk2LCJleHAiOjE2NDA3MTgyOTZ9.3pdSW2wwZ88cjd7uP3LEB7I9LLiVc7M_25p6nn77_TM
+
+### lấy thông tin user gồm username, avatar, email, status
+GET http://localhost:3000/user/info/sai

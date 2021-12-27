@@ -9,7 +9,7 @@ db.get = (endpoint, type) => {
         var params = [endpoint, type]
         conn.query(query, params, (err, res) => {
             if (err) return reject(err)
-            return resolve(res.rows[0])
+            else return resolve(res.rows[0])
         })
     })
 }
@@ -20,7 +20,7 @@ db.list = () => {
 
         conn.query(query, (err, res) => {
             if(err) return reject(err)
-            return resolve(res.rows)
+            else return resolve(res.rows)
         })
     })
 }
@@ -33,7 +33,7 @@ db.add = (report) => {
 
         conn.query(query, params, (err, res) => {
             if (err) return reject(err)
-            return resolve(res.rows[0])
+            else return resolve(res.rows[0])
         })
     })
 }
@@ -45,7 +45,7 @@ db.update_status = (report, status) => {
 
         conn.query(query, params, (err, res) => {
             if (err) return reject(err)
-            return resolve(res.rows[0])
+            else return resolve(res.rows[0])
         })
     })
 }
@@ -60,7 +60,7 @@ db.add_exist = (report) => {
 
         conn.query(query, params, (err, res) => {
             if (err) return reject(err)
-            return resolve(res.rows[0])
+            else return resolve(res.rows[0])
         })
     })
 }
@@ -73,7 +73,7 @@ db.delete = (endpoint, type) => {
 
         conn.query(query, params, (err, res) => {
             if (err) return reject(err)
-            return resolve(res.rows[0])
+            else return resolve(res.rows[0])
         })
     })
 }
@@ -84,7 +84,7 @@ db.deleteRead = () => {
 
         conn.query(query, (err, res) => {
             if (err) return reject(err)
-            return resolve(res.rows[0])
+            else return resolve(res.rows[0])
         })
     })
 }
