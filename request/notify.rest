@@ -1,0 +1,21 @@
+### thêm notify
+POST http://localhost:3000/notify/
+Content-Type: application/json
+
+{
+    "endpoint": "a",
+    "username": "A",
+    "content": "no content"
+}
+
+### xoá notify
+DELETE http://localhost:3000/notify/a
+
+### xoá các notify đã được xử lí
+DELETE http://localhost:3000/notify/read-notify
+
+### lấy thông tin notify
+GET http://localhost:3000/notify/a
+
+### Lấy danh sách notify
+GET http://localhost:3000/notify/all
