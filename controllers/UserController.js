@@ -256,6 +256,56 @@ user.add = (user) => {
     })
 }
 
+user.update = (user) => {
+    return new Promise((resolve, reject) => {
+        let num = 1
+        let params = []
+        let query = 'update "Account" set '
+        if (user.avatar) {
+            if (num > 1) query += ','
+            query += ' avatar = $' + num
+            num += 1
+            params.push(user.avatar)
+        }
+        if (user.password) {
+            if (num > 1) query += ','
+            query += ' password = $' + num
+            num += 1
+            params.push(user.password)
+        }
+        if (user.email) {
+            if (num > 1) query += ','
+            query += ' email = $' + num + ', status = 0'
+            num += 1
+            params.push(user.email)
+        }
+        if (user.status) {
+            if (num > 1) query += ','
+            query += ' status = $' + num
+            num += 1
+            params.push(user.status)
+        }
+        if (user.role) {
+            if (num > 1) query += ','
+            query += ' role = $' + num
+            num += 1
+            params.push(user.role)
+        }
+        query += ' where username = $' + num + ' returning *'
+        params.push(user.username)
+        if (num == 1) return resolve(null)
+        else {
+            conn.query(query, params, (err, res) => {
+                if (err) {
+                    return reject(err)
+                } else {
+                    return resolve(res.rows[0])
+                }
+            })
+        }
+    })
+}
+
 
 
 // user.is_following = (user, username) => {

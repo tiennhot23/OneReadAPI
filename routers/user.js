@@ -13,6 +13,46 @@ const mail = require('../middlewares/mail')
 
 const router = express.Router()
 
+router.get('/verify-email', auth.verifyUser, async (req, res, next) => {
+    var user = req.user
+    const token = req.query.token
+
+    try{
+        // if(!bcrypt.compareSync(user.username, token)){
+        //     return res.status(404).json({message: message.auth.token_invalid})
+        // }else{
+        //     return res.status(404).json({message: message.user.email_veified})
+        // }
+
+        var data = await UserController.get_data_from_token(token)
+        if (data.username && data.email 
+            && user.username == data.username && user.email == data.email) {
+                user = await UserController.verify_email(data.username)
+                return res.status(200).json({message: message.user.email_veified})
+        } else {
+            return res.status(404).json({message: message.user.not_found})
+        }
+    }catch (err){
+        res.status(500).json({message: err.message})
+    }
+})
+
+router.get('/info/:username', async (req, res, next) => {
+    let username = req.params.username
+    var user
+    try {
+        if (username) {
+            user = await UserController.get(username)
+            if (user) res.status(200).json(user)
+            else res.status(404).json({message: message.user.not_found})
+        } else {
+            res.status(400).json({message: message.user.missing_username})
+        }
+    } catch (err) {
+        res.status(500).json({message: err.message})
+    }
+})
+
 router.post('/login', async (req, res, next) => {
     var user = req.body
 
@@ -118,46 +158,69 @@ router.post('/verify-email', auth.verifyUser, async (req, res, next) => {
     }
 })
 
-
-router.get('/verify-email', auth.verifyUser, async (req, res, next) => {
-    var user = req.user
-    const token = req.query.token
+router.patch('/:username', async (req, res, next) => {
+    var user = {
+        username: req.params.username,
+        email: req.body.email,
+        avatar: req.body.avatar
+    }
 
     try{
-        // if(!bcrypt.compareSync(user.username, token)){
-        //     return res.status(404).json({message: message.auth.token_invalid})
-        // }else{
-        //     return res.status(404).json({message: message.user.email_veified})
-        // }
+        user = await UserController.update(user)
+        return res.status(200).json(user)
+    }catch (err){
+        return res.status(500).json({message: err.message})
+    }
+})
 
-        var data = await UserController.get_data_from_token(token)
-        if (data.username && data.email 
-            && user.username == data.username && user.email == data.email) {
-                user = await UserController.verify_email(data.username)
-                return res.status(200).json({message: message.user.email_veified})
+router.patch('/up-role/:username', async (req, res, next) => {
+    var user = {
+        username: req.params.username,
+        role: req.body.role
+    }
+
+    try{
+        if (!user.role) {
+            return res.status(400).json({message: message.user.missing_role})
         } else {
-            return res.status(404).json({message: message.user.not_found})
+            user = await UserController.update(user)
+            return res.status(200).json(user)
         }
     }catch (err){
-        res.status(500).json({message: err.message})
+        return res.status(500).json({message: err.message})
+    }
+
+})
+
+router.patch('/change-password/:username', encrypt.hash, async (req, res, next) => {
+    var user = {
+        username: req.params.username,
+        password: req.body.password
+    }
+
+    try{
+        if (!user.password) {
+            return res.status(400).json({message: message.user.missing_password})
+        } else {
+            user = await UserController.update(user)
+            return res.status(200).json(user)
+        }
+    }catch (err){
+        return res.status(500).json({message: err.message})
     }
 })
 
-router.get('/info/:username', async (req, res, next) => {
-    let username = req.params.username
-    var user
-    try {
-        if (username) {
-            user = await UserController.get(username)
-            if (user) res.status(200).json(user)
-            else res.status(404).json({message: message.user.not_found})
-        } else {
-            res.status(400).json({message: message.user.missing_username})
-        }
-    } catch (err) {
-        res.status(500).json({message: err.message})
-    }
-})
+// router.patch('/ban/:username', async (req, res, next) => {
+//     var user = req.body
+//     user.username = req.params.username
+
+//     try{
+//         user = UserController.update(user)
+//         return res.status(200).json(user)
+//     }catch (err){
+//         res.status(500).json({message: err.message})
+//     }
+// })
 
 // router.post('/follow-user', auth.verifyuser, async (req, res, next) => {
 //     const username = req.body.username
