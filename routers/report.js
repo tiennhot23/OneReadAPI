@@ -16,17 +16,21 @@ router.get('/all', async (req, res, next) => {
     }
 })
 
-router.get('/:type/:endpoint', async (req, res, next) => {
-    let type = req.params.type
-    let endpoint = req.params.endpoint
-    var report
+router.patch('/:type/:endpoint', async (req, res, next) => {
+    var report = {
+        type: req.params.type,
+        endpoint: req.params.endpoint,
+        status: req.body.status
+    }
     try {
-        if (!endpoint) {
+        if (!report.endpoint) {
             res.status(400).json({message: message.report.missing_endpoint})
-        } else if (!type) {
+        } else if (!report.type) {
             res.status(400).json({message: message.report.missing_type})
+        } else if (!report.status) {
+            res.status(400).json({message: message.report.missing_status})
         } else {
-            report = await ReportController.get(endpoint, type)
+            report = await ReportController.update_status(report)
             if (report) res.status(200).json(report)
             else res.status(404).json({message: message.report.not_found})
         }

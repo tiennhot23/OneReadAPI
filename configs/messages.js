@@ -21,10 +21,21 @@ module.exports = {
         missing_endpoint: 'Thiếu endpoint',
         missing_type: 'Thiếu loại report',
         missing_reason: 'Thiếu lí do',
+        missing_status: 'Thiếu status',
         not_found: 'Không tìm thấy report',
         report_pk: 'Report này đã tồn tại',
         type_constraint: 'Loại report chỉ có thể là "A": report account hoặc "C": report comment',
         status_constraint: 'Trạng thái của report là 0: chưa xử lí hoặc 1: đã xử lí'
+    },
+    notify: {
+        missing_endpoint: 'Thiếu endpoint',
+        missing_username: 'Thiếu username',
+        missing_content: 'Thiếu nội dung',
+        missing_status: 'Thiếu status',
+        not_found: 'Không tìm thấy thông báo',
+        notify_pk: 'Thông báo này đã tồn tại',
+        username_fk: 'User này không tồn tại',
+        status_constraint: 'Trạng thái của thông báo là 0: chưa xem hoặc 1: đã xem'
     },
     file:{
         not_exist: 'File không tồn tại',

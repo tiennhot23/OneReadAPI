@@ -15,7 +15,12 @@ DELETE http://localhost:3000/report/A/a
 DELETE http://localhost:3000/report/read-report
 
 ### lấy thông tin report
-GET http://localhost:3000/report/A/a
+PATCH http://localhost:3000/report/A/a
+Content-Type: application/json
+
+{
+    "status": "1"
+}
 
 ### Lấy danh sách report
 GET http://localhost:3000/report/all

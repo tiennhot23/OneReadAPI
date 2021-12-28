@@ -38,9 +38,9 @@ db.add = (report) => {
     })
 }
 
-db.update_status = (report, status) => {
+db.update_status = (report) => {
     return new Promise((resolve, reject) => {
-        let params = [status, report.endpoint, report.type]
+        let params = [report.status, report.endpoint, report.type]
         let query = 'update "Report" set status = $1 where endpoint = $2 and type = $3 returning *'
 
         conn.query(query, params, (err, res) => {
