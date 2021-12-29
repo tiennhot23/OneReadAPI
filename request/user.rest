@@ -12,9 +12,9 @@ POST http://localhost:3000/user/register
 Content-Type: application/json
 
 {
-    "username": "sai",
+    "username": "genos",
     "password": "123",
-    "email": "imagesaitama@gmail.com"
+    "email": "genos@gmail.com"
 }
 
 
@@ -26,6 +26,10 @@ Content-Type: application/json
 {
     "username": "sai"
 }
+
+### ban/unban user
+POST http://localhost:3000/user/ban/genos
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJuYW1lIjoic2FpIiwiYXZhdGFyIjoiaHR0cHM6Ly90aHVtYnMuZHJlYW1zdGltZS5jb20vYi9kZWZhdWx0LWF2YXRhci1wcm9maWxlLWljb24tc29jaWFsLW1lZGlhLXVzZXItdmVjdG9yLWRlZmF1bHQtYXZhdGFyLXByb2ZpbGUtaWNvbi1zb2NpYWwtbWVkaWEtdXNlci12ZWN0b3ItcG9ydHJhaXQtMTc2MTk0ODc2LmpwZyIsImVtYWlsIjoiaW1hZ2VzYWl0YW1hQGdtYWlsLmNvbSIsInN0YXR1cyI6MCwicm9sZSI6MSwicGFzc3dvcmQiOiIifSwiaWF0IjoxNjQwNzY3MzkyLCJleHAiOjE2NDA4NTM3OTJ9.rIkylavElleVjt_FoTgP3KD73Uyo24b1fwSPMeVIQD4
 
 ### cập nhật thông tin user
 PATCH http://localhost:3000/user/sai

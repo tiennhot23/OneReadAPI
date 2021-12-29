@@ -38,6 +38,7 @@ module.exports = {
         status_constraint: 'Trạng thái của thông báo là 0: chưa xem hoặc 1: đã xem',
         tag_notification: 'Hú hú!! Bạn vừa được ai đó nhắc đến trong comment',
         ban_notication: 'Oops! Chúc mừng bạn đã quay vào ô cấm vô thời hạn',
+        unban_notification: 'Okay, you are free now',
         book_finish_notification: 'Oh yeah! Sách mà bạn đang theo dõi đã hoàn thành rồi đấy. Đọc ngay nào...',
         new_chapter_notification: 'Đã có chương mới nhất rồi kìa, đọc ngay cho nóng!!'
     },
@@ -68,6 +69,8 @@ module.exports = {
         email_veified: 'Email đã được xác minh',
         can_not_follow_book: 'Không thể follow sách',
         can_not_unfollow_book: 'Không thể unfollow sách',
+        can_not_ban_user: 'Không thể ban user này',
+        can_not_unban_user: 'Không thể unban user này',
         account_pk: 'Username đã được sử dụng',
         status_constraint: 'Trạng thái của user là -1: banned, 1: default',
         role_constraint: 'Quyền của user là 0: user hoặc 1: admin'

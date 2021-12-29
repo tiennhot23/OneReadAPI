@@ -4,6 +4,7 @@ const bcrypt = require('bcrypt')
 
 const UserController = require('../controllers/UserController')
 const TokenController = require('../controllers/TokenController')
+const NotifyController = require('../controllers/NotifyController')
 const upload = require('../middlewares/upload')
 const encrypt = require('../middlewares/encrypt')
 const auth = require('../middlewares/auth')
@@ -158,6 +159,81 @@ router.post('/verify-email', auth.verifyUser, async (req, res, next) => {
     }
 })
 
+router.post('/ban/:username', auth.verifyAdmin, async (req, res, next) => {
+    var user = {
+        username: req.params.username,
+        status: '-1'
+    }
+    try{
+        if (user.username == req.user.username) {
+            return res.status(403).json({message: message.user.can_not_ban_user})
+        }
+        user = await UserController.update(user)
+        if (user) {
+            let notify = {
+                endpoint: `*ban*${user.username}`,
+                username: user.username,
+                content: message.notify.ban_notication
+            }
+            await NotifyController.add(notify)
+        } else {
+            res.status(404).json({message: message.user.not_found})
+        }
+        return res.status(200).json(user)
+    }catch (err){
+        if (err.constraint){
+            switch (err.constraint) {
+                case 'account_pk': {
+                    res.status(400).json({message: message.user.account_pk})
+                    break
+                }
+                case 'notify_pk': {
+                    return res.status(200).json(user)
+                    break
+                }
+                case 'role_constraint': {
+                    res.status(400).json({message: message.user.role_constraint})
+                    break
+                }
+                case 'status_constraint': {
+                    res.status(400).json({message: message.user.status_constraint})
+                    break
+                }
+                default: {
+                    res.status(500).json({message: err.message})
+                    break
+                }
+            }
+        } else res.status(500).json({message: err.message})
+    }
+})
+
+router.post('/unban/:username', auth.verifyAdmin, async (req, res, next) => {
+    var user = {
+        username: req.params.username,
+        status: '0'
+    }
+    try{
+        if (user.username == req.user.username) {
+            return res.status(403).json({message: message.user.can_not_unban_user})
+        }
+        user = await UserController.update(user)
+        if (user) {
+            let notify = {
+                endpoint: `*unban*${user.username}`,
+                username: user.username,
+                content: message.notify.unban_notification
+            }
+            await NotifyController.add(notify)
+        } else {
+            res.status(404).json({message: message.user.not_found})
+        }
+        return res.status(200).json(user)
+    }catch (err){
+        res.status(500).json({message: err.message})
+    }
+})
+
 router.patch('/:username', async (req, res, next) => {
     var user = {
         username: req.params.username,
@@ -210,17 +286,7 @@ router.patch('/change-password/:username', encrypt.hash, async (req, res, next) 
     }
 })
 
-// router.patch('/ban/:username', async (req, res, next) => {
-//     var user = req.body
-//     user.username = req.params.username
 
-//     try{
-//         user = UserController.update(user)
-//         return res.status(200).json(user)
-//     }catch (err){
-//         res.status(500).json({message: err.message})
-//     }
-// })
 
 // router.post('/follow-user', auth.verifyuser, async (req, res, next) => {
 //     const username = req.body.username

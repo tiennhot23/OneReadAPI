@@ -57,7 +57,6 @@ router.post('/', async (req, res, next) => {
                         username: tag,
                         content: message.notify.tag_notification
                     }
-                    console.log(notify)
                     await NotifyController.add(notify)
                 }
             })
