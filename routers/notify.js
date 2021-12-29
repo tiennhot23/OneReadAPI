@@ -43,7 +43,7 @@ router.get('/:endpoint', auth.verifyUser, async (req, res, next) => {
  * @body {endpoint, username, content}
  * @returns notify
  */
-router.post('/', auth.verifyUser, slugify.get_endpoint, async (req, res, next) => {
+router.post('/', auth.verifyUser, async (req, res, next) => {
     var notify = req.body
     try {
         if (!notify.endpoint) {
@@ -64,7 +64,7 @@ router.post('/', auth.verifyUser, slugify.get_endpoint, async (req, res, next) =
                     break
                 }
                 case 'username_fk': {
-                    res.status(400).json({message: message.notify.type_constraint})
+                    res.status(400).json({message: message.notify.username_fk})
                     break
                 }
                 case 'status_constraint': {
@@ -77,6 +77,21 @@ router.post('/', auth.verifyUser, slugify.get_endpoint, async (req, res, next) =
                 }
             }
         } else res.status(500).json({message: err.message})
+    }
+})
+
+/**
+ * xoá các notify đã đọc
+ * @body 
+ * @returns notifys
+ */
+ router.delete('/read-notify', async (req, res, next) => {
+    let notifys
+    try {
+        notifys = await NotifyController.deleteRead()
+        res.status(200).json(notifys)
+    } catch (err) {
+        res.status(500).json({message: err.message})
     }
 })
 
@@ -98,19 +113,6 @@ router.post('/', auth.verifyUser, slugify.get_endpoint, async (req, res, next) =
     }
 })
 
-/**
- * xoá các notify đã đọc
- * @body 
- * @returns notifys
- */
- router.delete('/read-notify', async (req, res, next) => {
-    let notifys
-    try {
-        notifys = await NotifyController.deleteRead()
-        res.status(200).json(notifys)
-    } catch (err) {
-        res.status(500).json({message: err.message})
-    }
-})
+
 
 module.exports = router

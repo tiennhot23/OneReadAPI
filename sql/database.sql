@@ -167,7 +167,7 @@ create table "Comment"
                 on delete cascade,
 	content text not null,
 	time timestamp not null default (localtimestamp at time zone 'GMT+7'),
-	files varchar[] not null
+	files varchar[]
 );
 
 create table "Notify"

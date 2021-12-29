@@ -35,7 +35,21 @@ module.exports = {
         not_found: 'Không tìm thấy thông báo',
         notify_pk: 'Thông báo này đã tồn tại',
         username_fk: 'User này không tồn tại',
-        status_constraint: 'Trạng thái của thông báo là 0: chưa xem hoặc 1: đã xem'
+        status_constraint: 'Trạng thái của thông báo là 0: chưa xem hoặc 1: đã xem',
+        tag_notification: 'Hú hú!! Bạn vừa được ai đó nhắc đến trong comment',
+        ban_notication: 'Oops! Chúc mừng bạn đã quay vào ô cấm vô thời hạn',
+        book_finish_notification: 'Oh yeah! Sách mà bạn đang theo dõi đã hoàn thành rồi đấy. Đọc ngay nào...',
+        new_chapter_notification: 'Đã có chương mới nhất rồi kìa, đọc ngay cho nóng!!'
+    },
+    comment: {
+        missing_endpoint: 'Thiếu endpoint',
+        missing_username: 'Thiếu username',
+        missing_content: 'Thiếu nội dung',
+        missing_root_comment: 'Thiếu comment gốc',
+        not_found: 'Không tìm thấy thông báo',
+        comment_pk: 'Thông báo này đã tồn tại',
+        username_fk: 'User này không tồn tại',
+        reply_constraint: 'Comment gốc không tồn tại',
     },
     file:{
         not_exist: 'File không tồn tại',

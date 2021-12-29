@@ -7,6 +7,7 @@ const book = require('./routers/book')
 const report = require('./routers/report')
 const user = require('./routers/user')
 const notify = require('./routers/notify')
+const comment = require('./routers/comment')
 
 require('dotenv').config()
 
@@ -32,6 +33,7 @@ app.use('/book', book)
 app.use('/report', report)
 app.use('/user', user)
 app.use('/notify', notify)
+app.use('/comment', comment)
 
 app.listen(port, () => console.log(`Listening on port ${port}`))
 
