@@ -22,6 +22,18 @@ db.get = (endpoint) => {
     })
 }
 
+db.get_user_follow = (book_endpoint) => {
+    return new Promise((resolve, reject) => {
+        let query = `select * from "BookFollows" where book_endpoint = $1`
+
+        var params = [book_endpoint]
+        conn.query(query, params, (err, res) => {
+            if (err) return reject(err)
+            return resolve(res.rows)
+        })
+    })
+}
+
 db.list = (filter, page) => {
     return new Promise((resolve, reject) => {
         let num = 1

@@ -3,6 +3,9 @@ const express = require('express')
 const router = express.Router()
 const ChapterController = require('../controllers/ChapterController')
 const TransactionController = require('../controllers/TransactionContoller')
+const UserController = require('../controllers/UserController')
+const NotifyController = require('../controllers/NotifyController')
+const BookController = require('../controllers/BookController')
 const slugify = require('../middlewares/slugify')
 const message = require('../configs/messages')
 
@@ -56,6 +59,15 @@ router.post('/', slugify.get_endpoint, async (req, res, next) => {
             let images = await ChapterController.add_chapter_detail(chapter)
             chapter.images = images.images
             await TransactionController.commit()
+            var followers = await BookController.get_user_follow(chapter.book_endpoint)
+            followers.forEach(async (user) => {
+                let notify = {
+                    endpoint: `*chapter*${chapter.book_endpoint}*${chapter.chapter_endpoint}`,
+                    username: user.username,
+                    content: message.notify.new_chapter_notification
+                }
+                await NotifyController.add(notify)
+            })
             return res.status(200).json(chapter)
         }
     } catch (err) {

@@ -51,7 +51,7 @@ module.exports = {
         ban_notication: 'Oops! Chúc mừng bạn đã quay vào ô cấm vô thời hạn',
         unban_notification: 'Okay, you are free now',
         book_finish_notification: 'Oh yeah! Sách mà bạn đang theo dõi đã hoàn thành rồi đấy. Đọc ngay nào...',
-        new_chapter_notification: 'Đã có chương mới nhất rồi kìa, đọc ngay cho nóng!!'
+        new_chapter_notification: 'Sách bạn đang follow có chương mới nhất rồi kìa, đọc ngay cho nóng!!'
     },
     comment: {
         missing_endpoint: 'Thiếu endpoint',
