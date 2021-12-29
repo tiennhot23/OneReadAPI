@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 
 const UserController = require('../controllers/UserController')
-const TokenController = require('../controllers/TokenController')
+const HistoryController = require('../controllers/HistoryController')
 const NotifyController = require('../controllers/NotifyController')
 const upload = require('../middlewares/upload')
 const encrypt = require('../middlewares/encrypt')
@@ -77,6 +77,21 @@ router.get('/comment_history', auth.verifyUser, async (req, res, next) => {
             res.status(400).json({message: message.user.missing_username})
         } else {
             books = await UserController.get_comment_history(username)
+            res.status(200).json(books)
+        }
+    } catch (err) {
+        res.status(500).json({message: err.message})
+    }
+})
+
+router.get('/history', auth.verifyUser, async (req, res, next) => {
+    let username = req.user.username
+    var books
+    try {
+        if (!username) {
+            res.status(400).json({message: message.user.missing_username})
+        } else {
+            books = await HistoryController.list(username)
             res.status(200).json(books)
         }
     } catch (err) {
@@ -372,107 +387,41 @@ router.delete('/:username', auth.verifyUser, async (req, res, next) => {
     }
 })
 
+router.delete('/history/all', auth.verifyUser, async (req, res, next) => {
+    var history = {
+        username: req.user.username
+    }
 
+    try{
+        if (!history.username) {
+            return res.status(400).json({message: message.user.missing_username})
+        } else {
+            history = await HistoryController.delete_all(history)
+            if (history && history.length > 0) return res.status(200).json(history)
+            else return res.status(404).json({message: message.user.no_history_found})
+        }
+    }catch (err){
+        return res.status(500).json({message: err.message})
+    }
+})
 
+router.delete('/history/single/:book_endpoint', auth.verifyUser, async (req, res, next) => {
+    var history = {
+        book_endpoint: req.params.book_endpoint,
+        username: req.user.username
+    }
 
-
-
-// /**
-//  * @body    {
-//  *              "article-slug": slug of article star
-//  *          }
-//  * @returns {
-//                 "user": {
-//                     "n": number of document found
-//                     "nModified": number of document has been modified
-//                     "ok": 1 (success), 0 (fail)
-//                 },
-//                 "article": {
-//                     "n": 1,
-//                     "nModified": 1,
-//                     "ok": 1
-//                 }
-//             }
-//  */
-// router.post('/star-article', auth.verifyuser, async (req, res, next) => {
-//     const slug = req.body.slug
-//     var currentuser = await UserController.get_user(req.user.user.username)
-//     if(!slug) return res.status(400).json({message: message.Article.not_found})
-//     try{
-//         var user = await UserController.star(currentuser, slug)
-//         if(user.nModified == 0) return res.status(200).json({message: message.Article.stared})
-//         var article = await ArticleController.get_one(slug)
-//         article = await ArticleController.star(article)
-//         res.status(200).json({user, article})
-//     }catch(err){
-//         res.status(500).json({message: err.message})
-//     }
-// })
-
-// /**
-//  * @body    {
-//  *              "username": username of unfollowed user
-//  *          }
-//  * @returns {
-//                 "userfollower": {
-//                     "n": number of document found
-//                     "nModified": number of document has been modified
-//                     "ok": 1 (success), 0 (fail)
-//                 },
-//                 "userfollowing": {
-//                     "n": 1,
-//                     "nModified": 1,
-//                     "ok": 1
-//                 }
-//             }
-//  */
-// router.post('/unfollow-user', auth.verifyuser, async (req, res, next) => {
-//     const username = req.body.username
-//     var currentuser = await UserController.get_user(req.user.user.username)
-//     if(!username) return res.status(400).json({message: message.user.not_found})
-//     if(username === currentuser.username) return res.status(500).json({message: message.user.can_not_unfollow_user})
-//     try{
-//         var userfollower = await UserController.get_user(username)
-//         if(!userfollower) return res.status(500).json({message: message.user.can_not_unfollow_user})
-//         userfollower = await UserController.unfollower(userfollower, currentuser.username)
-//         var userfollowing = await UserController.unfollowing(currentuser, username)
-//         res.status(200).json({userfollower, userfollowing})
-//     }catch(err){
-//         res.status(500).json({message: err.message})
-//     }
-// })
-            
-            
-//             /**
-//              * @body    {
-//              *              "article-slug": slug of article unstar
-//              *          }
-//              * @returns {
-//                             "user": {
-//                                 "n": number of document found
-//                                 "nModified": number of document has been modified
-//                                 "ok": 1 (success), 0 (fail)
-//                             },
-//                             "article": {
-//                                 "n": 1,
-//                                 "nModified": 1,
-//                                 "ok": 1
-//                             }
-//                         }
-//              */
-// router.post('/unstar-article', auth.verifyuser, async (req, res, next) => {
-//     const slug = req.body.slug
-//     var currentuser = await UserController.get_user(req.user.user.username)
-//     if(!slug) return res.status(400).json({message: message.Article.not_found})
-//     try{
-//         var user = await UserController.unstar(currentuser, slug)
-//         if(user.nModified == 0) return res.status(200).json({message: message.Article.not_stared})
-//         var article = await ArticleController.get_one(slug)
-//         article = await ArticleController.unstar(article)
-//         res.status(200).json({user, article})
-//     }catch(err){
-//         res.status(500).json({message: err.message})
-//     }
-// })
+    try{
+        if (!history.username) {
+            return res.status(400).json({message: message.user.missing_username})
+        } else {
+            history = await HistoryController.delete(history)
+            if (history) return res.status(200).json(history)
+            else return res.status(404).json({message: message.book.not_found})
+        }
+    }catch (err){
+        return res.status(500).json({message: err.message})
+    }
+})
 
 module.exports = router

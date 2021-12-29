@@ -33,7 +33,6 @@ router.get('/:book_endpoint/:chapter_endpoint', async (req, res, next) => {
                 const token = authHeader && authHeader.split(' ')[1]
                 if (token) {
                     var user = await UserController.get_data_from_token(token)
-                    console.log(user)
                     var history = {
                         book_endpoint: book_endpoint,
                         chapter_endpoint: chapter_endpoint,
@@ -44,7 +43,6 @@ router.get('/:book_endpoint/:chapter_endpoint', async (req, res, next) => {
                     } else {
                         history = await HistoryController.add(history)
                     }
-                    console.log(history)
                 }
                 res.status(200).json(chapter)
             }

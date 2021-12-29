@@ -70,4 +70,16 @@ db.delete = (history) => {
     })
 }
 
+db.delete_all = (history) => {
+    return new Promise((resolve, reject) => {
+        let query = `delete from "History" where username = $1 returning *`
+
+        var params = [history.username]
+        conn.query(query, params, (err, res) => {
+            if (err) return reject(err)
+            else return resolve(res.rows)
+        })
+    })
+}
+
 module.exports = db;

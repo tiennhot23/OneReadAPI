@@ -69,6 +69,7 @@ module.exports = {
     },
     user:{
         not_found: 'User không tồn tại',
+        no_history_found: 'Không tìm thấy lịch sử xem nào',
         missing_username: 'Thiếu username',
         missing_password: 'Thiếu password',
         missing_avatar: 'Thiếu avatar',
