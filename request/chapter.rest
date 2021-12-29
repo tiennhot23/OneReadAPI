@@ -1,0 +1,27 @@
+### thêm chapter
+POST http://localhost:3000/chapter/
+Content-Type: application/json
+
+{
+    "title": "Chapter 2",
+    "book_endpoint": "one-piece",
+    "images": ["aa","aaaaa"]
+}
+
+### cập nhật chapter
+PATCH http://localhost:3000/chapter/one-shot
+Content-Type: application/json
+
+{
+    "book_endpoint": "one-piece",
+    "title": "Chapter 1"
+}
+
+### xoá chapter
+DELETE http://localhost:3000/chapter/one-piece/chapter-2
+
+### lấy thông tin chapter
+GET http://localhost:3000/chapter/one-piece/chapter-2
+
+### Lấy danh sách chapter
+GET http://localhost:3000/chapter/one-piece/all

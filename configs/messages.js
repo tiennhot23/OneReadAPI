@@ -17,6 +17,17 @@ module.exports = {
         exist: 'Thể loại này đã tồn tại',
         genre_pk: 'Tên thể loại bị trùng'
     },
+    chapter:{
+        missing_title: 'Thiếu title',
+        missing_images: 'Thiếu images',
+        missing_chapter_endpoint: 'Thiếu endpoint',
+        missing_book_endpoint: 'Thiếu endpoint của sách',
+        not_found: 'Chapter này không tồn tại',
+        exist: 'Chapter này đã tồn tại',
+        chapter_pk: 'Chapter bị trùng',
+        chapter_detail_fk: 'Chapter bị trùng',
+        book_fk: 'Sách này không tồn tại'
+    },
     report: {
         missing_endpoint: 'Thiếu endpoint',
         missing_type: 'Thiếu loại report',
