@@ -56,174 +56,39 @@ user.verify_email = (username) => {
     })
 }
 
-/**
- * 
- * @param {User} user 
- * @param {string} username 
- * @returns {
-                "userfollowing": {
-                    "n": 1,
-                    "nModified": 1,
-                    "ok": 1
-                }
-            }
- */
-// user.following = (user, username) => {
-//     return new Promise((resolve, reject) => {
-//         if(module.exports.is_following(user, username)){
-//             resolve({
-//                 "n": 1,
-//                 "nModified": 0,
-//                 "ok": 1
-//             })
-//         }else{
-//             user.following.push(username)
-//             User.updateOne({username: user.username}, {following: user.following})
-//             .then((res) => {
-//                 resolve(res)
-//             }).catch((err) => {
-//                 reject(err)
-//             })
-//         }
-//     })
-// }
+user.follow_book = (book_endpoint, username) => {
+    return new Promise((resolve, reject) => {
+        let params = [book_endpoint, username]
+        let query = 'insert into "BookFollows" values ($1, $2) returning *'
+        conn.query(query, params, (err, res) => {
+            if (err) return reject(err)
+            else return resolve(res.rows[0])
+        })
+    })
+}
 
+user.get_book_following = (username) => {
+    return new Promise((resolve, reject) => {
+        let params = [username]
+        let query = `select b.* from "Book" b, (select * from "BookFollows" where username = $1) bf
+        where b.endpoint = bf.book_endpoint`
+        conn.query(query, params, (err, res) => {
+            if (err) return reject(err)
+            else return resolve(res.rows)
+        })
+    })
+}
 
-// /**
-//  * 
-//  * @param {User} user 
-//  * @param {string} username 
-//  * @returns {
-//                 "userfollower": {
-//                     "n": 1,
-//                     "nModified": 1,
-//                     "ok": 1
-//                 }
-//             }
-//  */
-// user.follower = (user, username) => {
-//     return new Promise((resolve, reject) => {
-//         if(module.exports.is_followed(user, username)){
-//             resolve({
-//                 "n": 1,
-//                 "nModified": 0,
-//                 "ok": 1
-//             })
-//         }else{
-//             user.follower.push(username)
-//             User.updateOne({username: user.username}, {follower: user.follower})
-//             .then((res) => {
-//                 resolve(res)
-//             }).catch((err) => {
-//                 reject(err)
-//             })
-//         }
-//     })
-// }
-
-// user.star = (user, slug) => {
-//     return new Promise((resolve, reject) => {
-//         if(module.exports.is_stared(user, slug)){
-//             resolve({
-//                 "n": 1,
-//                 "nModified": 0,
-//                 "ok": 1
-//             })
-//         }else{
-//             user.star.push(slug)
-//             User.updateOne({username: user.username}, {star: user.star})
-//             .then((res) => {
-//                 resolve(res)
-//             }).catch((err) => {
-//                 reject(err)
-//             })
-//         }
-//     })
-// }
-
-// /**
-//  * 
-//  * @param {User} user 
-//  * @param {string} username 
-//  * @returns {
-//                 "userfollowing": {
-//                     "n": 1,
-//                     "nModified": 1,
-//                     "ok": 1
-//                 }
-//             }
-//  */
-// user.unfollowing = (user, username) => {
-//     return new Promise((resolve, reject) => {
-//         if(!module.exports.is_following(user, username)){
-//             resolve({
-//                 "n": 1,
-//                 "nModified": 0,
-//                 "ok": 1
-//             })
-//         }else{
-//             user.following = user.following.filter(item => item!=username)
-//             User.updateOne({username: user.username}, {following: user.following})
-//             .then((res) => {
-//                 resolve(res)
-//             }).catch((err) => {
-//                 reject(err)
-//             })
-//         }
-//     })
-// }
-
-// /**
-//  * 
-//  * @param {User} user 
-//  * @param {string} username 
-//  * @returns {
-//                 "userfollower": {
-//                     "n": 1,
-//                     "nModified": 1,
-//                     "ok": 1
-//                 }
-//             }
-//  */
-// user.unfollower = (user, username) => {
-//     return new Promise((resolve, reject) => {
-//         if(!module.exports.is_followed(user, username)){
-//             resolve({
-//                 "n": 1,
-//                 "nModified": 0,
-//                 "ok": 1
-//             })
-//         }else{
-//             user.follower = user.follower.filter(item => item!=username)
-//             User.updateOne({username: user.username}, {follower: user.follower})
-//             .then((res) => {
-//                 resolve(res)
-//             }).catch((err) => {
-//                 reject(err)
-//             })
-//         }
-//     })
-// }
-            
-// user.unstar = (user, slug) => {
-//     return new Promise((resolve, reject) => {
-//         if(!module.exports.is_stared(user, slug)){
-//             resolve({
-//                 "n": 1,
-//                 "nModified": 0,
-//                 "ok": 1
-//             })
-//         }else{
-//             user.star = user.star.filter(item => item!=slug)
-//             User.updateOne({username: user.username}, {star: user.star})
-//             .then((res) => {
-//                 resolve(res)
-//             }).catch((err) => {
-//                 reject(err)
-//             })
-//         }
-//     })
-// }
+user.get_comment_history = (username) => {
+    return new Promise((resolve, reject) => {
+        let params = [username]
+        let query = `select * from "Comment" c where username = $1 order by time desc`
+        conn.query(query, params, (err, res) => {
+            if (err) return reject(err)
+            else return resolve(res.rows)
+        })
+    })
+}
 
 user.add = (user) => {
     return new Promise((resolve, reject) => {
@@ -306,6 +171,16 @@ user.update = (user) => {
     })
 }
 
+user.delete = (username) => {
+    return new Promise((resolve, reject) => {
+        let params = [username]
+        let query = `delete from "Account" where username = $1 returning *`
+        conn.query(query, params, (err, res) => {
+            if (err) return reject(err)
+            else return resolve(res.rows[0])
+        })
+    })
+}
 
 
 // user.is_following = (user, username) => {

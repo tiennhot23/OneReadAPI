@@ -54,6 +54,36 @@ router.get('/info/:username', async (req, res, next) => {
     }
 })
 
+router.get('/following', auth.verifyUser, async (req, res, next) => {
+    let username = req.user.username
+    var books
+    try {
+        if (!username) {
+            res.status(400).json({message: message.user.missing_username})
+        } else {
+            books = await UserController.get_book_following(username)
+            res.status(200).json(books)
+        }
+    } catch (err) {
+        res.status(500).json({message: err.message})
+    }
+})
+
+router.get('/comment_history', auth.verifyUser, async (req, res, next) => {
+    let username = req.user.username
+    var books
+    try {
+        if (!username) {
+            res.status(400).json({message: message.user.missing_username})
+        } else {
+            books = await UserController.get_comment_history(username)
+            res.status(200).json(books)
+        }
+    } catch (err) {
+        res.status(500).json({message: err.message})
+    }
+})
+
 router.post('/login', async (req, res, next) => {
     var user = req.body
 
@@ -156,6 +186,44 @@ router.post('/verify-email', auth.verifyUser, async (req, res, next) => {
         }
     }catch (err){
         res.status(500).json({message: err.message})
+    }
+})
+
+router.post('/follow-book/:book_endpoint', auth.verifyUser, async (req, res, next) => {
+    var obj = {
+        username: req.user.username,
+        book_endpoint: req.params.book_endpoint
+    }
+    try{
+        if (!obj.username) {
+            return res.status(400).json({message: message.user.missing_username})
+        } if (!obj.book_endpoint) {
+            return res.status(400).json({message: message.book.missing_endpoint})
+        } else {
+            obj = await UserController.follow_book(obj.book_endpoint, obj.username)
+            return res.status(200).json(obj)
+        }
+    }catch (err){
+        if (err.constraint){
+            switch (err.constraint) {
+                case 'book_follows_pk': {
+                    res.status(400).json({message: message.user.book_follows_pk})
+                    break
+                }
+                case 'book_fk': {
+                    res.status(400).json({message: message.user.book_fk})
+                    break
+                }
+                case 'username_fk': {
+                    res.status(400).json({message: message.user.username_fk})
+                    break
+                }
+                default: {
+                    res.status(500).json({message: err.message})
+                    break
+                }
+            }
+        } else res.status(500).json({message: err.message})
     }
 })
 
@@ -286,23 +354,27 @@ router.patch('/change-password/:username', encrypt.hash, async (req, res, next) 
     }
 })
 
+router.delete('/:username', auth.verifyUser, async (req, res, next) => {
+    var user = {
+        username: req.params.username
+    }
+
+    try{
+        if (!user.username) {
+            return res.status(400).json({message: message.user.missing_username})
+        } else {
+            user = await UserController.delete(user.username)
+            if (user) return res.status(200).json(user)
+            else return res.status(404).json({message: message.user.not_found})
+        }
+    }catch (err){
+        return res.status(500).json({message: err.message})
+    }
+})
 
 
-// router.post('/follow-user', auth.verifyuser, async (req, res, next) => {
-//     const username = req.body.username
-//     var currentuser = await UserController.get_user(req.user.user.username)
-//     if(!username) return res.status(400).json({message: message.user.not_found})
-//     if(username === currentuser.username) return res.status(500).json({message: message.user.can_not_follow_user})
-//     try{
-//         var userfollower = await UserController.get_user(username)
-//         if(!userfollower) return res.status(500).json({message: message.user.can_not_follow_user})
-//         userfollower = await UserController.follower(userfollower, currentuser.username)
-//         var userfollowing = await UserController.following(currentuser, username)
-//         res.status(200).json({userfollower, userfollowing})
-//     }catch(err){
-//         res.status(500).json({message: err.message})
-//     }
-// })
+
+
 
 
 // /**

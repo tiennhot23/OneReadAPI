@@ -103,7 +103,8 @@ create table "BookFollows"
 	username varchar(50) not null
 		constraint username_fk
 			references "Account"
-				on update cascade,
+				on update cascade
+                on delete cascade,
 	constraint book_follows_pk
 		primary key (book_endpoint, username)
 );
@@ -139,7 +140,8 @@ create table "History"
 	username varchar(50) not null
 		constraint username_fk
 			references "Account"
-				on update cascade,
+				on update cascade
+                on delete cascade,
 	chapter_endpoint varchar(255) not null,
 	time timestamp not null default (localtimestamp at time zone 'GMT+7'),
 	constraint history_pk
@@ -158,9 +160,10 @@ create table "Comment"
     username varchar(50) not null
 		constraint username_fk
 			references "Account"
-				on update cascade,
+				on update cascade
+                on delete cascade,
 	endpoint varchar(255) not null,
-	id_reply int
+	id_root int
 	    constraint reply_constraint
 	        references "Comment"
 	            on update cascade
@@ -179,7 +182,8 @@ create table "Notify"
     username varchar(50) not null
 		constraint username_fk
 			references "Account"
-				on update cascade,
+				on update cascade
+                on delete cascade,
 	content text not null,
 	/*
 	    0   :   chưa xem
@@ -249,7 +253,7 @@ insert into "Book"(endpoint, title, type) values ('one-punch-man', 'One punch ma
 insert into "Account" values ('a', 'a', 1, 'a', 1);
 insert into "BookFollows" values ('b', 'a');
 insert into "History" (chapter_endpoint, book_endpoint, username) values ('1', 'b', 'a');
-insert into "Comment"(username, endpoint, id_reply, content, files) values ('a', 'a', null, 'a', '{}');
+insert into "Comment"(username, endpoint, id_root, content, files) values ('a', 'a', null, 'a', '{}');
 insert into "Notify" (endpoint, username, content) values ('a', 'a', 'ê');
 insert into "Genre" (endpoint, title) values ('manga', 'Manga');
 insert into "BookGenres" values ('one-punch-man', 'comedy');
@@ -278,16 +282,18 @@ from "Genre" g,
 where g.endpoint = bg.genre_endpoint) g,
 (select count(username) follow from "BookFollows" where book_endpoint = 'one-punch-man') n;
 
-select  * from "Account";
+select  * from "Notify";
 
 update "Report" set status = 0, num = num + 1,
                     time = localtimestamp at time zone 'GMT+7', reason = reason + '\n' + time + '\nreason'
 where endpoint = 'a' and type = 'C' returning *;
 
-update "Report" set reason = 'reason\nreason' where endpoint = 'a' returning *;
+update "Notify" set endpoint = '*comment*1' where endpoint = '/comment/1' returning *;
 
 delete from "Report" where true;
 alter table "Account" add constraint status_constraint check ( status = any ('{1,0,-1}'::smallint[]));
+select * from "Comment" where endpoint = 'a' and id_root is null order by time desc;
+select * from "Comment" where id = '1' or id_root = '1';
 
 
 

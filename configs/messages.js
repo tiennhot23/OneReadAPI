@@ -73,7 +73,10 @@ module.exports = {
         can_not_unban_user: 'Không thể unban user này',
         account_pk: 'Username đã được sử dụng',
         status_constraint: 'Trạng thái của user là -1: banned, 1: default',
-        role_constraint: 'Quyền của user là 0: user hoặc 1: admin'
+        role_constraint: 'Quyền của user là 0: user hoặc 1: admin',
+        book_follows_pk: 'Sách đã được follow bởi user này',
+        book_fk: 'Sách không tồn tại',
+        username_fk: 'User này không khả dụng'
     },
     auth:{
         unauthorized: 'Cần tài khoản để có thể thực hiện chức năng này',
