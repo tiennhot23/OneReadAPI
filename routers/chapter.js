@@ -4,6 +4,7 @@ const router = express.Router()
 const ChapterController = require('../controllers/ChapterController')
 const TransactionController = require('../controllers/TransactionContoller')
 const UserController = require('../controllers/UserController')
+const HistoryController = require('../controllers/HistoryController')
 const NotifyController = require('../controllers/NotifyController')
 const BookController = require('../controllers/BookController')
 const slugify = require('../middlewares/slugify')
@@ -27,7 +28,26 @@ router.get('/:book_endpoint/:chapter_endpoint', async (req, res, next) => {
     try {
         if (chapter_endpoint) {
             chapter = await ChapterController.get(book_endpoint, chapter_endpoint)
-            if (chapter) res.status(200).json(chapter)
+            if (chapter) {
+                const authHeader = req.headers['authorization']
+                const token = authHeader && authHeader.split(' ')[1]
+                if (token) {
+                    var user = await UserController.get_data_from_token(token)
+                    console.log(user)
+                    var history = {
+                        book_endpoint: book_endpoint,
+                        chapter_endpoint: chapter_endpoint,
+                        username: user.username
+                    }
+                    if (await HistoryController.get(history)) {
+                        history = await HistoryController.update(history)
+                    } else {
+                        history = await HistoryController.add(history)
+                    }
+                    console.log(history)
+                }
+                res.status(200).json(chapter)
+            }
             else res.status(404).json({message: message.chapter.not_found})
         } else {
             res.status(400).json({message: message.chapter.missing_chapter_endpoint})
