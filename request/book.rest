@@ -3,10 +3,10 @@ POST http://localhost:3000/book/
 Content-Type: application/json
 
 {
-    "title": "Grand blue",
-    "type": "Comic",
+    "title": "Sherlock holmes",
+    "type": "Novel",
     "genres": [
-        "comedy", "seinen", "school-life", "slice-of-life"
+        "trinh-tham"
     ]
 }
 
@@ -39,3 +39,7 @@ Content-Type: application/json
 
 ### Lấy danh sách book
 GET http://localhost:3000/book/all
+
+### Lấy danh sách suggest book
+GET http://localhost:3000/book/suggest-book
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJuYW1lIjoic2FpIiwiYXZhdGFyIjoiaHR0cHM6Ly90aHVtYnMuZHJlYW1zdGltZS5jb20vYi9kZWZhdWx0LWF2YXRhci1wcm9maWxlLWljb24tc29jaWFsLW1lZGlhLXVzZXItdmVjdG9yLWRlZmF1bHQtYXZhdGFyLXByb2ZpbGUtaWNvbi1zb2NpYWwtbWVkaWEtdXNlci12ZWN0b3ItcG9ydHJhaXQtMTc2MTk0ODc2LmpwZyIsImVtYWlsIjoiaW1hZ2VzYWl0YW1hQGdtYWlsLmNvbSIsInN0YXR1cyI6MCwicm9sZSI6MSwicGFzc3dvcmQiOiIifSwiaWF0IjoxNjQwODgwODM1LCJleHAiOjE2NDA5NjcyMzV9.Ly8JbTr7kloG97hJSnT-RjZ4fmFO5aEAWMl5dEhOEiQ

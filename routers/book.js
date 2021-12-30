@@ -7,6 +7,7 @@ const NotifyController = require('../controllers/NotifyController')
 
 const slugify = require('../middlewares/slugify')
 const message = require('../configs/messages')
+const auth = require('../middlewares/auth')
 
 /**
  * Lấy danh sách các sách với filter nếu có và phân trang
@@ -19,6 +20,27 @@ router.get('/all', async (req, res, next) => {
     try {
         books = await BookController.list(req.body, page)
         res.status(200).json(books)
+    } catch (err) {
+        res.status(500).json({message: err.message})
+    }
+})
+
+router.get('/suggest-book', auth.verifyUser, async (req, res, next) => {
+    var user = req.user
+    var books
+    try {
+        books = await BookController.get_suggest_book(user.username)
+        return res.status(200).json(books)
+    } catch (err) {
+        res.status(500).json({message: err.message})
+    }
+})
+
+router.get('/top-search', async (req, res, next) => {
+    var books
+    try {
+        books = await BookController.get_top_search()
+        return res.status(200).json(books)
     } catch (err) {
         res.status(500).json({message: err.message})
     }
@@ -44,6 +66,8 @@ router.get('/:endpoint', async (req, res, next) => {
         res.status(500).json({message: err.message})
     }
 })
+
+
 
 
 
@@ -111,17 +135,6 @@ router.post('/', slugify.get_endpoint, async (req, res, next) => {
     let endpoint = req.params.endpoint
     try {
         book = await BookController.update_info(book, endpoint)
-        if (req.body.status) {
-            var followers = await BookController.get_user_follow(book.endpoint)
-            followers.forEach((user) => {
-                let notify = {
-                    endpoint: `*book*${book.endpoint}`,
-                    username: user.username,
-                    content: message.notify.book_finish_notification
-                }
-                NotifyController.add(notify)
-            })
-        }
         if (book) res.status(200).json(book)
         else res.status(404).json({message: message.book.not_found})
     } catch (err) {

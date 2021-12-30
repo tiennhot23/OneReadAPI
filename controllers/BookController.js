@@ -35,6 +35,29 @@ db.get_user_follow = (book_endpoint) => {
     })
 }
 
+db.get_suggest_book = (username) => {
+    return new Promise((resolve, reject) => {
+        let query = `select b.* from 
+        (select book_endpoint, count(book_endpoint) as count from 
+        (select * from "BookGenres" where book_endpoint not in 
+        (select book_endpoint from "BookFollows" where username = $1)) as bg where genre_endpoint in
+        (select genre_endpoint from (select bg.genre_endpoint as genre_endpoint, count(genre_endpoint) as count from
+        (select book_endpoint from "BookFollows" where username = $1) bf,
+        "BookGenres" bg where bf.book_endpoint = bg.book_endpoint
+        group by genre_endpoint
+        order by count desc limit 10) as g)
+        group by book_endpoint
+        order by count desc limit 10) as sg, "Book" b
+        where b.endpoint = sg.book_endpoint`
+
+        let params = [username]
+        conn.query(query, params, (err, res) => {
+            if (err) return reject(err)
+            else return resolve(res.rows)
+        })
+    })
+}
+
 db.list = (filter, page) => {
     return new Promise((resolve, reject) => {
         let num = 1

@@ -3,8 +3,8 @@ POST http://localhost:3000/genre/
 Content-Type: application/json
 
 {
-    "title": "One shot",
-    "description": "Những truyện ngắn, thường là 1 chapter"
+    "title": "Trinh thám",
+    "description": "Dùng não cực căng"
 }
 
 ### cập nhật genre
