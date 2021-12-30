@@ -49,3 +49,10 @@ GET http://localhost:3000/book/top-search
 
 ### Lấy danh sách top rating book
 GET http://localhost:3000/book/top-rating
+
+### Lấy danh sách top view day
+GET http://localhost:3000/book/top-view-day
+### Lấy danh sách top view month
+GET http://localhost:3000/book/top-view-month
+### Lấy danh sách top view year
+GET http://localhost:3000/book/top-view-year

@@ -80,6 +80,51 @@ db.get_top_rating = () => {
     })
 }
 
+db.get_top_day = () => {
+    return new Promise((resolve, reject) => {
+        let query = `select b.*, view from (select book_endpoint, sum(view) as view from "BookViews"
+        where date_part('day', time) = date_part('day', date(localtimestamp at time zone 'GMT+7'))
+        group by book_endpoint limit 10) as v, "Book" b
+        where v.book_endpoint = b.endpoint
+        order by view desc`
+
+        conn.query(query, (err, res) => {
+            if (err) return reject(err)
+            else return resolve(res.rows)
+        })
+    })
+}
+
+db.get_top_month = () => {
+    return new Promise((resolve, reject) => {
+        let query = `select b.*, view from (select book_endpoint, sum(view) as view from "BookViews"
+        where date_part('month', time) = date_part('month', date(localtimestamp at time zone 'GMT+7'))
+        group by book_endpoint limit 10) as v, "Book" b
+        where v.book_endpoint = b.endpoint
+        order by view desc`
+
+        conn.query(query, (err, res) => {
+            if (err) return reject(err)
+            else return resolve(res.rows)
+        })
+    })
+}
+
+db.get_top_year = () => {
+    return new Promise((resolve, reject) => {
+        let query = `select b.*, view from (select book_endpoint, sum(view) as view from "BookViews"
+        where date_part('year', time) = date_part('year', date(localtimestamp at time zone 'GMT+7'))
+        group by book_endpoint limit 10) as v, "Book" b
+        where v.book_endpoint = b.endpoint
+        order by view desc`
+
+        conn.query(query, (err, res) => {
+            if (err) return reject(err)
+            else return resolve(res.rows)
+        })
+    })
+}
+
 db.list = (filter, page) => {
     return new Promise((resolve, reject) => {
         let num = 1

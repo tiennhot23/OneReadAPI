@@ -56,6 +56,36 @@ router.get('/top-rating', async (req, res, next) => {
     }
 })
 
+router.get('/top-view-day', async (req, res, next) => {
+    var books
+    try {
+        books = await BookController.get_top_day()
+        return res.status(200).json(books)
+    } catch (err) {
+        res.status(500).json({message: err.message})
+    }
+})
+
+router.get('/top-view-month', async (req, res, next) => {
+    var books
+    try {
+        books = await BookController.get_top_month()
+        return res.status(200).json(books)
+    } catch (err) {
+        res.status(500).json({message: err.message})
+    }
+})
+
+router.get('/top-view-year', async (req, res, next) => {
+    var books
+    try {
+        books = await BookController.get_top_year()
+        return res.status(200).json(books)
+    } catch (err) {
+        res.status(500).json({message: err.message})
+    }
+})
+
 router.get('/:endpoint', async (req, res, next) => {
     let endpoint = req.params.endpoint
     let search = req.body.search
