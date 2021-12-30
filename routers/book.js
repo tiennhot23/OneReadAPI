@@ -3,6 +3,7 @@ const express = require('express')
 const router = express.Router()
 const BookController = require('../controllers/BookController')
 const TransactionController = require('../controllers/TransactionContoller')
+const NotifyController = require('../controllers/NotifyController')
 
 const slugify = require('../middlewares/slugify')
 const message = require('../configs/messages')
@@ -106,16 +107,48 @@ router.post('/', slugify.get_endpoint, async (req, res, next) => {
  * @returns book
  */
  router.patch('/:endpoint', slugify.get_endpoint, async (req, res, next) => {
-    var book = {
-        endpoint: req.body.endpoint,
-        title: req.body.title,
-        description: req.body.description
-    }
+    var book = req.body
     let endpoint = req.params.endpoint
     try {
-        book = await BookController.update(book, endpoint)
+        book = await BookController.update_info(book, endpoint)
+        if (req.body.status) {
+            var followers = await BookController.get_user_follow(book.endpoint)
+            followers.forEach((user) => {
+                let notify = {
+                    endpoint: `*book*${book.endpoint}`,
+                    username: user.username,
+                    content: message.notify.book_finish_notification
+                }
+                NotifyController.add(notify)
+            })
+        }
         if (book) res.status(200).json(book)
         else res.status(404).json({message: message.book.not_found})
+    } catch (err) {
+        res.status(500).json({message: err.message})
+    }
+})
+
+router.patch('/finish/:endpoint', async (req, res, next) => {
+    let endpoint = req.params.endpoint
+    try {
+        var book = await BookController.get(endpoint)
+        if (book.status == 0) {
+            book = await BookController.finish_book(endpoint)
+            var followers = await BookController.get_user_follow(book.endpoint)
+            followers.forEach(async (user) => {
+                let notify = {
+                    endpoint: `*book*${book.endpoint}`,
+                    username: user.username,
+                    content: message.notify.book_finish_notification
+                }
+                console.log(1)
+                NotifyController.add(notify)
+            })
+            
+        }
+        if (book) res.status(200).json(book)
+        else res.status(404).json({message: message.book.not_found})  
     } catch (err) {
         res.status(500).json({message: err.message})
     }

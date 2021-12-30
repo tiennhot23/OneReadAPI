@@ -191,12 +191,6 @@ db.update_info = (book, endpoint) => {
             num += 1
             params.push(book.type)
         }
-        if (book.status) {
-            if (num > 1) query += ','
-            query += ' status = $' + num
-            num += 1
-            params.push(book.status)
-        }
 
         query += ' where endpoint = $' + num + ' returning *'
         params.push(endpoint)
@@ -217,6 +211,18 @@ db.update_rating = (book, endpoint) => {
     return new Promise((resolve, reject) => {
         let query = 'update "Book" set rate_count = $1, rating = $2 where endpoint = $3 returning *'
         let params = [book.rate_count, book.rating, endpoint]
+
+        conn.query(query, params, (err, res) => {
+            if (err) return reject(err)
+            return resolve(res.rows[0])
+        })
+    })
+}
+
+db.finish_book = (endpoint) => {
+    return new Promise((resolve, reject) => {
+        let query = 'update "Book" set status = 1 where endpoint = $1 returning *'
+        let params = [endpoint]
 
         conn.query(query, params, (err, res) => {
             if (err) return reject(err)

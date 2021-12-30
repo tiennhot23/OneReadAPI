@@ -18,6 +18,14 @@ Content-Type: application/json
     
 }
 
+### finish book
+PATCH http://localhost:3000/book/finish/one-punch-man
+Content-Type: application/json
+
+{
+    
+}
+
 ### xoá book
 DELETE http://localhost:3000/book/sherlock-holme
 
