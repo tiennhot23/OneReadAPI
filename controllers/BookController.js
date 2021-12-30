@@ -58,6 +58,28 @@ db.get_suggest_book = (username) => {
     })
 }
 
+db.get_top_search = () => {
+    return new Promise((resolve, reject) => {
+        let query = `select * from "Book" order by search_number desc`
+
+        conn.query(query, (err, res) => {
+            if (err) return reject(err)
+            else return resolve(res.rows)
+        })
+    })
+}
+
+db.get_top_rating = () => {
+    return new Promise((resolve, reject) => {
+        let query = `select * from "Book" order by rating desc`
+
+        conn.query(query, (err, res) => {
+            if (err) return reject(err)
+            else return resolve(res.rows)
+        })
+    })
+}
+
 db.list = (filter, page) => {
     return new Promise((resolve, reject) => {
         let num = 1

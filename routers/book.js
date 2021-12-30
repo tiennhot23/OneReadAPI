@@ -46,6 +46,16 @@ router.get('/top-search', async (req, res, next) => {
     }
 })
 
+router.get('/top-rating', async (req, res, next) => {
+    var books
+    try {
+        books = await BookController.get_top_rating()
+        return res.status(200).json(books)
+    } catch (err) {
+        res.status(500).json({message: err.message})
+    }
+})
+
 router.get('/:endpoint', async (req, res, next) => {
     let endpoint = req.params.endpoint
     let search = req.body.search
