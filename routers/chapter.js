@@ -24,6 +24,7 @@ router.get('/:book_endpoint/all', async (req, res, next) => {
 router.get('/:book_endpoint/:chapter_endpoint', async (req, res, next) => {
     let chapter_endpoint = req.params.chapter_endpoint
     let book_endpoint = req.params.book_endpoint
+    let view = req.body.view
     var chapter
     try {
         if (chapter_endpoint) {
@@ -43,6 +44,15 @@ router.get('/:book_endpoint/:chapter_endpoint', async (req, res, next) => {
                     } else {
                         history = await HistoryController.add(history)
                     }
+                }
+                if (view) {
+                    let time = new Date().toISOString().slice(0,10)
+                    if (await BookController.get_view(book_endpoint, time)) {
+                        await BookController.update_view(book_endpoint, time)
+                    } else {
+                        await BookController.add_view(book_endpoint, time)
+                    }
+                    
                 }
                 res.status(200).json(chapter)
             }

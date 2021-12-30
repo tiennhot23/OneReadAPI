@@ -12,7 +12,7 @@ const message = require('../configs/messages')
  * @body filter{author (không dùng %%), type, genre, status (0, 1)}
  * @returns books
  */
-router.get('/all/:page', async (req, res, next) => {
+router.get('/all', async (req, res, next) => {
     var page = req.params.page
     var books
     try {
@@ -25,10 +25,15 @@ router.get('/all/:page', async (req, res, next) => {
 
 router.get('/:endpoint', async (req, res, next) => {
     let endpoint = req.params.endpoint
+    let search = req.body.search
     var book
     try {
         if (endpoint) {
             book = await BookController.get(endpoint)
+            if (search) {
+                let search_number = await BookController.update_search_number(book.endpoint)
+                book.search_number = search_number.search_number
+            }
             if (book) res.status(200).json(book)
             else res.status(404).json({message: message.book.not_found})
         } else {
@@ -58,6 +63,8 @@ router.post('/', slugify.get_endpoint, async (req, res, next) => {
             let genres = book.genres
             book = await BookController.add(book)
             if (genres) await BookController.add_book_genres(book.endpoint, genres)
+            let view = await BookController.add_view(book.endpoint, new Date().toISOString().slice(0,10))
+            book.view = view.view
             await TransactionController.commit()
             res.status(200).json(book)
         }
@@ -93,26 +100,26 @@ router.post('/', slugify.get_endpoint, async (req, res, next) => {
 })
 
 
-// /**
-//  * cập nhật book
-//  * @body {endpoint, title, (author), (thumb), (theme), (description), type}
-//  * @returns book
-//  */
-//  router.patch('/:endpoint', slugify.get_endpoint, async (req, res, next) => {
-//     var book = {
-//         endpoint: req.body.endpoint,
-//         title: req.body.title,
-//         description: req.body.description
-//     }
-//     let endpoint = req.params.endpoint
-//     try {
-//         book = await BookController.update(book, endpoint)
-//         if (book) res.status(200).json(book)
-//         else res.status(404).json({message: message.book.not_found})
-//     } catch (err) {
-//         res.status(500).json({message: err.message})
-//     }
-// })
+/**
+ * cập nhật book
+ * @body {endpoint, title, (author), (thumb), (theme), (description), type}
+ * @returns book
+ */
+ router.patch('/:endpoint', slugify.get_endpoint, async (req, res, next) => {
+    var book = {
+        endpoint: req.body.endpoint,
+        title: req.body.title,
+        description: req.body.description
+    }
+    let endpoint = req.params.endpoint
+    try {
+        book = await BookController.update(book, endpoint)
+        if (book) res.status(200).json(book)
+        else res.status(404).json({message: message.book.not_found})
+    } catch (err) {
+        res.status(500).json({message: err.message})
+    }
+})
 
 /**
  * xoá book - cập nhật status = -1

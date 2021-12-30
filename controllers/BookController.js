@@ -12,7 +12,8 @@ db.get = (endpoint) => {
         from "Genre" g,
              (select * from "BookGenres" where book_endpoint = $1) bg
         where g.endpoint = bg.genre_endpoint) g,
-        (select count(username) follow from "BookFollows" where book_endpoint = $1) n`
+        (select count(username) follow from "BookFollows" where book_endpoint = $1) f,
+        (select sum(view) as view from "BookViews" where book_endpoint = $1) v`
 
         var params = [endpoint]
         conn.query(query, params, (err, res) => {
@@ -143,7 +144,7 @@ db.add_book_genres = (book_endpoint, genres) => {
     })
 }
 
-db.update = (book, endpoint) => {
+db.update_info = (book, endpoint) => {
     return new Promise((resolve, reject) => {
         let num = 1
         let params = []
@@ -160,17 +161,111 @@ db.update = (book, endpoint) => {
             num += 1
             params.push(book.title)
         }
+        if (book.author) {
+            if (num > 1) query += ','
+            query += ' author = $' + num
+            num += 1
+            params.push(book.author)
+        }
+        if (book.thumb) {
+            if (num > 1) query += ','
+            query += ' thumb = $' + num
+            num += 1
+            params.push(book.thumb)
+        }
+        if (book.theme) {
+            if (num > 1) query += ','
+            query += ' theme = $' + num
+            num += 1
+            params.push(book.theme)
+        }
         if (book.description) {
             if (num > 1) query += ','
             query += ' description = $' + num
             num += 1
             params.push(book.description)
         }
+        if (book.type) {
+            if (num > 1) query += ','
+            query += ' type = $' + num
+            num += 1
+            params.push(book.type)
+        }
+        if (book.status) {
+            if (num > 1) query += ','
+            query += ' status = $' + num
+            num += 1
+            params.push(book.status)
+        }
 
         query += ' where endpoint = $' + num + ' returning *'
         params.push(endpoint)
 
         if (num == 1) query = 'select * from "Book" where endpoint = $1 limit 1'
+
+        conn.query(query, params, (err, res) => {
+            if (err) return reject(err)
+            return resolve(res.rows[0])
+        })
+    })
+}
+
+/**
+ * cong thuc tinh rating: 
+ */
+db.update_rating = (book, endpoint) => {
+    return new Promise((resolve, reject) => {
+        let query = 'update "Book" set rate_count = $1, rating = $2 where endpoint = $3 returning *'
+        let params = [book.rate_count, book.rating, endpoint]
+
+        conn.query(query, params, (err, res) => {
+            if (err) return reject(err)
+            return resolve(res.rows[0])
+        })
+    })
+}
+
+db.get_view = (book_endpoint, time) => {
+    return new Promise((resolve, reject) => {
+        let query = 'select * from "BookViews" where book_endpoint = $1 and time = $2'
+        let params = [book_endpoint, time]
+
+        conn.query(query, params, (err, res) => {
+            if (err) return reject(err)
+            return resolve(res.rows[0])
+        })
+    })
+}
+
+db.add_view = (book_endpoint, time) => {
+    return new Promise((resolve, reject) => {
+        let query = 'insert into "BookViews" (book_endpoint, time) values($1, $2) returning view'
+        let params = [book_endpoint, time]
+
+        conn.query(query, params, (err, res) => {
+            if (err) return reject(err)
+            return resolve(res.rows[0])
+        })
+    })
+}
+
+db.update_view = (book_endpoint, time) => {
+    return new Promise((resolve, reject) => {
+        console.log(book_endpoint, time)
+        let query = 'update "BookViews" set view = (view + 1) where book_endpoint = $1 and time = $2 returning view'
+        let params = [book_endpoint, time]
+
+        conn.query(query, params, (err, res) => {
+            if (err) return reject(err)
+            return resolve(res.rows[0])
+        })
+    })
+}
+
+db.update_search_number = (endpoint) => {
+    return new Promise((resolve, reject) => {
+        let query = 'update "Book" set search_number = (search_number + 1) where endpoint = $1 returning search_number'
+        let params = [endpoint]
 
         conn.query(query, params, (err, res) => {
             if (err) return reject(err)

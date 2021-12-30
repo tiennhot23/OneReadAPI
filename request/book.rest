@@ -22,7 +22,12 @@ Content-Type: application/json
 DELETE http://localhost:3000/book/sherlock-holme
 
 ### lấy thông tin book
-GET http://localhost:3000/book/one-punch-man
+GET http://localhost:3000/book/one-piece
+Content-Type: application/json
+
+{
+    "search": true
+}
 
 ### Lấy danh sách book
-GET http://localhost:3000/book/all/1
+GET http://localhost:3000/book/all

@@ -3,7 +3,7 @@ POST http://localhost:3000/chapter/
 Content-Type: application/json
 
 {
-    "title": "Chapter 2",
+    "title": "Chapter 1",
     "book_endpoint": "one-piece",
     "images": ["aa","aaaaa"]
 }
@@ -21,8 +21,13 @@ Content-Type: application/json
 DELETE http://localhost:3000/chapter/one-piece/chapter-2
 
 ### lấy thông tin chapter
-GET http://localhost:3000/chapter/one-piece/chapter-2
+GET http://localhost:3000/chapter/one-piece/chapter-1
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJuYW1lIjoic2FpIiwiYXZhdGFyIjoiaHR0cHM6Ly90aHVtYnMuZHJlYW1zdGltZS5jb20vYi9kZWZhdWx0LWF2YXRhci1wcm9maWxlLWljb24tc29jaWFsLW1lZGlhLXVzZXItdmVjdG9yLWRlZmF1bHQtYXZhdGFyLXByb2ZpbGUtaWNvbi1zb2NpYWwtbWVkaWEtdXNlci12ZWN0b3ItcG9ydHJhaXQtMTc2MTk0ODc2LmpwZyIsImVtYWlsIjoiaW1hZ2VzYWl0YW1hQGdtYWlsLmNvbSIsInN0YXR1cyI6MCwicm9sZSI6MSwicGFzc3dvcmQiOiIifSwiaWF0IjoxNjQwODA2NDE1LCJleHAiOjE2NDA4OTI4MTV9.rogPaE7LsML8Ub_qz8-E1ZOcigYcm7G2SDm222L5xlo
+Content-Type: application/json
+
+{
+    "view": true
+}
 
 ### Lấy danh sách chapter
 GET http://localhost:3000/chapter/one-piece/all
