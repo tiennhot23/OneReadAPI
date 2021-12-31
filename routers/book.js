@@ -86,6 +86,48 @@ router.get('/top-view-year', async (req, res, next) => {
     }
 })
 
+router.get('/top-follow', async (req, res, next) => {
+    var books
+    try {
+        books = await BookController.get_top_follow()
+        return res.status(200).json(books)
+    } catch (err) {
+        res.status(500).json({message: err.message})
+    }
+})
+
+router.get('/follower/:endpoint', async (req, res, next) => {
+    let endpoint = req.params.endpoint
+    var users
+    try {
+        users = await BookController.get_user_follow(endpoint)
+        return res.status(200).json(users)
+    } catch (err) {
+        res.status(500).json({message: err.message})
+    }
+})
+
+router.get('/last-update', async (req, res, next) => {
+    var books
+    try {
+        books = await BookController.get_last_update()
+        return res.status(200).json(books)
+    } catch (err) {
+        res.status(500).json({message: err.message})
+    }
+})
+
+router.get('/relate-book/:endpoint', async (req, res, next) => {
+    let endpoint = req.params.endpoint
+    var books
+    try {
+        books = await BookController.get_relate_book(endpoint)
+        return res.status(200).json(books)
+    } catch (err) {
+        res.status(500).json({message: err.message})
+    }
+})
+
 router.get('/:endpoint', async (req, res, next) => {
     let endpoint = req.params.endpoint
     let search = req.body.search

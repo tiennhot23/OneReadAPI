@@ -56,3 +56,11 @@ GET http://localhost:3000/book/top-view-day
 GET http://localhost:3000/book/top-view-month
 ### Lấy danh sách top view year
 GET http://localhost:3000/book/top-view-year
+### Lấy danh sách top follow
+GET http://localhost:3000/book/top-follow
+### Lấy danh sách user dang follow sasch
+GET http://localhost:3000/book/follower/one-piece
+### Lấy danh sách last update
+GET http://localhost:3000/book/last-update
+### Gợi ý truyện cùng thể loại
+GET http://localhost:3000/book/relate-book/one-punch-man

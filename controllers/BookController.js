@@ -125,6 +125,53 @@ db.get_top_year = () => {
     })
 }
 
+db.get_top_follow = () => {
+    return new Promise((resolve, reject) => {
+        let query = `select b.*, count from (select book_endpoint, count(username) as count from "BookFollows"
+        group by book_endpoint limit 10) as v, "Book" b
+        where v.book_endpoint = b.endpoint
+        order by count desc`
+
+        conn.query(query, (err, res) => {
+            if (err) return reject(err)
+            else return resolve(res.rows)
+        })
+    })
+}
+
+db.get_last_update = () => {
+    return new Promise((resolve, reject) => {
+        let query = `select * from "Book" b where endpoint in
+        (select book_endpoint from "Chapter"
+        order by time desc limit 10) limit 10`
+
+        conn.query(query, (err, res) => {
+            if (err) return reject(err)
+            else return resolve(res.rows)
+        })
+    })
+}
+
+db.get_relate_book = (endpoint) => {
+    return new Promise((resolve, reject) => {
+        let query = `select * from "Book",
+        (select book_endpoint, count(book_endpoint) as count from "BookGenres"
+        where genre_endpoint in
+        (select genre_endpoint from "BookGenres" where book_endpoint = $1)
+        and book_endpoint <> $1
+        group by book_endpoint
+        order by count desc limit 10) as g
+        where book_endpoint = endpoint`
+
+        let params = [endpoint]
+
+        conn.query(query, params, (err, res) => {
+            if (err) return reject(err)
+            else return resolve(res.rows)
+        })
+    })
+}
+
 db.list = (filter, page) => {
     return new Promise((resolve, reject) => {
         let num = 1
