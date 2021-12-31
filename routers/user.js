@@ -1,11 +1,9 @@
 const express = require('express')
-const jwt = require('jsonwebtoken')
-const bcrypt = require('bcrypt')
 
 const UserController = require('../controllers/UserController')
 const HistoryController = require('../controllers/HistoryController')
 const NotifyController = require('../controllers/NotifyController')
-const upload = require('../middlewares/upload')
+const utils = require('../utils/utils')
 const encrypt = require('../middlewares/encrypt')
 const auth = require('../middlewares/auth')
 const constants = require('../configs/constants')
@@ -14,30 +12,34 @@ const mail = require('../middlewares/mail')
 
 const router = express.Router()
 
-router.get('/verify-email', auth.verifyUser, async (req, res, next) => {
+/**
+ * Cập nhật trạng thái tài khoản thành đã xác thực
+ */
+router.get('/verify-email/:username', auth.verifyUser, async (req, res, next) => {
     var user = req.user
     const token = req.query.token
 
     try{
-        // if(!bcrypt.compareSync(user.username, token)){
-        //     return res.status(404).json({message: message.auth.token_invalid})
-        // }else{
-        //     return res.status(404).json({message: message.user.email_veified})
-        // }
-
-        var data = await UserController.get_data_from_token(token)
-        if (data.username && data.email 
-            && user.username == data.username && user.email == data.email) {
-                user = await UserController.verify_email(data.username)
-                return res.status(200).json({message: message.user.email_veified})
+        if (!token) {
+            return res.status(400).json({message: message.auth.token_invalid})
         } else {
-            return res.status(404).json({message: message.user.not_found})
+            var data = await UserController.get_data_from_token(token)
+            if (data.username && data.email 
+                && user.username == data.username && user.email == data.email) {
+                    user = await UserController.verify_email(data.username)
+                    return res.status(200).json({message: message.user.email_veified})
+            } else {
+                return res.status(404).json({message: message.user.not_found})
+            }
         }
     }catch (err){
         res.status(500).json({message: err.message})
     }
 })
 
+/**
+ * Lấy thông tin user gồm username, avatar, status, email
+ */
 router.get('/info/:username', async (req, res, next) => {
     let username = req.params.username
     var user
@@ -54,7 +56,10 @@ router.get('/info/:username', async (req, res, next) => {
     }
 })
 
-router.get('/following', auth.verifyUser, async (req, res, next) => {
+/**
+ * Lấy danh sách các sách mà user đang follow
+ */
+router.get('/book-following/:username', auth.verifyUser, async (req, res, next) => {
     let username = req.user.username
     var books
     try {
@@ -69,22 +74,28 @@ router.get('/following', auth.verifyUser, async (req, res, next) => {
     }
 })
 
-router.get('/comment_history', auth.verifyUser, async (req, res, next) => {
-    let username = req.user.username
-    var books
+/**
+ * Lịch sử comment của user
+ */
+router.get('/comment-history/:username', auth.verifyAdmin, async (req, res, next) => {
+    let username = req.params.username
+    var comments
     try {
         if (!username) {
             res.status(400).json({message: message.user.missing_username})
         } else {
-            books = await UserController.get_comment_history(username)
-            res.status(200).json(books)
+            comments = await UserController.get_comment_history(username)
+            res.status(200).json(comments)
         }
     } catch (err) {
         res.status(500).json({message: err.message})
     }
 })
 
-router.get('/history', auth.verifyUser, async (req, res, next) => {
+/**
+ * Lịch sử xem của user
+ */
+router.get('/history/:username', auth.verifyUser, async (req, res, next) => {
     let username = req.user.username
     var books
     try {
@@ -98,6 +109,8 @@ router.get('/history', auth.verifyUser, async (req, res, next) => {
         res.status(500).json({message: err.message})
     }
 })
+
+
 
 router.post('/login', async (req, res, next) => {
     var user = req.body
@@ -118,10 +131,10 @@ router.post('/login', async (req, res, next) => {
                  * SOLVE: change oject user to json 
                  * ... jwt.sign({user}, ...
                  */
-                const accessToken = jwt.sign({user}, process.env.ACCESSTOKEN, { expiresIn: '1d'})
+                const accessToken = utils.generateAccessToken(user)
                 res.status(200).json({
                     accessToken: accessToken,
-                    data: user
+                    user: user
                 })
             } else {
                 return res.status(500).json({messsage: message.user.incorrect_account})
@@ -133,16 +146,10 @@ router.post('/login', async (req, res, next) => {
 })
 
 
-//TODO: code this
-router.post('/logout', auth.verifyUser, async (req, res, next) => {
-    try{
-        res.status(200).json()
-    }catch (err){
-        res.status(500).json({message: err.message})
-    }
-})
-
-
+/**
+ * Đăng kí tài khoản, trả về message đăng kí thàn công hay thất bại
+ * @body user: {username, password, email, (avatar)}
+ */
 router.post('/register', encrypt.hash, async (req, res, next) => {
     var user = req.body
 
@@ -155,7 +162,8 @@ router.post('/register', encrypt.hash, async (req, res, next) => {
             return res.status(400).json({message: message.user.missing_email})
         } else {
             user = await UserController.add(user)
-            return res.status(200).json(user)
+            if (user) return res.status(200).json({message: message.user.registed_success})
+            else return res.status(500).json({message: message.user.registed_fail})
         }
     }catch (err){
         if (err.constraint){
@@ -187,7 +195,10 @@ router.post('/register', encrypt.hash, async (req, res, next) => {
     }
 })
 
-router.post('/verify-email', auth.verifyUser, async (req, res, next) => {
+/**
+ * Gửi email xác thực
+ */
+router.post('/verify-email/:username', auth.verifyUser, async (req, res, next) => {
     var user = req.user
     try{
         if(!user.username || !req.body.username){
@@ -204,7 +215,10 @@ router.post('/verify-email', auth.verifyUser, async (req, res, next) => {
     }
 })
 
-router.post('/follow-book/:book_endpoint', auth.verifyUser, async (req, res, next) => {
+/**
+ * follow sách
+ */
+router.post('/follow-book/:book_endpoint/:username', auth.verifyUser, async (req, res, next) => {
     var obj = {
         username: req.user.username,
         book_endpoint: req.params.book_endpoint
@@ -242,6 +256,47 @@ router.post('/follow-book/:book_endpoint', auth.verifyUser, async (req, res, nex
     }
 })
 
+router.post('/unfollow-book/:book_endpoint/:username', auth.verifyUser, async (req, res, next) => {
+    var obj = {
+        username: req.user.username,
+        book_endpoint: req.params.book_endpoint
+    }
+    try{
+        if (!obj.username) {
+            return res.status(400).json({message: message.user.missing_username})
+        } if (!obj.book_endpoint) {
+            return res.status(400).json({message: message.book.missing_endpoint})
+        } else {
+            obj = await UserController.unfollow_book(obj.book_endpoint, obj.username)
+            return res.status(200).json(obj)
+        }
+    }catch (err){
+        if (err.constraint){
+            switch (err.constraint) {
+                case 'book_follows_pk': {
+                    res.status(400).json({message: message.user.book_follows_pk})
+                    break
+                }
+                case 'book_fk': {
+                    res.status(400).json({message: message.user.book_fk})
+                    break
+                }
+                case 'username_fk': {
+                    res.status(400).json({message: message.user.username_fk})
+                    break
+                }
+                default: {
+                    res.status(500).json({message: err.message})
+                    break
+                }
+            }
+        } else res.status(500).json({message: err.message})
+    }
+})
+
+/**
+ * ban user
+ */
 router.post('/ban/:username', auth.verifyAdmin, async (req, res, next) => {
     var user = {
         username: req.params.username,
@@ -258,7 +313,7 @@ router.post('/ban/:username', auth.verifyAdmin, async (req, res, next) => {
                 username: user.username,
                 content: message.notify.ban_notication
             }
-            await NotifyController.add(notify)
+            NotifyController.add(notify)
         } else {
             res.status(404).json({message: message.user.not_found})
         }
@@ -307,7 +362,7 @@ router.post('/unban/:username', auth.verifyAdmin, async (req, res, next) => {
                 username: user.username,
                 content: message.notify.unban_notification
             }
-            await NotifyController.add(notify)
+            NotifyController.add(notify)
         } else {
             res.status(404).json({message: message.user.not_found})
         }
@@ -317,7 +372,7 @@ router.post('/unban/:username', auth.verifyAdmin, async (req, res, next) => {
     }
 })
 
-router.patch('/:username', async (req, res, next) => {
+router.patch('/:username', auth.verifyUser, async (req, res, next) => {
     var user = {
         username: req.params.username,
         email: req.body.email,
@@ -332,26 +387,22 @@ router.patch('/:username', async (req, res, next) => {
     }
 })
 
-router.patch('/up-role/:username', async (req, res, next) => {
+router.patch('/up-role/:username', auth.verifyAdmin, async (req, res, next) => {
     var user = {
         username: req.params.username,
-        role: req.body.role
+        role: '1'
     }
 
     try{
-        if (!user.role) {
-            return res.status(400).json({message: message.user.missing_role})
-        } else {
-            user = await UserController.update(user)
-            return res.status(200).json(user)
-        }
+        user = await UserController.update(user)
+        return res.status(200).json(user)
     }catch (err){
         return res.status(500).json({message: err.message})
     }
 
 })
 
-router.patch('/change-password/:username', encrypt.hash, async (req, res, next) => {
+router.patch('/change-password/:username', auth.verifyUser, encrypt.hash, async (req, res, next) => {
     var user = {
         username: req.params.username,
         password: req.body.password
@@ -387,7 +438,7 @@ router.delete('/:username', auth.verifyUser, async (req, res, next) => {
     }
 })
 
-router.delete('/history/all', auth.verifyUser, async (req, res, next) => {
+router.delete('/history/all/:username', auth.verifyUser, async (req, res, next) => {
     var history = {
         username: req.user.username
     }
@@ -397,27 +448,29 @@ router.delete('/history/all', auth.verifyUser, async (req, res, next) => {
             return res.status(400).json({message: message.user.missing_username})
         } else {
             history = await HistoryController.delete_all(history)
-            if (history && history.length > 0) return res.status(200).json(history)
-            else return res.status(404).json({message: message.user.no_history_found})
+            if (history && history.length > 0) return res.status(200).json({message: message.history.delete_all})
+            else return res.status(404).json({message: message.history.not_found})
         }
     }catch (err){
         return res.status(500).json({message: err.message})
     }
 })
 
-router.delete('/history/single/:book_endpoint', auth.verifyUser, async (req, res, next) => {
+router.delete('/history/single/:username', auth.verifyUser, async (req, res, next) => {
     var history = {
-        book_endpoint: req.params.book_endpoint,
+        book_endpoint: req.body.book_endpoint,
         username: req.user.username
     }
 
     try{
         if (!history.username) {
             return res.status(400).json({message: message.user.missing_username})
+        } else if (!history.book_endpoint) {
+            return res.status(400).json({message: message.book.missing_endpoint})
         } else {
             history = await HistoryController.delete(history)
-            if (history) return res.status(200).json(history)
-            else return res.status(404).json({message: message.book.not_found})
+            if (history) return res.status(200).json({message: message.history.delete_success})
+            else return res.status(404).json({message: message.history.not_found})
         }
     }catch (err){
         return res.status(500).json({message: err.message})

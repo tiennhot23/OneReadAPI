@@ -1,4 +1,3 @@
-const { query } = require('express')
 const conn = require('../connection')
 
 const db = {}
@@ -172,38 +171,83 @@ db.get_relate_book = (endpoint) => {
     })
 }
 
-db.list = (filter, page) => {
+db.filter_with_genres = (filter) => {
     return new Promise((resolve, reject) => {
-        let num = 1
-        let query = 'select * from "Book" where'
+        let num = 3
+        let params = [filter.genres, filter.genres.length]
+        let query = `select b.* from "Book" b, 
+        (select book_endpoint, count(book_endpoint) as count 
+        from "BookGenres" where genre_endpoint = any($1::varchar[])
+        group by book_endpoint) as bg
+        where b.endpoint = bg.book_endpoint`
+        
+        if (filter.title) {
+            query += ` and title ilike $` + num
+            num += 1
+            params.push('%' + filter.title + '%')
+        }
         if (filter.author) {
-            if(num > 1) query += ','
-            query += ' author = $' + num
+            query += ` and lower(author) = lower($` + num + `)`
             num += 1
             params.push(filter.author)
         }
         if (filter.type) {
-            if(num > 1) query += ','
+            query += ' and type = $' + num
+            num += 1
+            params.push(filter.type)
+        }
+        if (filter.status) {
+            query += ' and status = $' + num
+            num += 1
+            params.push(filter.status)
+        }
+
+        query += ` and count >= $2
+        order by count desc`
+
+        conn.query(query, params, (err, res) => {
+            if(err) return reject(err)
+            return resolve(res.rows)
+        })
+    })
+}
+
+db.filter_without_genres = (filter) => {
+    return new Promise((resolve, reject) => {
+        let num = 1
+        let params = []
+        let query = `select * from "Book"`
+        
+        if (filter.title) {
+            if(num > 1) query += ' and'
+            else query += ' where'
+            query += ` title ilike $` + num
+            num += 1
+            params.push('%' + filter.title + '%')
+        }
+        if (filter.author) {
+            if(num > 1) query += ' and'
+            else query += ' where'
+            query += ` lower(author) = lower($` + num + `)`
+            num += 1
+            params.push(filter.author)
+        }
+        if (filter.type) {
+            if(num > 1) query += ' and'
+            else query += ' where'
             query += ' type = $' + num
             num += 1
             params.push(filter.type)
         }
-        if (filter.genre) {
-            if(num > 1) query += ','
-            query += ' genre in $' + num
-            num += 1
-            params.push(filter.genre)
-        }
         if (filter.status) {
-            if(num > 1) query += ','
+            if(num > 1) query += ' and'
+            else query += ' where'
             query += ' status = $' + num
             num += 1
             params.push(filter.status)
         }
 
-        if (num == 1) query = 'select * from "Book"'
-
-        conn.query(query, (err, res) => {
+        conn.query(query, params, (err, res) => {
             if(err) return reject(err)
             return resolve(res.rows)
         })
@@ -426,6 +470,19 @@ db.delete = (endpoint) => {
         conn.query(query, params, (err, res) => {
             if (err) return reject(err)
             return resolve(res.rows[0])
+        })
+    })
+}
+
+db.delete_all_genres = (endpoint) => {
+    return new Promise((resolve, reject) => {
+        let query = 'delete from "BookGenres" where book_endpoint = $1'
+
+        var params = [endpoint]
+
+        conn.query(query, params, (err, res) => {
+            if (err) return reject(err)
+            return resolve(res.rows)
         })
     })
 }

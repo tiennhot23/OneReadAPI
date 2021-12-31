@@ -11,9 +11,10 @@ auth.verifyUser = (req, res, next) => {
     if (token == null) return res.status(401).json({message: message.auth.unauthorized})
 
     jwt.verify(token, process.env.ACCESSTOKEN, (err, ress) => {
+        if (err) return res.status(400).json({message: message.auth.token_invalid})
         var user = ress.user
-        if (err || user.role < 0) return res.status(403).json({message: message.auth.forbidden})
-        if (req.body.username && req.body.username != user.username && user.role == 0) return res.status(403).json({message: message.auth.forbidden})
+        if (user.role < 0) return res.status(403).json({message: message.auth.forbidden})
+        if (req.params.username && req.params.username != user.username && user.role == 0) return res.status(403).json({message: message.auth.forbidden})
         req.user = user
         next()
     })
@@ -26,8 +27,9 @@ auth.verifyAdmin = (req, res, next) => {
     if (token == null) return res.status(401).json({message: message.auth.unauthorized})
 
     jwt.verify(token, process.env.ACCESSTOKEN, (err, ress) => {
+        if (err) return res.status(400).json({message: message.auth.token_invalid})
         var user = ress.user
-        if (err || user.role < 1) return res.status(403).json({message: message.auth.forbidden})
+        if (user.role < 1) return res.status(403).json({message: message.auth.forbidden})
         req.user = user
         next()
     })

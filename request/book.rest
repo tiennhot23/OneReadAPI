@@ -3,10 +3,11 @@ POST http://localhost:3000/book/
 Content-Type: application/json
 
 {
-    "title": "Sherlock holmes",
-    "type": "Novel",
+    "title": "HARD CORE LEVELING WARRIOR",
+    "type": "Comic",
+    "author": "Tabaka Yuuki",
     "genres": [
-        "trinh-tham"
+        "action", "fantasy", "manhwa", "comedy", "supernatural"
     ]
 }
 
@@ -39,6 +40,12 @@ Content-Type: application/json
 
 ### Lấy danh sách book
 GET http://localhost:3000/book/all
+Content-Type: application/json
+
+{
+    "genres": ["action", "comedy"],
+    "title": "one"
+}
 
 ### Lấy danh sách suggest book
 GET http://localhost:3000/book/suggest-book

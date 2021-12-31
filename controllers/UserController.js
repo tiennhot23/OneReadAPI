@@ -15,7 +15,7 @@ user.get_data_from_token = (token) => {
 
 user.get = (username, password) => {
     return new Promise((resolve, reject) => {
-        let query = 'select * from "Account" where username = $1 limit 1'
+        let query = 'select username, avatar, status, email from "Account" where username = $1 limit 1'
         let params = [username]
 
         conn.query(query, params, (err, res) => {
@@ -67,6 +67,17 @@ user.follow_book = (book_endpoint, username) => {
     })
 }
 
+user.unfollow_book = (book_endpoint, username) => {
+    return new Promise((resolve, reject) => {
+        let params = [book_endpoint, username]
+        let query = 'delete from "BookFollows" where book_endpoint = $1 and username = $2 returning *'
+        conn.query(query, params, (err, res) => {
+            if (err) return reject(err)
+            else return resolve(res.rows[0])
+        })
+    })
+}
+
 user.get_book_following = (username) => {
     return new Promise((resolve, reject) => {
         let params = [username]
@@ -109,7 +120,7 @@ user.add = (user) => {
             num += 1
             params.push(user.email)
         }
-        query += ') returning *;'
+        query += ')'
 
         conn.query(query, params, (err, res) => {
             if (err) {
@@ -156,7 +167,7 @@ user.update = (user) => {
             num += 1
             params.push(user.role)
         }
-        query += ' where username = $' + num + ' returning *'
+        query += ' where username = $' + num + ' returning username, avatar, email, status, role'
         params.push(user.username)
         if (num == 1) return resolve(null)
         else {
@@ -174,7 +185,7 @@ user.update = (user) => {
 user.delete = (username) => {
     return new Promise((resolve, reject) => {
         let params = [username]
-        let query = `delete from "Account" where username = $1 returning *`
+        let query = `delete from "Account" where username = $1 returning username, avatar, email, status, role`
         conn.query(query, params, (err, res) => {
             if (err) return reject(err)
             else return resolve(res.rows[0])
@@ -182,17 +193,5 @@ user.delete = (username) => {
     })
 }
 
-
-// user.is_following = (user, username) => {
-//     return user.following.includes(username)
-// }
-
-// user.is_followed = (user, username) => {
-//     return user.follower.includes(username)
-// }
-
-// user.is_stared = (user, slug) => {
-//     return user.star.includes(slug)
-// }
 
 module.exports = user

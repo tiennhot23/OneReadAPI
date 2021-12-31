@@ -69,6 +69,8 @@ module.exports = {
         choose_file: 'Vui lòng chọn file'
     },
     user:{
+        registed_success: 'Đăng kí thành công',
+        registed_fail: 'Đăng kí thất bại',
         not_found: 'User không tồn tại',
         no_history_found: 'Không tìm thấy lịch sử xem nào',
         missing_username: 'Thiếu username',
@@ -90,6 +92,11 @@ module.exports = {
         book_follows_pk: 'Sách đã được follow bởi user này',
         book_fk: 'Sách không tồn tại',
         username_fk: 'User này không khả dụng'
+    },
+    history:{
+        delete_all: 'Đã xoá toàn bộ lịch sử đọc',
+        delete_success: 'Xoá thành công',
+        not_found: 'Không tìm thấy lịch sử đọc nào'
     },
     auth:{
         unauthorized: 'Cần tài khoản để có thể thực hiện chức năng này',
