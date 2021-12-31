@@ -35,7 +35,26 @@ router.patch('/:type/:endpoint', async (req, res, next) => {
             else res.status(404).json({message: message.report.not_found})
         }
     } catch (err) {
-        res.status(500).json({message: err.message})
+        if (err.constraint){
+            switch (err.constraint) {
+                case 'report_pk': {
+                    res.status(400).json({message: message.report.report_pk})
+                    break
+                }
+                case 'type_constraint': {
+                    res.status(400).json({message: message.report.type_constraint})
+                    break
+                }
+                case 'status_constraint': {
+                    res.status(400).json({message: message.report.status_constraint})
+                    break
+                }
+                default: {
+                    res.status(500).json({message: err.message})
+                    break
+                }
+            }
+        } else res.status(500).json({message: err.message})
     }
 })
 
@@ -46,7 +65,7 @@ router.patch('/:type/:endpoint', async (req, res, next) => {
  * @body {endpoint, type {A,C}, reason}
  * @returns report
  */
-router.post('/', slugify.get_endpoint, async (req, res, next) => {
+router.post('/:username', slugify.get_endpoint, async (req, res, next) => {
     var report = req.body
     try {
         if (!report.endpoint) {

@@ -179,7 +179,7 @@ db.filter_with_genres = (filter) => {
         (select book_endpoint, count(book_endpoint) as count 
         from "BookGenres" where genre_endpoint = any($1::varchar[])
         group by book_endpoint) as bg
-        where b.endpoint = bg.book_endpoint`
+        where b.endpoint = bg.book_endpoint and status <> -1`
         
         if (filter.title) {
             query += ` and title ilike $` + num
@@ -216,33 +216,25 @@ db.filter_without_genres = (filter) => {
     return new Promise((resolve, reject) => {
         let num = 1
         let params = []
-        let query = `select * from "Book"`
+        let query = `select * from "Book" where status <> -1`
         
         if (filter.title) {
-            if(num > 1) query += ' and'
-            else query += ' where'
-            query += ` title ilike $` + num
+            query += ` and title ilike $` + num
             num += 1
             params.push('%' + filter.title + '%')
         }
         if (filter.author) {
-            if(num > 1) query += ' and'
-            else query += ' where'
-            query += ` lower(author) = lower($` + num + `)`
+            query += ` and lower(author) = lower($` + num + `)`
             num += 1
             params.push(filter.author)
         }
         if (filter.type) {
-            if(num > 1) query += ' and'
-            else query += ' where'
-            query += ' type = $' + num
+            query += ' and type = $' + num
             num += 1
             params.push(filter.type)
         }
         if (filter.status) {
-            if(num > 1) query += ' and'
-            else query += ' where'
-            query += ' status = $' + num
+            query += ' and status = $' + num
             num += 1
             params.push(filter.status)
         }
@@ -438,7 +430,6 @@ db.add_view = (book_endpoint, time) => {
 
 db.update_view = (book_endpoint, time) => {
     return new Promise((resolve, reject) => {
-        console.log(book_endpoint, time)
         let query = 'update "BookViews" set view = (view + 1) where book_endpoint = $1 and time = $2 returning view'
         let params = [book_endpoint, time]
 

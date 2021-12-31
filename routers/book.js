@@ -29,7 +29,7 @@ router.get('/all', async (req, res, next) => {
     }
 })
 
-router.get('/suggest-book', auth.verifyUser, async (req, res, next) => {
+router.get('/suggest-book/:username', auth.verifyUser, async (req, res, next) => {
     var user = req.user
     var books
     try {
@@ -132,7 +132,7 @@ router.get('/relate-book/:endpoint', async (req, res, next) => {
     }
 })
 
-router.get('/:endpoint', async (req, res, next) => {
+router.get('/detail/:endpoint', async (req, res, next) => {
     let endpoint = req.params.endpoint
     let search = req.body.search
     var book

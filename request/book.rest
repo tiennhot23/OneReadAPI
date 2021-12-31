@@ -43,8 +43,7 @@ GET http://localhost:3000/book/all
 Content-Type: application/json
 
 {
-    "genres": ["action", "comedy"],
-    "title": "one"
+    "type": "Novel"
 }
 
 ### Lấy danh sách suggest book

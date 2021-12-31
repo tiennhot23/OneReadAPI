@@ -6,7 +6,7 @@ const auth = require('../middlewares/auth')
 const slugify = require('../middlewares/slugify')
 const message = require('../configs/messages')
 
-router.get('/all', auth.verifyUser, async (req, res, next) => {
+router.get('/all/:username', auth.verifyUser, async (req, res, next) => {
     const user = req.user
     var notifys
     try {
@@ -17,7 +17,7 @@ router.get('/all', auth.verifyUser, async (req, res, next) => {
     }
 })
 
-router.get('/:endpoint', auth.verifyUser, async (req, res, next) => {
+router.get('/:endpoint/:username', auth.verifyUser, async (req, res, next) => {
     let username = req.user.username
     let endpoint = req.params.endpoint
     var notify
@@ -43,7 +43,7 @@ router.get('/:endpoint', auth.verifyUser, async (req, res, next) => {
  * @body {endpoint, username, content}
  * @returns notify
  */
-router.post('/', auth.verifyUser, async (req, res, next) => {
+router.post('/', auth.verifyAdmin, async (req, res, next) => {
     var notify = req.body
     try {
         if (!notify.endpoint) {
@@ -85,7 +85,7 @@ router.post('/', auth.verifyUser, async (req, res, next) => {
  * @body 
  * @returns notifys
  */
- router.delete('/read-notify', async (req, res, next) => {
+ router.delete('/read-notify/:username', auth.verifyUser, async (req, res, next) => {
     let notifys
     try {
         notifys = await NotifyController.deleteRead()
@@ -100,7 +100,7 @@ router.post('/', auth.verifyUser, async (req, res, next) => {
  * @body 
  * @returns notify
  */
- router.delete('/:endpoint', auth.verifyUser, async (req, res, next) => {
+ router.delete('/:endpoint/:username', auth.verifyUser, async (req, res, next) => {
     let notify
     let endpoint = req.params.endpoint
     let username = req.user.username

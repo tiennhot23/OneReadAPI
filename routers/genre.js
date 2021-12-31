@@ -16,7 +16,7 @@ router.get('/all', async (req, res, next) => {
     }
 })
 
-router.get('/:endpoint', async (req, res, next) => {
+router.get('/detail/:endpoint', async (req, res, next) => {
     let endpoint = req.params.endpoint
     var genre
     try {
@@ -86,7 +86,19 @@ router.post('/', slugify.get_endpoint, async (req, res, next) => {
         if (genre) res.status(200).json(genre)
         else res.status(404).json({message: message.genre.not_found})
     } catch (err) {
-        res.status(500).json({message: err.message})
+        if (err.constraint){
+            switch (err.constraint) {
+                case 'genre_pk': {
+                    res.status(400).json({message: message.genre.genre_pk})
+                    break
+                }
+                default: {
+                    res.status(500).json({message: err.message})
+                    break;
+                }
+            }
+        }
+        else res.status(500).json({message: err.message})
     }
 })
 

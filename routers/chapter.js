@@ -9,8 +9,9 @@ const NotifyController = require('../controllers/NotifyController')
 const BookController = require('../controllers/BookController')
 const slugify = require('../middlewares/slugify')
 const message = require('../configs/messages')
+const auth = require('../middlewares/auth')
 
-router.get('/:book_endpoint/all', async (req, res, next) => {
+router.get('/all/:book_endpoint', async (req, res, next) => {
     let book_endpoint = req.params.book_endpoint
     var chapters
     try {
@@ -21,7 +22,7 @@ router.get('/:book_endpoint/all', async (req, res, next) => {
     }
 })
 
-router.get('/:book_endpoint/:chapter_endpoint', async (req, res, next) => {
+router.get('/detail/:book_endpoint/:chapter_endpoint', async (req, res, next) => {
     let chapter_endpoint = req.params.chapter_endpoint
     let book_endpoint = req.params.book_endpoint
     let view = req.body.view
@@ -30,6 +31,7 @@ router.get('/:book_endpoint/:chapter_endpoint', async (req, res, next) => {
         if (chapter_endpoint) {
             chapter = await ChapterController.get(book_endpoint, chapter_endpoint)
             if (chapter) {
+                res.status(200).json(chapter)
                 const authHeader = req.headers['authorization']
                 const token = authHeader && authHeader.split(' ')[1]
                 if (token) {
@@ -54,7 +56,6 @@ router.get('/:book_endpoint/:chapter_endpoint', async (req, res, next) => {
                     }
                     
                 }
-                res.status(200).json(chapter)
             }
             else res.status(404).json({message: message.chapter.not_found})
         } else {
@@ -66,7 +67,7 @@ router.get('/:book_endpoint/:chapter_endpoint', async (req, res, next) => {
 })
 
 
-router.post('/', slugify.get_endpoint, async (req, res, next) => {
+router.post('/', auth.verifyAdmin, slugify.get_endpoint, async (req, res, next) => {
     var chapter = {
         chapter_endpoint: req.body.endpoint,
         book_endpoint: req.body.book_endpoint,
@@ -129,11 +130,11 @@ router.post('/', slugify.get_endpoint, async (req, res, next) => {
  * @body {chapter_endpoint, (title), (description)}
  * @returns chapter
  */
- router.patch('/:chapter_endpoint', slugify.get_endpoint, async (req, res, next) => {
+ router.patch('/book_endpoint/:chapter_endpoint', slugify.get_endpoint, async (req, res, next) => {
     let chapter_endpoint = req.params.chapter_endpoint
     var chapter = {
         chapter_endpoint: req.body.endpoint,
-        book_endpoint: req.body.book_endpoint,
+        book_endpoint: req.params.book_endpoint,
         title: req.body.title,
         images: req.body.images
     }

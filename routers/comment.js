@@ -18,7 +18,7 @@ router.get('/:endpoint', auth.verifyUser, async (req, res, next) => {
     }
 })
 
-router.get('/reply/:id', async (req, res, next) => {
+router.get('/detail/:id', async (req, res, next) => {
     let id = req.params.id
     var replies
     try {
@@ -37,7 +37,7 @@ router.get('/reply/:id', async (req, res, next) => {
  * @body {endpoint, username, id_root, content, files}
  * @returns comment
  */
-router.post('/', async (req, res, next) => {
+router.post('/:username', auth.verifyUser, async (req, res, next) => {
     var comment = req.body
     try {
         if (!comment.endpoint) {
@@ -57,7 +57,7 @@ router.post('/', async (req, res, next) => {
                         username: tag,
                         content: message.notify.tag_notification
                     }
-                    await NotifyController.add(notify)
+                    NotifyController.add(notify)
                 }
             })
             res.status(200).json(comment)
