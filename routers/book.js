@@ -316,6 +316,50 @@ router.patch('/finish/:endpoint', auth.verifyAdmin, async (req, res, next) => {
     }
 })
 
+router.patch('/rate/:endpoint', auth.verifyUser, async (req, res, next) => {
+    let endpoint = req.params.endpoint
+    var book = req.body
+    try {
+        var book = await BookController.get(endpoint)
+        if (!book.rating) {
+            return res.status(400).json({message: message.book.missing_rating})
+        } else if (!book.rate_count) {
+            return res.status(400).json({message: message.book.missing_rate_count})
+        } else {
+            book = await BookController.update_rating(book, endpoint)
+            if (book) res.status(200).json(book)
+            else res.status(404).json({message: message.book.not_found})  
+        }
+    } catch (err) {
+        if (err.constraint){
+            switch (err.constraint) {
+                case 'book_pk': {
+                    res.status(400).json({message: message.book.book_pk})
+                    break
+                }
+                case 'type_constraint': {
+                    res.status(400).json({message: message.book.type_constraint})
+                    break
+                }
+                case 'genre_fk': {
+                    res.status(400).json({message: message.genre.not_found})
+                    break
+                }
+                case 'book_fk': {
+                    res.status(400).json({message: message.book.not_found})
+                    break
+                }
+                default:{
+                    res.status(500).json({message: err.message})
+                    break
+                }
+            }
+        } else {
+            res.status(500).json({message: err.message})
+        }
+    }
+})
+
 /**
  * xoá book - cập nhật status = -1
  * @body {}
