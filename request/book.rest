@@ -1,15 +1,24 @@
 ### thêm book
 POST http://localhost:3000/book/
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJuYW1lIjoic2FpIiwiYXZhdGFyIjoiaHR0cHM6Ly90aHVtYnMuZHJlYW1zdGltZS5jb20vYi9kZWZhdWx0LWF2YXRhci1wcm9maWxlLWljb24tc29jaWFsLW1lZGlhLXVzZXItdmVjdG9yLWRlZmF1bHQtYXZhdGFyLXByb2ZpbGUtaWNvbi1zb2NpYWwtbWVkaWEtdXNlci12ZWN0b3ItcG9ydHJhaXQtMTc2MTk0ODc2LmpwZyIsImVtYWlsIjoiaW1hZ2VzYWl0YW1hQGdtYWlsLmNvbSIsInN0YXR1cyI6MCwicm9sZSI6MSwicGFzc3dvcmQiOiIifSwiaWF0IjoxNjQwOTc0ODg5LCJleHAiOjE2NzI1MTA4ODl9.9j6Ov8eys7a8m0S1G5LMDZw0_krjw6eNoOmANAC-m3U
 Content-Type: application/json
 
 {
-    "title": "HARD CORE LEVELING WARRIOR",
+    "title": "Nghịch Thiên Tà Thần",
+    "thumb": "//st.nettruyengo.com/data/comics/154/nghich-thien-ta-than.jpg",
+    "theme": "//st.nettruyengo.com/data/comics/154/nghich-thien-ta-than.jpg",
     "type": "Comic",
-    "author": "Tabaka Yuuki",
+    "description": "Nhất đại thiên tài huyền mạch bị hao tổn trở thành phế vật, gia tộc vứt bỏ, thế nhân chế giễu, thậm chí đêm tân hôn bị người độc hại...... Huyền Thiên chí bảo, luân hồi kính hiện, nghịch thiên cải mệnh, khởi động lại nhân sinh, mang theo cừu hận cùng tiếc nuối, thề phải đăng đỉnh lực lượng đỉnh phong!",
     "genres": [
-        "action", "fantasy", "manhwa", "comedy", "supernatural"
+      "action",
+      "adventure",
+      "manhua",
+      "mystery",
+      "shounen",
+      "supernatural",
+      "truyen-mau"
     ]
-}
+  }
 
 ### cập nhật book
 PATCH http://localhost:3000/book/sherlock-holme

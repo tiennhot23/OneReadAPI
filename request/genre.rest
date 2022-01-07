@@ -3,8 +3,8 @@ POST http://localhost:3000/genre/
 Content-Type: application/json
 
 {
-    "title": "Trinh thám",
-    "description": "Dùng não cực căng"
+    "title": "Webtoon",
+    "description": "Là truyện tranh được đăng dài kỳ trên internet của Hàn Quốc chứ không xuất bản theo cách thông thường"
 }
 
 ### cập nhật genre

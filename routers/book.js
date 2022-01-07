@@ -154,7 +154,20 @@ router.get('/detail/:endpoint', async (req, res, next) => {
 })
 
 
-
+router.get('/type/:type', async (req, res, next) => {
+    let type = req.params.type
+    var books
+    try {
+        if (type) {
+            books = await BookController.get_book_of_type(type)
+            return res.status(200).json(books)
+        } else {
+            return res.status(400).json({message: message.book.missing_type})
+        }
+    } catch (err) {
+        res.status(500).json({message: err.message})
+    }
+})
 
 
 /**
@@ -170,22 +183,22 @@ router.post('/', auth.verifyAdmin, slugify.get_endpoint, async (req, res, next) 
         } else if (!book.type) {
             res.status(400).json({message: message.book.missing_type})
         } else {
-            await TransactionController.begin()
+            // await TransactionController.begin()
             let genres = book.genres
             book = await BookController.add(book)
             if (genres) await BookController.add_book_genres(book.endpoint, genres)
             let view = await BookController.add_view(book.endpoint, new Date().toISOString().slice(0,10))
             book.view = view.view
-            book.genres = []
-            genres.forEach(async (genre) => {
-                genre = await GenreController.get(genre)
-                book.genres.push(genre)
-            })
-            await TransactionController.commit()
+            book.genres = genres
+            // genres.forEach(async (genre) => {
+            //     genre = await GenreController.get(genre)
+            //     book.genres.push(genre)
+            // })
+            // await TransactionController.commit()
             res.status(200).json(book)
         }
     } catch (err) {
-        await TransactionController.rollback()
+        // await TransactionController.rollback()
         if (err.constraint){
             switch (err.constraint) {
                 case 'book_pk': {

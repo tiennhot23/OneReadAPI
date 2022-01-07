@@ -82,12 +82,12 @@ router.post('/', auth.verifyAdmin, slugify.get_endpoint, async (req, res, next) 
         } else if (!chapter.book_endpoint) {
             res.status(400).json({message: message.chapter.missing_book_endpoint})
         } else {
-            await TransactionController.begin()
+            // await TransactionController.begin()
             chapter = await ChapterController.add(chapter)
             chapter.images = req.body.images
             let images = await ChapterController.add_chapter_detail(chapter)
             chapter.images = images.images
-            await TransactionController.commit()
+            // await TransactionController.commit()
             var followers = await BookController.get_user_follow(chapter.book_endpoint)
             followers.forEach(async (user) => {
                 let notify = {
@@ -100,7 +100,7 @@ router.post('/', auth.verifyAdmin, slugify.get_endpoint, async (req, res, next) 
             return res.status(200).json(chapter)
         }
     } catch (err) {
-        await TransactionController.rollback()
+        // await TransactionController.rollback()
         if (err.constraint){
             switch (err.constraint) {
                 case 'chapter_pk': {
