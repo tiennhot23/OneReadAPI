@@ -5,6 +5,7 @@ const GenreController = require('../controllers/GenreController')
 
 const slugify = require('../middlewares/slugify')
 const message = require('../configs/messages')
+const auth = require('../middlewares/auth')
 
 router.get('/all', async (req, res, next) => {
     var genres
@@ -39,7 +40,7 @@ router.get('/detail/:endpoint', async (req, res, next) => {
  * @body {endpoint, title, (description)}
  * @returns genre
  */
-router.post('/', slugify.get_endpoint, async (req, res, next) => {
+router.post('/', auth.verifyAdmin, slugify.get_endpoint, async (req, res, next) => {
     var genre = {
         endpoint: req.body.endpoint,
         title: req.body.title,
@@ -74,7 +75,7 @@ router.post('/', slugify.get_endpoint, async (req, res, next) => {
  * @body {endpoint, (title), (description)}
  * @returns genre
  */
- router.patch('/:endpoint', slugify.get_endpoint, async (req, res, next) => {
+ router.patch('/:endpoint', auth.verifyAdmin, slugify.get_endpoint, async (req, res, next) => {
     var genre = {
         endpoint: req.body.endpoint,
         title: req.body.title,
@@ -107,7 +108,7 @@ router.post('/', slugify.get_endpoint, async (req, res, next) => {
  * @body {endpoint, title, (description)}
  * @returns genre
  */
- router.delete('/:endpoint', async (req, res, next) => {
+ router.delete('/:endpoint', auth.verifyAdmin, async (req, res, next) => {
     let genre
     let endpoint = req.params.endpoint
     try {

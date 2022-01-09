@@ -10,6 +10,68 @@ const slugify = require('../middlewares/slugify')
 const message = require('../configs/messages')
 const auth = require('../middlewares/auth')
 
+
+// //thêm dữ liệu từ web scraping
+// const slug = require('slugify')
+// const data = require('../data/list-comic-3')
+// router.get('/', async (req, res, next) => {
+//     for (var e of data){
+//         console.log(e.title)
+//         // await new Promise(resolve => setTimeout(resolve, 7000))
+//         var book = e
+//         try {
+//             if (!book.title) {
+//                 res.status(400).json({message: message.book.missing_title})
+//             } else if (!book.type) {
+//                 res.status(400).json({message: message.book.missing_type})
+//             } else {
+//                 book.endpoint = slug(book.title, { lower: true, strict: true })
+//                 let genres = book.genres
+//                 const blacklist = ['harem', 'magical', 'adult', 'anime', 'cooking', 'doujinshi', 'dam-my', 'live-action', 'mecha', 'anime', 'romance', 'isekai', 'fi', 'sci' 
+//                 , 'shoujo-ai', 'shounen-ai', 'smut', 'soft-yuri', 'thieu-nhi', '16+', 'soft-yaoi', 'gender-bender', 'tap-chi-truyen-tranh', 'truyen-scan', 'viet-nam']
+//                 const found = genres.some(r=> blacklist.includes(r))
+//                 if (!found) {
+//                     book = await BookController.add(book)
+//                     if (genres) await BookController.add_book_genres(book.endpoint, genres)
+//                     let view = await BookController.add_view(book.endpoint, new Date().toISOString().slice(0,10))
+//                     book.view = view.view
+//                     book.genres = genres
+//                 } else {
+//                     console.log(genres)
+//                 }
+//             }
+//         } catch (err) {
+//             console.log(err)
+//             if (err.constraint){
+//                 switch (err.constraint) {
+//                     case 'book_pk': {
+//                         res.status(400).json({message: message.book.book_pk})
+//                         break
+//                     }
+//                     case 'type_constraint': {
+//                         res.status(400).json({message: message.book.type_constraint})
+//                         break
+//                     }
+//                     case 'genre_fk': {
+//                         res.status(400).json({message: message.genre.not_found})
+//                         break
+//                     }
+//                     case 'book_fk': {
+//                         res.status(400).json({message: message.book.not_found})
+//                         break
+//                     }
+//                     default:{
+//                         res.status(500).json({message: err.message})
+//                         break
+//                     }
+//                 }
+//             } else {
+//                 res.status(500).json({message: err.message})
+//             }
+//         }
+//     }
+// })
+
 /**
  * Lấy danh sách các sách với filter nếu có và phân trang
  * @body filter{author (không dùng %%), type, genre, status (0, 1)}
