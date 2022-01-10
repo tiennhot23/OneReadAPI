@@ -130,7 +130,7 @@ router.post('/', auth.verifyAdmin, slugify.get_endpoint, async (req, res, next) 
  * @body {chapter_endpoint, (title), (description)}
  * @returns chapter
  */
- router.patch('/book_endpoint/:chapter_endpoint', slugify.get_endpoint, async (req, res, next) => {
+ router.patch('/:book_endpoint/:chapter_endpoint', auth.verifyAdmin, slugify.get_endpoint, async (req, res, next) => {
     let chapter_endpoint = req.params.chapter_endpoint
     var chapter = {
         chapter_endpoint: req.body.endpoint,
@@ -141,24 +141,32 @@ router.post('/', auth.verifyAdmin, slugify.get_endpoint, async (req, res, next) 
     try {
         if (!chapter.book_endpoint) {
             return res.status(400).json({message: message.chapter.missing_book_endpoint})
+        } else if (!chapter.images || chapter.images.length == 0) {
+            return res.status(400).json({message: message.chapter.missing_images})
         }
-        await TransactionController.begin()
-        if (chapter.title) {
-            chapter = await ChapterController.update(chapter, chapter_endpoint)
-        } 
+        chapter = await ChapterController.update(chapter, chapter_endpoint)
         if (chapter) {
-            if (chapter.images && chapter.images.length != 0) {
-                chapter.images = req.body.images
-                chapter.images = await ChapterController.update_chapter_images(chapter)
-            }
-            await TransactionController.commit()
             return res.status(200).json(chapter)
         } else {
-            await TransactionController.commit()
             return res.status(404).json({message: message.chapter.not_found})
         }
+        // await TransactionController.begin()
+        // if (chapter.title) {
+        //     chapter = await ChapterController.update(chapter, chapter_endpoint)
+        // } 
+        // if (chapter) {
+        //     if (chapter.images && chapter.images.length != 0) {
+        //         chapter.images = req.body.images
+        //         chapter.images = await ChapterController.update_chapter_images(chapter)
+        //     }
+        //     await TransactionController.commit()
+        //     return res.status(200).json(chapter)
+        // } else {
+        //     await TransactionController.commit()
+        //     return res.status(404).json({message: message.chapter.not_found})
+        // }
     } catch (err) {
-        await TransactionController.rollback()
+        // await TransactionController.rollback()
         if (err.constraint){
             switch (err.constraint) {
                 case 'chapter_pk': {

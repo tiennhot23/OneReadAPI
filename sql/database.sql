@@ -108,22 +108,23 @@ create table "Chapter"
 			references "Book"(endpoint)
 				on update cascade,
 	title text not null,
+	images text[] not null,
 	time date not null default (date(localtimestamp at time zone 'GMT+7')),
 	constraint chapter_pk
         primary key (chapter_endpoint, book_endpoint)
 );
 
-create table "ChapterDetail"
-(
-    chapter_endpoint varchar(255) not null,
-    book_endpoint varchar(255) not null,
-    images varchar[] not null,
-    constraint chapter_detail_fk
-        foreign key (chapter_endpoint, book_endpoint)
-            references "Chapter"(chapter_endpoint, book_endpoint)
-                on update cascade
-                on delete cascade
-);
+-- create table "ChapterDetail"
+-- (
+--     chapter_endpoint varchar(255) not null,
+--     book_endpoint varchar(255) not null,
+--     images varchar[] not null,
+--     constraint chapter_detail_fk
+--         foreign key (chapter_endpoint, book_endpoint)
+--             references "Chapter"(chapter_endpoint, book_endpoint)
+--                 on update cascade
+--                 on delete cascade
+-- );
 
 create table "History"
 (
@@ -235,7 +236,7 @@ delete from "BookViews" where true;
 delete from "Comment" where true;
 delete from "History" where true;
 delete from "BookFollows" where true;
-delete from "ChapterDetail" where true;
+--delete from "ChapterDetail" where true;
 delete from "Chapter" where true;
 delete from "Account" where true;
 delete from "Book" where true;
@@ -258,7 +259,7 @@ drop table "BookViews";
 drop table "Comment";
 drop table "History";
 drop table "BookFollows";
-drop table "ChapterDetail";
+--drop table "ChapterDetail";
 drop table "Chapter";
 drop table "Account";
 drop table "Book";
@@ -271,10 +272,12 @@ select * from "BookViews";
 select * from "Comment";
 select * from "History";
 select * from "BookFollows";
-select * from "ChapterDetail";
+--select * from "ChapterDetail";
 select * from "Chapter";
 select * from "Account";
 select * from "Book";
+
+
 
 
 --data
@@ -361,8 +364,15 @@ and type = 'Comic'
 and count >= 2
 order by count desc;
 
+delete from "BookGenres" where book_endpoint = 'anh-hung-rac-ruoi' returning *;
+delete from "BookViews" where book_endpoint = 'anh-hung-rac-ruoi' returning *;
+delete from "Book" where endpoint = 'anh-hung-rac-ruoi' returning *;
 
-select date_part('day', date(localtimestamp at time zone 'GMT+7'));
+select * from "Genre" where endpoint = 'ngon-tinh';
+select * from "Book" where endpoint = 'dai-chien-titan';
+select * from "Book";
+
+
 
 
 

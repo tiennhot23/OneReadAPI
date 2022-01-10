@@ -4,7 +4,7 @@ const db = {}
 
 db.get = (book_endpoint, chapter_endpoint) => {
     return new Promise((resolve, reject) => {
-        let query = `select * from "Chapter", (select images from "ChapterDetail" where chapter_endpoint = $2 and book_endpoint = $1) as images where chapter_endpoint = $2 and book_endpoint = $1`
+        let query = `select * from "Chapter" where chapter_endpoint = $2 and book_endpoint = $1`
 
         var params = [book_endpoint, chapter_endpoint]
         conn.query(query, params, (err, res) => {
@@ -17,7 +17,7 @@ db.get = (book_endpoint, chapter_endpoint) => {
 db.list = (book_endpoint) => {
     return new Promise((resolve, reject) => {
         let params = [book_endpoint]
-        let query = 'select * from "Chapter" where book_endpoint = $1 order by time desc'
+        let query = 'select chapter_endpoint, book_endpoint, title, time from "Chapter" where book_endpoint = $1 order by time desc'
 
         conn.query(query, params, (err, res) => {
             if(err) return reject(err)
@@ -28,8 +28,8 @@ db.list = (book_endpoint) => {
 
 db.add = (chapter) => {
     return new Promise((resolve, reject) => {
-        let query = 'insert into "Chapter" (chapter_endpoint, book_endpoint, title) values ($1, $2, $3) returning *' 
-        var params = [chapter.chapter_endpoint, chapter.book_endpoint, chapter.title]
+        let query = 'insert into "Chapter" (chapter_endpoint, book_endpoint, title, images) values ($1, $2, $3, $4) returning *' 
+        var params = [chapter.chapter_endpoint, chapter.book_endpoint, chapter.title, chapter.images]
 
         conn.query(query, params, (err, res) => {
             if (err) return reject(err)
@@ -38,22 +38,22 @@ db.add = (chapter) => {
     })
 }
 
-db.add_chapter_detail = (chapter) => {
-    return new Promise((resolve, reject) => {
-        let query = 'insert into "ChapterDetail" (chapter_endpoint, book_endpoint, images) values ($1, $2, $3) returning images' 
-        var params = [chapter.chapter_endpoint, chapter.book_endpoint, chapter.images]
+// db.add_chapter_detail = (chapter) => {
+//     return new Promise((resolve, reject) => {
+//         let query = 'insert into "ChapterDetail" (chapter_endpoint, book_endpoint, images) values ($1, $2, $3) returning images' 
+//         var params = [chapter.chapter_endpoint, chapter.book_endpoint, chapter.images]
 
-        conn.query(query, params, (err, res) => {
-            if (err) return reject(err)
-            else return resolve(res.rows[0])
-        })
-    })
-}
+//         conn.query(query, params, (err, res) => {
+//             if (err) return reject(err)
+//             else return resolve(res.rows[0])
+//         })
+//     })
+// }
 
 db.update = (chapter, chapter_endpoint) => {
     return new Promise((resolve, reject) => {
-        let params = [chapter.title, chapter.chapter_endpoint, chapter_endpoint, chapter.book_endpoint]
-        let query = 'update "Chapter" set title = $1, chapter_endpoint = $2 where chapter_endpoint = $3 and book_endpoint = $4 returning *'
+        let params = [chapter.title, chapter.chapter_endpoint, chapter.images, chapter_endpoint, chapter.book_endpoint]
+        let query = 'update "Chapter" set title = $1, chapter_endpoint = $2, images = $3 where chapter_endpoint = $4 and book_endpoint = $5 returning *'
 
         conn.query(query, params, (err, res) => {
             if (err) return reject(err)
@@ -62,17 +62,17 @@ db.update = (chapter, chapter_endpoint) => {
     })
 }
 
-db.update_chapter_images = (chapter) => {
-    return new Promise((resolve, reject) => {
-        let params = [chapter.images, chapter.chapter_endpoint, chapter.book_endpoint]
-        let query = 'update "ChapterDetail" set images = $1 where chapter_endpoint = $2 and book_endpoint = $3 returning images'
+// db.update_chapter_images = (chapter) => {
+//     return new Promise((resolve, reject) => {
+//         let params = [chapter.images, chapter.chapter_endpoint, chapter.book_endpoint]
+//         let query = 'update "ChapterDetail" set images = $1 where chapter_endpoint = $2 and book_endpoint = $3 returning images'
 
-        conn.query(query, params, (err, res) => {
-            if (err) return reject(err)
-            else return resolve(res.rows[0])
-        })
-    })
-}
+//         conn.query(query, params, (err, res) => {
+//             if (err) return reject(err)
+//             else return resolve(res.rows[0])
+//         })
+//     })
+// }
 
 db.delete = (book_endpoint, chapter_endpoint) => {
     return new Promise((resolve, reject) => {
