@@ -84,9 +84,9 @@ router.post('/', auth.verifyAdmin, slugify.get_endpoint, async (req, res, next) 
         } else {
             // await TransactionController.begin()
             chapter = await ChapterController.add(chapter)
-            chapter.images = req.body.images
-            let images = await ChapterController.add_chapter_detail(chapter)
-            chapter.images = images.images
+            // chapter.images = req.body.images
+            // let images = await ChapterController.add_chapter_detail(chapter)
+            // chapter.images = images.images
             // await TransactionController.commit()
             var followers = await BookController.get_user_follow(chapter.book_endpoint)
             followers.forEach(async (user) => {
