@@ -36,6 +36,9 @@ app.use('/user', user)
 app.use('/notify', notify)
 app.use('/comment', comment)
 app.use('/chapter', chapter)
+app.use('/', (req, res, next) => {
+    res.json({message: 'ONE'})
+})
 
 app.listen(port, () => console.log(`Listening on port ${port}`))
 
