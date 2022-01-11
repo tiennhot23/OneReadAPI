@@ -3,8 +3,7 @@
 ## Chế độ online và offline
 ## Download chapter
 ## Tìm kiếm sách
--	Lưu text tìm kiếm của user vào local
--	Search_number của sách khi thực hiện click ở giao diện tìm kiếm
+-	lưu lịch sử tìm kiếm (10 tìm kiếm gần nhất)
 ## Đọc sách
 -	Tăng view của sách từ book_endpoint trong bảng chapter
 -	Tăng view trong bảng ViewStatistic dựa theo ngày tháng năm và endpoint của sách

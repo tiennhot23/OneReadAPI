@@ -426,7 +426,7 @@ db.get_view = (book_endpoint, time) => {
 }
 
 db.get_book_of_type = (type) => {
-    return new Promise((resovle, reject) => {
+    return new Promise((resolve, reject) => {
         let query = `select * from "Book" where type = $1 order by rate_count desc, rating desc`
         let params = [type]
 
