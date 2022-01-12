@@ -333,10 +333,42 @@ group by book_endpoint
 order by count desc limit 10) as g
 where book_endpoint = endpoint;
 
---top view
+--top view all
+select b.*, view, time from (select book_endpoint, sum(view) as view, max(time) as time from "BookViews"
+--where date_part('day', time) = date_part('day', date(localtimestamp at time zone 'GMT+7'))
+group by book_endpoint order by time desc limit 10) as v, "Book" b
+where v.book_endpoint = b.endpoint
+order by view desc;
+
+--top view month real
 select b.*, view from (select book_endpoint, sum(view) as view from "BookViews"
 where date_part('month', time) = date_part('month', date(localtimestamp at time zone 'GMT+7'))
 group by book_endpoint limit 10) as v, "Book" b
+where v.book_endpoint = b.endpoint
+order by view desc;
+
+--top view day real
+select b.*, view from (select book_endpoint, sum(view) as view from "BookViews"
+where date_part('day', time) = date_part('day', date(localtimestamp at time zone 'GMT+7'))
+group by book_endpoint limit 10) as v, "Book" b
+where v.book_endpoint = b.endpoint
+order by view desc;
+
+--top view month fake
+select b.*, view from (select bv.book_endpoint, sum(bv.view) as view from "BookViews" bv,
+(select book_endpoint, max(time) as time from "BookViews"
+group by book_endpoint order by time desc limit 10) b
+where bv.book_endpoint = b.book_endpoint and date_part('month', bv.time) = date_part('month', b.time) and date_part('year', bv.time) = date_part('year', b.time)
+group by bv.book_endpoint) as v, "Book" b
+where v.book_endpoint = b.endpoint
+order by view desc;
+
+--top view day fake
+select b.*, view from (select bv.book_endpoint, sum(bv.view) as view from "BookViews" bv,
+(select book_endpoint, max(time) as time from "BookViews"
+group by book_endpoint order by time desc limit 10) b
+where bv.book_endpoint = b.book_endpoint and bv.time = b.time
+group by bv.book_endpoint) as v, "Book" b
 where v.book_endpoint = b.endpoint
 order by view desc;
 
@@ -366,11 +398,12 @@ order by count desc;
 
 delete from "BookGenres" where book_endpoint = 'anh-hung-rac-ruoi' returning *;
 delete from "BookViews" where book_endpoint = 'anh-hung-rac-ruoi' returning *;
-delete from "Book" where endpoint = 'anh-hung-rac-ruoi' returning *;
+delete from "Chapter" where book_endpoint = 'giet-con-chim-nhai' returning *;
 
 select * from "Genre" where endpoint = 'ngon-tinh';
 select * from "Book" where endpoint = 'dai-chien-titan';
 select * from "Book";
+select * from "BookGenres";
 
 
 

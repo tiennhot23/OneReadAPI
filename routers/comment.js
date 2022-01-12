@@ -12,7 +12,7 @@ router.get('/:endpoint', auth.verifyUser, async (req, res, next) => {
     var comments
     try {
         comments = await CommentController.list(endpoint)
-        res.status(200).json(comments)
+        res.status(200).json({comments: comments})
     } catch (err) {
         res.status(500).json({message: err.message})
     }
@@ -23,7 +23,7 @@ router.get('/detail/:id', async (req, res, next) => {
     var replies
     try {
         replies = await CommentController.get(id)
-        if (replies) res.status(200).json(replies)
+        if (replies) res.status(200).json({comments: replies})
         else res.status(404).json({message: message.comment.not_found})
     } catch (err) {
         res.status(500).json({message: err.message})
@@ -60,7 +60,7 @@ router.post('/:username', auth.verifyUser, async (req, res, next) => {
                     NotifyController.add(notify)
                 }
             })
-            res.status(200).json(comment)
+            res.status(200).json({comment: comment})
         }
     } catch (err) {
         if (err.constraint){
@@ -96,7 +96,7 @@ router.post('/:username', auth.verifyUser, async (req, res, next) => {
     let id = req.params.id
     try {
         comment = await CommentController.delete(id)
-        if (comment) res.status(200).json(comment)
+        if (comment) res.status(200).json({comment: comment})
         else res.status(404).json({message: message.comment.not_found})
     } catch (err) {
         res.status(500).json({message: err.message})

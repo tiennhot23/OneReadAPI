@@ -11,7 +11,7 @@ router.get('/all/:username', auth.verifyUser, async (req, res, next) => {
     var notifys
     try {
         notifys = await NotifyController.list(user.username)
-        res.status(200).json(notifys)
+        res.status(200).json({notifys: notifys})
     } catch (err) {
         res.status(500).json({message: err.message})
     }
@@ -28,7 +28,7 @@ router.get('/:endpoint/:username', auth.verifyUser, async (req, res, next) => {
             res.status(400).json({message: message.notify.missing_username})
         } else {
             notify = await NotifyController.get(endpoint, username)
-            if (notify) res.status(200).json(notify)
+            if (notify) res.status(200).json({notify: notify})
             else res.status(404).json({message: message.notify.not_found})
         }
     } catch (err) {
@@ -54,7 +54,7 @@ router.post('/', auth.verifyAdmin, async (req, res, next) => {
             res.status(400).json({message: message.notify.missing_content})
         } else {
             notify = await NotifyController.add(notify)
-            res.status(200).json(notify)
+            res.status(200).json({notify: notify})
         }
     } catch (err) {
         if (err.constraint){
@@ -89,7 +89,7 @@ router.post('/', auth.verifyAdmin, async (req, res, next) => {
     let notifys
     try {
         notifys = await NotifyController.deleteRead()
-        res.status(200).json(notifys)
+        res.status(200).json({notifys: notifys})
     } catch (err) {
         res.status(500).json({message: err.message})
     }
@@ -106,7 +106,7 @@ router.post('/', auth.verifyAdmin, async (req, res, next) => {
     let username = req.user.username
     try {
         notify = await NotifyController.delete(endpoint, username)
-        if (notify) res.status(200).json(notify)
+        if (notify) res.status(200).json({notify: notify})
         else res.status(404).json({message: message.notify.not_found})
     } catch (err) {
         res.status(500).json({message: err.message})

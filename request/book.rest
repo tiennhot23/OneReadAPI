@@ -36,11 +36,20 @@ Content-Type: application/json
     
 }
 
+### rate book
+PATCH http://localhost:3000/book/rate/one-punch-man
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJuYW1lIjoic2FpIiwiYXZhdGFyIjoiaHR0cHM6Ly90aHVtYnMuZHJlYW1zdGltZS5jb20vYi9kZWZhdWx0LWF2YXRhci1wcm9maWxlLWljb24tc29jaWFsLW1lZGlhLXVzZXItdmVjdG9yLWRlZmF1bHQtYXZhdGFyLXByb2ZpbGUtaWNvbi1zb2NpYWwtbWVkaWEtdXNlci12ZWN0b3ItcG9ydHJhaXQtMTc2MTk0ODc2LmpwZyIsImVtYWlsIjoiaW1hZ2VzYWl0YW1hQGdtYWlsLmNvbSIsInN0YXR1cyI6MCwicm9sZSI6MSwicGFzc3dvcmQiOiIifSwiaWF0IjoxNjQwOTc0ODg5LCJleHAiOjE2NzI1MTA4ODl9.9j6Ov8eys7a8m0S1G5LMDZw0_krjw6eNoOmANAC-m3U
+Content-Type: application/json
+
+{
+    "rating": 5.0
+}
+
 ### xoá book
 DELETE http://localhost:3000/book/sherlock-holme
 
 ### lấy thông tin book
-GET http://localhost:3000/book/one-piece
+GET http://localhost:3000/book/detail/one-punch-man
 Content-Type: application/json
 
 {

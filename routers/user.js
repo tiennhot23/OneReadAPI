@@ -46,7 +46,7 @@ router.get('/info/:username', async (req, res, next) => {
     try {
         if (username) {
             user = await UserController.get(username)
-            if (user) res.status(200).json(user)
+            if (user) res.status(200).json({user: user})
             else res.status(404).json({message: message.user.not_found})
         } else {
             res.status(400).json({message: message.user.missing_username})
@@ -67,7 +67,7 @@ router.get('/book-following/:username', auth.verifyUser, async (req, res, next) 
             res.status(400).json({message: message.user.missing_username})
         } else {
             books = await UserController.get_book_following(username)
-            res.status(200).json(books)
+            res.status(200).json({books: books})
         }
     } catch (err) {
         res.status(500).json({message: err.message})
@@ -85,7 +85,7 @@ router.get('/comment-history/:username', auth.verifyAdmin, async (req, res, next
             res.status(400).json({message: message.user.missing_username})
         } else {
             comments = await UserController.get_comment_history(username)
-            res.status(200).json(comments)
+            res.status(200).json({comments: comments})
         }
     } catch (err) {
         res.status(500).json({message: err.message})
@@ -103,7 +103,7 @@ router.get('/history/:username', auth.verifyUser, async (req, res, next) => {
             res.status(400).json({message: message.user.missing_username})
         } else {
             books = await HistoryController.list(username)
-            res.status(200).json(books)
+            res.status(200).json({books: books})
         }
     } catch (err) {
         res.status(500).json({message: err.message})
@@ -230,7 +230,7 @@ router.post('/follow-book/:book_endpoint/:username', auth.verifyUser, async (req
             return res.status(400).json({message: message.book.missing_endpoint})
         } else {
             obj = await UserController.follow_book(obj.book_endpoint, obj.username)
-            return res.status(200).json(obj)
+            return res.status(200).json({message: message.user.followed_book})
         }
     }catch (err){
         if (err.constraint){
@@ -268,7 +268,7 @@ router.post('/unfollow-book/:book_endpoint/:username', auth.verifyUser, async (r
             return res.status(400).json({message: message.book.missing_endpoint})
         } else {
             obj = await UserController.unfollow_book(obj.book_endpoint, obj.username)
-            return res.status(200).json(obj)
+            return res.status(200).json({message: message.user.unfollowed_book})
         }
     }catch (err){
         if (err.constraint){
@@ -317,7 +317,7 @@ router.post('/ban/:username', auth.verifyAdmin, async (req, res, next) => {
         } else {
             res.status(404).json({message: message.user.not_found})
         }
-        return res.status(200).json(user)
+        return res.status(200).json({user: user})
     }catch (err){
         if (err.constraint){
             switch (err.constraint) {
@@ -326,7 +326,7 @@ router.post('/ban/:username', auth.verifyAdmin, async (req, res, next) => {
                     break
                 }
                 case 'notify_pk': {
-                    return res.status(200).json(user)
+                    return res.status(200).json({user: user})
                     break
                 }
                 case 'role_constraint': {
@@ -366,7 +366,7 @@ router.post('/unban/:username', auth.verifyAdmin, async (req, res, next) => {
         } else {
             res.status(404).json({message: message.user.not_found})
         }
-        return res.status(200).json(user)
+        return res.status(200).json({user: user})
     }catch (err){
         res.status(500).json({message: err.message})
     }
@@ -381,7 +381,7 @@ router.patch('/:username', auth.verifyUser, async (req, res, next) => {
 
     try{
         user = await UserController.update(user)
-        return res.status(200).json(user)
+        return res.status(200).json({user: user})
     }catch (err){
         return res.status(500).json({message: err.message})
     }
@@ -395,7 +395,7 @@ router.patch('/up-role/:username', auth.verifyAdmin, async (req, res, next) => {
 
     try{
         user = await UserController.update(user)
-        return res.status(200).json(user)
+        return res.status(200).json({user: user})
     }catch (err){
         return res.status(500).json({message: err.message})
     }
@@ -413,7 +413,7 @@ router.patch('/change-password/:username', auth.verifyUser, encrypt.hash, async 
             return res.status(400).json({message: message.user.missing_password})
         } else {
             user = await UserController.update(user)
-            return res.status(200).json(user)
+            return res.status(200).json({user: user})
         }
     }catch (err){
         return res.status(500).json({message: err.message})
@@ -430,7 +430,7 @@ router.delete('/:username', auth.verifyUser, async (req, res, next) => {
             return res.status(400).json({message: message.user.missing_username})
         } else {
             user = await UserController.delete(user.username)
-            if (user) return res.status(200).json(user)
+            if (user) return res.status(200).json({user: user})
             else return res.status(404).json({message: message.user.not_found})
         }
     }catch (err){

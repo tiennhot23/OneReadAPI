@@ -16,7 +16,7 @@ router.get('/all/:book_endpoint', async (req, res, next) => {
     var chapters
     try {
         chapters = await ChapterController.list(book_endpoint)
-        res.status(200).json(chapters)
+        res.status(200).json({chapters: chapters})
     } catch (err) {
         res.status(500).json({message: err.message})
     }
@@ -31,7 +31,7 @@ router.get('/detail/:book_endpoint/:chapter_endpoint', async (req, res, next) =>
         if (chapter_endpoint) {
             chapter = await ChapterController.get(book_endpoint, chapter_endpoint)
             if (chapter) {
-                res.status(200).json(chapter)
+                res.status(200).json({chapter: chapter})
                 const authHeader = req.headers['authorization']
                 const token = authHeader && authHeader.split(' ')[1]
                 if (token) {
@@ -97,7 +97,7 @@ router.post('/', auth.verifyAdmin, slugify.get_endpoint, async (req, res, next) 
                 }
                 await NotifyController.add(notify)
             })
-            return res.status(200).json(chapter)
+            return res.status(200).json({chapter: chapter})
         }
     } catch (err) {
         // await TransactionController.rollback()
@@ -146,7 +146,7 @@ router.post('/', auth.verifyAdmin, slugify.get_endpoint, async (req, res, next) 
         }
         chapter = await ChapterController.update(chapter, chapter_endpoint)
         if (chapter) {
-            return res.status(200).json(chapter)
+            return res.status(200).json({chapter: chapter})
         } else {
             return res.status(404).json({message: message.chapter.not_found})
         }
@@ -160,7 +160,7 @@ router.post('/', auth.verifyAdmin, slugify.get_endpoint, async (req, res, next) 
         //         chapter.images = await ChapterController.update_chapter_images(chapter)
         //     }
         //     await TransactionController.commit()
-        //     return res.status(200).json(chapter)
+        //     return res.status(200).json({chapter: chapter})
         // } else {
         //     await TransactionController.commit()
         //     return res.status(404).json({message: message.chapter.not_found})
@@ -202,7 +202,7 @@ router.post('/', auth.verifyAdmin, slugify.get_endpoint, async (req, res, next) 
     let book_endpoint = req.params.book_endpoint
     try {
         chapter = await ChapterController.delete(book_endpoint, chapter_endpoint)
-        if (chapter) res.status(200).json(chapter)
+        if (chapter) res.status(200).json({chapter: chapter})
         else res.status(404).json({message: message.chapter.not_found})
     } catch (err) {
         res.status(500).json({message: err.message})

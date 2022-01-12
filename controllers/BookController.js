@@ -81,7 +81,7 @@ db.get_top_rating = () => {
 
 db.get_top_day = () => {
     return new Promise((resolve, reject) => {
-        /*
+        /* TOP VIEW DAY REAL
         let query = `select b.*, view from (select book_endpoint, sum(view) as view from "BookViews"
         where date_part('day', time) = date_part('day', date(localtimestamp at time zone 'GMT+7'))
         group by book_endpoint limit 10) as v, "Book" b
@@ -89,9 +89,12 @@ db.get_top_day = () => {
         order by view desc`
         */
 
-        let query = `select b.*, view from (select book_endpoint, sum(view) as view from "BookViews"
-        where date_part('day', time) = date_part('day', date(localtimestamp at time zone 'GMT+7'))
-        group by book_endpoint limit 10) as v, "Book" b
+        // TOP VIEW DAY FAKE
+        let query = `select b.*, view from (select bv.book_endpoint, sum(bv.view) as view from "BookViews" bv,
+        (select book_endpoint, max(time) as time from "BookViews"
+        group by book_endpoint order by time desc limit 10) b
+        where bv.book_endpoint = b.book_endpoint and bv.time = b.time
+        group by bv.book_endpoint) as v, "Book" b
         where v.book_endpoint = b.endpoint
         order by view desc`
 
@@ -104,9 +107,20 @@ db.get_top_day = () => {
 
 db.get_top_month = () => {
     return new Promise((resolve, reject) => {
+        /*TOP VIEW MONTH REAL
         let query = `select b.*, view from (select book_endpoint, sum(view) as view from "BookViews"
         where date_part('month', time) = date_part('month', date(localtimestamp at time zone 'GMT+7'))
         group by book_endpoint limit 10) as v, "Book" b
+        where v.book_endpoint = b.endpoint
+        order by view desc`
+        */
+
+        //TOP VIEW MONTH FAKE
+        let query = `select b.*, view from (select bv.book_endpoint, sum(bv.view) as view from "BookViews" bv,
+        (select book_endpoint, max(time) as time from "BookViews"
+        group by book_endpoint order by time desc limit 10) b
+        where bv.book_endpoint = b.book_endpoint and date_part('month', bv.time) = date_part('month', b.time) and date_part('year', bv.time) = date_part('year', b.time)
+        group by bv.book_endpoint) as v, "Book" b
         where v.book_endpoint = b.endpoint
         order by view desc`
 
@@ -119,9 +133,17 @@ db.get_top_month = () => {
 
 db.get_top_year = () => {
     return new Promise((resolve, reject) => {
+        /* TOP VIEW YEAR REAL
         let query = `select b.*, view from (select book_endpoint, sum(view) as view from "BookViews"
         where date_part('year', time) = date_part('year', date(localtimestamp at time zone 'GMT+7'))
         group by book_endpoint limit 10) as v, "Book" b
+        where v.book_endpoint = b.endpoint
+        order by view desc`
+        */
+
+        //TOP VIEW YEAR FAKE
+        let query = `select b.*, view from (select book_endpoint, sum(view) as view, max(time) as time from "BookViews"
+        group by book_endpoint order by time desc limit 10) as v, "Book" b
         where v.book_endpoint = b.endpoint
         order by view desc`
 
@@ -391,7 +413,7 @@ db.update_info = (book, endpoint) => {
  */
 db.update_rating = (book, endpoint) => {
     return new Promise((resolve, reject) => {
-        let query = 'update "Book" set rate_count = $1, rating = $2 where endpoint = $3 returning *'
+        let query = 'update "Book" set rate_count = $1, rating = $2 where endpoint = $3 returning rating, rate_count'
         let params = [book.rate_count, book.rating, endpoint]
 
         conn.query(query, params, (err, res) => {
@@ -461,10 +483,10 @@ db.update_view = (book_endpoint, time) => {
     })
 }
 
-db.update_search_number = (endpoint) => {
+db.update_search_number = (book) => {
     return new Promise((resolve, reject) => {
-        let query = 'update "Book" set search_number = (search_number + 1) where endpoint = $1 returning search_number'
-        let params = [endpoint]
+        let query = 'update "Book" set search_number = $2 where endpoint = $1 returning search_number'
+        let params = [book.endpoint, book.search_number]
 
         conn.query(query, params, (err, res) => {
             if (err) return reject(err)

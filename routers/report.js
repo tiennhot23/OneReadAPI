@@ -10,7 +10,7 @@ router.get('/all', async (req, res, next) => {
     var reports
     try {
         reports = await ReportController.list()
-        res.status(200).json(reports)
+        res.status(200).json({reports: reports})
     } catch (err) {
         res.status(500).json({message: err.message})
     }
@@ -31,7 +31,7 @@ router.patch('/:type/:endpoint', async (req, res, next) => {
             res.status(400).json({message: message.report.missing_status})
         } else {
             report = await ReportController.update_status(report)
-            if (report) res.status(200).json(report)
+            if (report) res.status(200).json({report: report})
             else res.status(404).json({message: message.report.not_found})
         }
     } catch (err) {
@@ -80,7 +80,7 @@ router.post('/:username', slugify.get_endpoint, async (req, res, next) => {
             } else {
                 report = await ReportController.add(report)
             }
-            res.status(200).json(report)
+            res.status(200).json({report: report})
         }
     } catch (err) {
         if (err.constraint){
@@ -117,7 +117,7 @@ router.post('/:username', slugify.get_endpoint, async (req, res, next) => {
     let type = req.params.type
     try {
         report = await ReportController.delete(endpoint, type)
-        if (report) res.status(200).json(report)
+        if (report) res.status(200).json({report: report})
         else res.status(404).json({message: message.report.not_found})
     } catch (err) {
         res.status(500).json({message: err.message})
@@ -133,7 +133,7 @@ router.post('/:username', slugify.get_endpoint, async (req, res, next) => {
     let reports
     try {
         reports = await ReportController.deleteRead()
-        res.status(200).json(reports)
+        res.status(200).json({reports: reports})
     } catch (err) {
         res.status(500).json({message: err.message})
     }

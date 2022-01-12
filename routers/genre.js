@@ -11,7 +11,7 @@ router.get('/all', async (req, res, next) => {
     var genres
     try {
         genres = await GenreController.list()
-        res.status(200).json(genres)
+        res.status(200).json({genres: genres})
     } catch (err) {
         res.status(500).json({message: err.message})
     }
@@ -23,7 +23,7 @@ router.get('/detail/:endpoint', async (req, res, next) => {
     try {
         if (endpoint) {
             genre = await GenreController.get(endpoint)
-            if (genre) res.status(200).json(genre)
+            if (genre) res.status(200).json({genre: genre})
             else res.status(404).json({message: message.genre.not_found})
         } else {
             res.status(400).json({message: message.genre.missing_endpoint})
@@ -49,7 +49,7 @@ router.post('/', auth.verifyAdmin, slugify.get_endpoint, async (req, res, next) 
     try {
         if (genre.title) {
             genre = await GenreController.add(genre)
-            res.status(200).json(genre)
+            res.status(200).json({genre: genre})
         } else {
             res.status(400).json({message: message.genre.missing_title})
         }
@@ -84,7 +84,7 @@ router.post('/', auth.verifyAdmin, slugify.get_endpoint, async (req, res, next) 
     let endpoint = req.params.endpoint
     try {
         genre = await GenreController.update(genre, endpoint)
-        if (genre) res.status(200).json(genre)
+        if (genre) res.status(200).json({genre: genre})
         else res.status(404).json({message: message.genre.not_found})
     } catch (err) {
         if (err.constraint){
@@ -113,7 +113,7 @@ router.post('/', auth.verifyAdmin, slugify.get_endpoint, async (req, res, next) 
     let endpoint = req.params.endpoint
     try {
         genre = await GenreController.delete(endpoint)
-        if (genre) res.status(200).json(genre)
+        if (genre) res.status(200).json({genre: genre})
         else res.status(404).json({message: message.genre.not_found})
     } catch (err) {
         res.status(500).json({message: err.message})

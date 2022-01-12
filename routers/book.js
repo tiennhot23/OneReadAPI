@@ -9,6 +9,7 @@ const GenreController = require('../controllers/GenreController')
 const slugify = require('../middlewares/slugify')
 const message = require('../configs/messages')
 const auth = require('../middlewares/auth')
+const constants = require('../configs/constants')
 
 
 // //thêm dữ liệu từ web scraping
@@ -85,7 +86,7 @@ router.get('/all', async (req, res, next) => {
         } else {
             books = await BookController.filter_without_genres(req.body)
         }
-        res.status(200).json(books)
+        res.status(200).json({books: books})
     } catch (err) {
         res.status(500).json({message: err.message})
     }
@@ -96,7 +97,7 @@ router.get('/suggest-book/:username', auth.verifyUser, async (req, res, next) =>
     var books
     try {
         books = await BookController.get_suggest_book(user.username)
-        return res.status(200).json(books)
+        return res.status(200).json({books: books})
     } catch (err) {
         res.status(500).json({message: err.message})
     }
@@ -106,7 +107,7 @@ router.get('/top-search', async (req, res, next) => {
     var books
     try {
         books = await BookController.get_top_search()
-        return res.status(200).json(books)
+        return res.status(200).json({books: books})
     } catch (err) {
         res.status(500).json({message: err.message})
     }
@@ -116,7 +117,7 @@ router.get('/top-rating', async (req, res, next) => {
     var books
     try {
         books = await BookController.get_top_rating()
-        return res.status(200).json(books)
+        return res.status(200).json({books: books})
     } catch (err) {
         res.status(500).json({message: err.message})
     }
@@ -126,7 +127,7 @@ router.get('/top-view-day', async (req, res, next) => {
     var books
     try {
         books = await BookController.get_top_day()
-        return res.status(200).json(books)
+        return res.status(200).json({books: books})
     } catch (err) {
         res.status(500).json({message: err.message})
     }
@@ -136,7 +137,7 @@ router.get('/top-view-month', async (req, res, next) => {
     var books
     try {
         books = await BookController.get_top_month()
-        return res.status(200).json(books)
+        return res.status(200).json({books: books})
     } catch (err) {
         res.status(500).json({message: err.message})
     }
@@ -146,7 +147,7 @@ router.get('/top-view-year', async (req, res, next) => {
     var books
     try {
         books = await BookController.get_top_year()
-        return res.status(200).json(books)
+        return res.status(200).json({books: books})
     } catch (err) {
         res.status(500).json({message: err.message})
     }
@@ -156,7 +157,7 @@ router.get('/top-follow', async (req, res, next) => {
     var books
     try {
         books = await BookController.get_top_follow()
-        return res.status(200).json(books)
+        return res.status(200).json({books: books})
     } catch (err) {
         res.status(500).json({message: err.message})
     }
@@ -167,7 +168,7 @@ router.get('/follower/:endpoint', async (req, res, next) => {
     var users
     try {
         users = await BookController.get_user_follow(endpoint)
-        return res.status(200).json(users)
+        return res.status(200).json({users: users})
     } catch (err) {
         res.status(500).json({message: err.message})
     }
@@ -177,7 +178,7 @@ router.get('/last-update', async (req, res, next) => {
     var books
     try {
         books = await BookController.get_last_update()
-        return res.status(200).json(books)
+        return res.status(200).json({books: books})
     } catch (err) {
         res.status(500).json({message: err.message})
     }
@@ -188,7 +189,7 @@ router.get('/relate-book/:endpoint', async (req, res, next) => {
     var books
     try {
         books = await BookController.get_relate_book(endpoint)
-        return res.status(200).json(books)
+        return res.status(200).json({books: books})
     } catch (err) {
         res.status(500).json({message: err.message})
     }
@@ -202,10 +203,11 @@ router.get('/detail/:endpoint', async (req, res, next) => {
         if (endpoint) {
             book = await BookController.get(endpoint)
             if (search) {
-                let search_number = await BookController.update_search_number(book.endpoint)
+                book.search_number = Math.min(book.search_number + 1, constants.max_int)
+                let search_number = await BookController.update_search_number(book)
                 book.search_number = search_number.search_number
             }
-            if (book) res.status(200).json(book)
+            if (book) res.status(200).json({book: book})
             else res.status(404).json({message: message.book.not_found})
         } else {
             res.status(400).json({message: message.book.missing_endpoint})
@@ -222,7 +224,7 @@ router.get('/type/:type', async (req, res, next) => {
     try {
         if (type) {
             books = await BookController.get_book_of_type(type)
-            return res.status(200).json(books)
+            return res.status(200).json({books: books})
         } else {
             return res.status(400).json({message: message.book.missing_type})
         }
@@ -257,7 +259,7 @@ router.post('/', auth.verifyAdmin, slugify.get_endpoint, async (req, res, next) 
             //     book.genres.push(genre)
             // })
             // await TransactionController.commit()
-            res.status(200).json(book)
+            res.status(200).json({book: book})
         }
     } catch (err) {
         // await TransactionController.rollback()
@@ -309,7 +311,7 @@ router.post('/', auth.verifyAdmin, slugify.get_endpoint, async (req, res, next) 
         }
         book = await BookController.update_info(book, endpoint)
         await TransactionController.commit()
-        if (book) res.status(200).json(book)
+        if (book) res.status(200).json({book: book})
         else res.status(404).json({message: message.book.not_found})
     } catch (err) {
         await TransactionController.rollback()
@@ -359,7 +361,7 @@ router.patch('/finish/:endpoint', auth.verifyAdmin, async (req, res, next) => {
             })
             
         }
-        if (book) res.status(200).json(book)
+        if (book) res.status(200).json({book: book})
         else res.status(404).json({message: message.book.not_found})  
     } catch (err) {
         if (err.constraint){
@@ -393,17 +395,25 @@ router.patch('/finish/:endpoint', auth.verifyAdmin, async (req, res, next) => {
 
 router.patch('/rate/:endpoint', auth.verifyUser, async (req, res, next) => {
     let endpoint = req.params.endpoint
-    var book = req.body
+    var rating = req.body.rating
     try {
-        var book = await BookController.get(endpoint)
-        if (!book.rating) {
+        if (!rating) {
             return res.status(400).json({message: message.book.missing_rating})
-        } else if (!book.rate_count) {
-            return res.status(400).json({message: message.book.missing_rate_count})
+        } else if (rating > 5.0) {
+            return res.status(400).json({message: message.book.rating_constraint})
         } else {
-            book = await BookController.update_rating(book, endpoint)
-            if (book) res.status(200).json(book)
-            else res.status(404).json({message: message.book.not_found})  
+            var book = await BookController.get(endpoint)
+            if (book) {
+                rating = Math.max(rating, 3.5) // :D hehe tất cả các đánh giá dưới 3.5 đều chuyển thành 3.5 để ko ảnh hưởng lớn đến điểm rating
+                book.rate_count = Math.min(book.rate_count + 1, constants.max_int)
+                book.rating = ((book.rating * (book.rate_count - 1)) + rating)/book.rate_count
+                book.rating = book.rating.toFixed(1)
+                var obj = await BookController.update_rating(book, endpoint)
+                book.rating = obj.rating
+                book.rate_count = obj.rate_count
+                res.status(200).json({book: book})
+            }
+            else res.status(404).json({message: message.book.not_found})
         }
     } catch (err) {
         if (err.constraint){
@@ -445,7 +455,7 @@ router.patch('/rate/:endpoint', auth.verifyUser, async (req, res, next) => {
     let endpoint = req.params.endpoint
     try {
         book = await BookController.delete(endpoint)
-        if (book) res.status(200).json(book)
+        if (book) res.status(200).json({book: book})
         else res.status(404).json({message: message.book.not_found})
     } catch (err) {
         res.status(500).json({message: err.message})

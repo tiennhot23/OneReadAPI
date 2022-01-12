@@ -10,6 +10,7 @@ module.exports = {
         not_found: 'Sách này không tồn tại',
         exist: 'Sách này đã tồn tại',
         book_pk: 'Tên sách bị trùng',
+        rating_constraint: 'Rating giới hạn từ 0 đến 5',
         type_constraint: 'Sách chỉ gồm các loại "Comic", "Novel" hoặc "Literature"',
         status_constraint: 'Tình trạng của sách: -1 - đã xoá, 0 - đang tiến hành, 1 - đã hoàn thành'
     },
@@ -84,6 +85,8 @@ module.exports = {
         incorrect_account: 'Username và password không trùng khớp',
         email_exist: 'Email đã được sử dụng',
         email_veified: 'Email đã được xác minh',
+        followed_book: 'Đã follow sách',
+        unfollowed_book: 'Đã unfollow sách',
         can_not_follow_book: 'Không thể follow sách',
         can_not_unfollow_book: 'Không thể unfollow sách',
         can_not_ban_user: 'Không thể ban user này',
