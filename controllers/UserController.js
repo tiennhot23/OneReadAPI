@@ -120,7 +120,7 @@ user.add = (user) => {
             num += 1
             params.push(user.email)
         }
-        query += ')'
+        query += ') returning username'
 
         conn.query(query, params, (err, res) => {
             if (err) {
