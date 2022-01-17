@@ -1,3 +1,4 @@
+const constants = require('../configs/constants')
 const conn = require('../connection')
 
 const db = {}
@@ -201,7 +202,7 @@ db.get_relate_book = (endpoint) => {
     })
 }
 
-db.filter_with_genres = (filter) => {
+db.filter_with_genres = (filter, page) => {
     return new Promise((resolve, reject) => {
         let num = 3
         let params = [filter.genres, filter.genres.length]
@@ -234,6 +235,7 @@ db.filter_with_genres = (filter) => {
 
         query += ` and count >= $2
         order by count desc`
+        query += ' limit ' + constants.limit_element + ' offset ' + (constants.limit_element * (page - 1))
 
         conn.query(query, params, (err, res) => {
             if(err) return reject(err)
@@ -242,7 +244,7 @@ db.filter_with_genres = (filter) => {
     })
 }
 
-db.filter_without_genres = (filter) => {
+db.filter_without_genres = (filter, page) => {
     return new Promise((resolve, reject) => {
         let num = 1
         let params = []
@@ -268,6 +270,7 @@ db.filter_without_genres = (filter) => {
             num += 1
             params.push(filter.status)
         }
+        query += ' limit ' + constants.limit_element + ' offset ' + (constants.limit_element * (page - 1))
 
         conn.query(query, params, (err, res) => {
             if(err) return reject(err)

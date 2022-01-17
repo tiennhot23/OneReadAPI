@@ -1,4 +1,4 @@
-const limit_element = 10
+const limit_element = 20
 const saltRounds = 10
 const fileBaseURL = 'http://localhost:3000/file/'
 const baseURL = 'http://localhost:3000/'

@@ -80,11 +80,13 @@ const constants = require('../configs/constants')
  */
 router.get('/all', async (req, res, next) => {
     var books
+    var page = req.query.page
+    if (!page) page = 1
     try {
         if (req.body.genres && req.body.genres.length > 0) {
-            books = await BookController.filter_with_genres(req.body)
+            books = await BookController.filter_with_genres(req.body, page)
         } else {
-            books = await BookController.filter_without_genres(req.body)
+            books = await BookController.filter_without_genres(req.body, page)
         }
         res.status(200).json({books: books})
     } catch (err) {
