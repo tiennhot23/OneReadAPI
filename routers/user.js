@@ -121,7 +121,7 @@ router.post('/login', async (req, res, next) => {
         } else if (!user.password) {
             return res.status(400).json({message: message.user.missing_password})
         } else {
-            user = await UserController.get(user.username, user.password)
+            user = await UserController.login(user.username, user.password)
             if (user) {
                 user.password = ''
                 

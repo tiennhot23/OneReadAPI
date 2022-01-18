@@ -13,20 +13,19 @@ user.get_data_from_token = (token) => {
     })
 }
 
-user.get = (username, password) => {
+user.login = (username, password) => {
     return new Promise((resolve, reject) => {
-        let query = 'select username, avatar, status, email from "Account" where username = $1 limit 1'
+        let query = 'select username, password, avatar, status, email from "Account" where username = $1 limit 1'
         let params = [username]
 
         conn.query(query, params, (err, res) => {
             if (err) return reject(err)
             else {
                 if(!bcrypt.compareSync(password, res.rows[0].password)){
-                    resolve(null)
+                    return resolve(null)
                 }else{
-                    resolve(res)
+                    return resolve(res.rows[0])
                 }
-                return resolve(res.rows[0])
             } 
         })
     })
@@ -36,6 +35,7 @@ user.get = (username) => {
     return new Promise((resolve, reject) => {
         let query = 'select username, avatar, email, status, role from "Account" where username = $1 limit 1'
         let params = [username]
+        console.log("no")
 
         conn.query(query, params, (err, res) => {
             if (err) return reject(err)
