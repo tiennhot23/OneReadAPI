@@ -60,7 +60,7 @@ db.get_suggest_book = (username) => {
 
 db.get_top_search = () => {
     return new Promise((resolve, reject) => {
-        let query = `select * from "Book" order by search_number desc`
+        let query = `select * from "Book" order by search_number desc limit 10`
 
         conn.query(query, (err, res) => {
             if (err) return reject(err)
@@ -71,7 +71,7 @@ db.get_top_search = () => {
 
 db.get_top_rating = () => {
     return new Promise((resolve, reject) => {
-        let query = `select * from "Book" order by rating desc`
+        let query = `select * from "Book" order by rating desc limit 10`
 
         conn.query(query, (err, res) => {
             if (err) return reject(err)

@@ -14,7 +14,7 @@ const constants = require('../configs/constants')
 
 // //thêm dữ liệu từ web scraping
 // const slug = require('slugify')
-// const data = require('../data/list-comic-3')
+// const data = require('../data/list-comic-4')
 // router.get('/', async (req, res, next) => {
 //     for (var e of data){
 //         console.log(e.title)
@@ -28,7 +28,7 @@ const constants = require('../configs/constants')
 //             } else {
 //                 book.endpoint = slug(book.title, { lower: true, strict: true })
 //                 let genres = book.genres
-//                 const blacklist = ['harem', 'magical', 'adult', 'anime', 'cooking', 'doujinshi', 'dam-my', 'live-action', 'mecha', 'anime', 'romance', 'isekai', 'fi', 'sci' 
+//                 const blacklist = ['comic', 'harem', 'magical', 'adult', 'anime', 'cooking', 'doujinshi', 'dam-my', 'live-action', 'mecha', 'anime', 'romance', 'isekai', 'fi', 'sci' 
 //                 , 'shoujo-ai', 'shounen-ai', 'smut', 'soft-yuri', 'thieu-nhi', '16+', 'soft-yaoi', 'gender-bender', 'tap-chi-truyen-tranh', 'truyen-scan', 'viet-nam']
 //                 const found = genres.some(r=> blacklist.includes(r))
 //                 if (!found) {
