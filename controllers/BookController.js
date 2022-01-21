@@ -202,6 +202,18 @@ db.get_relate_book = (endpoint) => {
     })
 }
 
+db.get_book_of_type = (type) => {
+    return new Promise((resolve, reject) => {
+        let query = `select * from "Book" b where b.type = $1 order by rate_count desc, rating desc limit 10`
+        let params = [type]
+
+        conn.query(query, params, (err, res) => {
+            if (err) return reject(err)
+            else return resolve(res.rows)
+        })
+    })
+}
+
 db.filter_with_genres = (filter, page) => {
     return new Promise((resolve, reject) => {
         let num = 3
@@ -450,17 +462,7 @@ db.get_view = (book_endpoint, time) => {
     })
 }
 
-db.get_book_of_type = (type) => {
-    return new Promise((resolve, reject) => {
-        let query = `select * from "Book" where type = $1 order by rate_count desc, rating desc`
-        let params = [type]
 
-        conn.query(query, params, (err, res) => {
-            if (err) return reject(err)
-            else return resolve(res)
-        })
-    })
-}
 
 db.add_view = (book_endpoint, time) => {
     return new Promise((resolve, reject) => {
