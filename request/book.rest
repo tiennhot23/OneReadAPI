@@ -49,19 +49,15 @@ Content-Type: application/json
 DELETE http://localhost:3000/book/sherlock-holme
 
 ### lấy thông tin book
-GET http://localhost:3000/book/detail/one-punch-man
-Content-Type: application/json
-
-{
-    "search": true
-}
+GET http://localhost:3000/book/detail/grand-blue?search=true
 
 ### Lấy danh sách book
-GET http://localhost:3000/book/all
+POST http://localhost:3000/book/all
 Content-Type: application/json
 
 {
-    "type": "Novel"
+    "title": "yêu thần",
+    "genres": ["action", "shounen"]
 }
 
 ### Lấy danh sách suggest book

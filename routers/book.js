@@ -78,7 +78,7 @@ const constants = require('../configs/constants')
  * @body filter{author (không dùng %%), type, genre, status (0, 1)}
  * @returns books
  */
-router.get('/all', async (req, res, next) => {
+router.post('/all', async (req, res, next) => {
     var books
     var page = req.query.page
     if (!page) page = 1
@@ -199,17 +199,19 @@ router.get('/relate-book/:endpoint', async (req, res, next) => {
 
 router.get('/detail/:endpoint', async (req, res, next) => {
     let endpoint = req.params.endpoint
-    let search = req.body.search
+    let search = req.query.search
     var book
     try {
         if (endpoint) {
             book = await BookController.get(endpoint)
-            if (search) {
-                book.search_number = Math.min(book.search_number + 1, constants.max_int)
-                let search_number = await BookController.update_search_number(book)
-                book.search_number = search_number.search_number
-            }
-            if (book) res.status(200).json({book: book})
+            if (book) {
+                if (search) {
+                    book.search_number = Math.min(book.search_number + 1, constants.max_int)
+                    let search_number = await BookController.update_search_number(book)
+                    book.search_number = search_number.search_number
+                }
+                res.status(200).json({book: book})
+            } 
             else res.status(404).json({message: message.book.not_found})
         } else {
             res.status(400).json({message: message.book.missing_endpoint})

@@ -25,7 +25,7 @@ router.get('/all/:book_endpoint', async (req, res, next) => {
 router.get('/detail/:book_endpoint/:chapter_endpoint', async (req, res, next) => {
     let chapter_endpoint = req.params.chapter_endpoint
     let book_endpoint = req.params.book_endpoint
-    let view = req.body.view
+    let view = req.query.view
     var chapter
     try {
         if (chapter_endpoint) {
