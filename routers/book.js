@@ -78,7 +78,19 @@ const constants = require('../configs/constants')
  * @body filter{author (không dùng %%), type, genre, status (0, 1)}
  * @returns books
  */
-router.post('/all', async (req, res, next) => {
+router.get('/all', async (req, res, next) => {
+    var books
+    var page = req.query.page
+    if (!page) page = 1
+    try {
+        books = await BookController.get_all(page)
+        res.status(200).json({books: books})
+    } catch (err) {
+        res.status(500).json({message: err.message})
+    }
+})
+
+router.post('/filter', async (req, res, next) => {
     var books
     var page = req.query.page
     if (!page) page = 1

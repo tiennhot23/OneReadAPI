@@ -291,6 +291,20 @@ db.filter_without_genres = (filter, page) => {
     })
 }
 
+db.get_all = (page) => {
+    return new Promise((resolve, reject) => {
+        let num = 1
+        let params = []
+        let query = `select * from "Book" where status <> -1`
+        query += ' limit ' + constants.limit_element + ' offset ' + (constants.limit_element * (page - 1))
+
+        conn.query(query, params, (err, res) => {
+            if(err) return reject(err)
+            return resolve(res.rows)
+        })
+    })
+}
+
 db.add = (book) => {
     return new Promise((resolve, reject) => {
         let num = 3
