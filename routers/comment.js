@@ -7,7 +7,7 @@ const auth = require('../middlewares/auth')
 const slugify = require('../middlewares/slugify')
 const message = require('../configs/messages')
 
-router.get('/:endpoint', auth.verifyUser, async (req, res, next) => {
+router.get('/:endpoint', async (req, res, next) => {
     const endpoint = req.params.endpoint
     var comments
     try {
@@ -48,6 +48,7 @@ router.post('/:username', auth.verifyUser, async (req, res, next) => {
             res.status(400).json({message: message.comment.missing_content})
         } else {
             comment = await CommentController.add(comment)
+            if (comment.id_root === null) comment.id_root = comment.id
             let tags = comment.content.split('@')
             tags.forEach(async (tag) => {
                 tag = tag.split(' ')[0]

@@ -1,12 +1,13 @@
 ### thêm comment
-POST http://localhost:3000/comment/
+POST http://localhost:3000/comment/sai
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJuYW1lIjoic2FpIiwiYXZhdGFyIjoiaHR0cHM6Ly90aHVtYnMuZHJlYW1zdGltZS5jb20vYi9kZWZhdWx0LWF2YXRhci1wcm9maWxlLWljb24tc29jaWFsLW1lZGlhLXVzZXItdmVjdG9yLWRlZmF1bHQtYXZhdGFyLXByb2ZpbGUtaWNvbi1zb2NpYWwtbWVkaWEtdXNlci12ZWN0b3ItcG9ydHJhaXQtMTc2MTk0ODc2LmpwZyIsImVtYWlsIjoiaW1hZ2VzYWl0YW1hQGdtYWlsLmNvbSIsInN0YXR1cyI6MCwicm9sZSI6MSwicGFzc3dvcmQiOiIifSwiaWF0IjoxNjQwOTc0ODg5LCJleHAiOjE2NzI1MTA4ODl9.9j6Ov8eys7a8m0S1G5LMDZw0_krjw6eNoOmANAC-m3U
 Content-Type: application/json
 
 {
-    "endpoint": "a",
+    "endpoint": "*book*giet-con-chim-nhai",
     "username": "sai",
-    "id_root": "6",
-    "content": "@sai hello"
+    "id_root": 9,
+    "content": "@genos dm hello"
 }
 
 ### xoá comment gốc và tất cả reply
@@ -15,7 +16,7 @@ Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJuY
 
 ### lấy ds comment gốc theo endpoint
 GET http://localhost:3000/comment/a
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJuYW1lIjoic2FpIiwiYXZhdGFyIjoiaHR0cHM6Ly90aHVtYnMuZHJlYW1zdGltZS5jb20vYi9kZWZhdWx0LWF2YXRhci1wcm9maWxlLWljb24tc29jaWFsLW1lZGlhLXVzZXItdmVjdG9yLWRlZmF1bHQtYXZhdGFyLXByb2ZpbGUtaWNvbi1zb2NpYWwtbWVkaWEtdXNlci12ZWN0b3ItcG9ydHJhaXQtMTc2MTk0ODc2LmpwZyIsImVtYWlsIjoiaW1hZ2VzYWl0YW1hQGdtYWlsLmNvbSIsInN0YXR1cyI6MCwicm9sZSI6MSwicGFzc3dvcmQiOiIifSwiaWF0IjoxNjQwNzY3MzkyLCJleHAiOjE2NDA4NTM3OTJ9.rIkylavElleVjt_FoTgP3KD73Uyo24b1fwSPMeVIQD4
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyIjp7InVzZXJuYW1lIjoic2FpIiwiYXZhdGFyIjoiaHR0cHM6Ly90aHVtYnMuZHJlYW1zdGltZS5jb20vYi9kZWZhdWx0LWF2YXRhci1wcm9maWxlLWljb24tc29jaWFsLW1lZGlhLXVzZXItdmVjdG9yLWRlZmF1bHQtYXZhdGFyLXByb2ZpbGUtaWNvbi1zb2NpYWwtbWVkaWEtdXNlci12ZWN0b3ItcG9ydHJhaXQtMTc2MTk0ODc2LmpwZyIsImVtYWlsIjoiaW1hZ2VzYWl0YW1hQGdtYWlsLmNvbSIsInN0YXR1cyI6MCwicm9sZSI6MSwicGFzc3dvcmQiOiIifSwiaWF0IjoxNjQwOTc0ODg5LCJleHAiOjE2NzI1MTA4ODl9.9j6Ov8eys7a8m0S1G5LMDZw0_krjw6eNoOmANAC-m3U
 
 ### lấy ds comment gốc và các reply
 GET http://localhost:3000/comment/reply/1
