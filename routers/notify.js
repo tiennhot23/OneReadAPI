@@ -28,7 +28,9 @@ router.get('/:endpoint/:username', auth.verifyUser, async (req, res, next) => {
             res.status(400).json({message: message.notify.missing_username})
         } else {
             notify = await NotifyController.get(endpoint, username)
-            if (notify) res.status(200).json({notify: notify})
+            if (notify) {
+                res.status(200).json({notify: notify})
+            }
             else res.status(404).json({message: message.notify.not_found})
         }
     } catch (err) {

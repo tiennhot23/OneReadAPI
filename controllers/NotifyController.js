@@ -4,7 +4,7 @@ const db = {}
 
 db.get = (endpoint, username) => {
     return new Promise((resolve, reject) => {
-        let query = 'update "Notify" set status = 1 where endpoint = $1 and username = $2 returning *'
+        let query = `update "Notify" set status = 1 where endpoint = $1 and username = $2 returning *, , to_char(time, 'DD-MM-YYYY hh:mm:ss') as time`
 
         var params = [endpoint, username]
         conn.query(query, params, (err, res) => {
@@ -16,7 +16,7 @@ db.get = (endpoint, username) => {
 
 db.list = () => {
     return new Promise((resolve, reject) => {
-        let query = 'select * from "Notify" order by status'
+        let query = `select *, to_char(time, 'DD-MM-YYYY hh:mm:ss') as time from "Notify" order by status`
 
         conn.query(query, (err, res) => {
             if(err) return reject(err)

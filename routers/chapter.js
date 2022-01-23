@@ -10,7 +10,6 @@ const BookController = require('../controllers/BookController')
 const slugify = require('../middlewares/slugify')
 const message = require('../configs/messages')
 const auth = require('../middlewares/auth')
-
 router.get('/all/:book_endpoint', async (req, res, next) => {
     let book_endpoint = req.params.book_endpoint
     var chapters

@@ -93,7 +93,7 @@ user.get_book_following = (username) => {
 user.get_comment_history = (username) => {
     return new Promise((resolve, reject) => {
         let params = [username]
-        let query = `select * from "Comment" c where username = $1 order by time desc`
+        let query = `select *, to_char(time, 'DD-MM-YYYY hh:mm:ss') as time from "Comment" c where username = $1 order by time desc`
         conn.query(query, params, (err, res) => {
             if (err) return reject(err)
             else return resolve(res.rows)
