@@ -217,7 +217,7 @@ router.get('/detail/:endpoint', async (req, res, next) => {
         if (endpoint) {
             book = await BookController.get(endpoint)
             if (book) {
-                if (search) {
+                if (search == 'true') {
                     book.search_number = Math.min(book.search_number + 1, constants.max_int)
                     let search_number = await BookController.update_search_number(book)
                     book.search_number = search_number.search_number

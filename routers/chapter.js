@@ -46,7 +46,7 @@ router.get('/detail/:book_endpoint/:chapter_endpoint', async (req, res, next) =>
                         history = await HistoryController.add(history)
                     }
                 }
-                if (view) {
+                if (view == 'true') {
                     let time = new Date().toISOString().slice(0,10)
                     if (await BookController.get_view(book_endpoint, time)) {
                         await BookController.update_view(book_endpoint, time)
