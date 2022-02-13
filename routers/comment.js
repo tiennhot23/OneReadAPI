@@ -9,9 +9,25 @@ const message = require('../configs/messages')
 
 router.get('/:endpoint', async (req, res, next) => {
     const endpoint = req.params.endpoint
-    var comments
+    var page = req.query.page
+    if (!page) page = 1
+    var comments = []
     try {
-        comments = await CommentController.list(endpoint)
+        var result = await CommentController.list(endpoint, page)
+        result.forEach(e => {
+            comments.push({
+                id: e.id,
+                id_root: e.id_root,
+                endpoint: e.endpoint,
+                content: e.content,
+                files: e.files,
+                time: e.time,
+                user: {
+                    username: e.username,
+                    avatar: e.avatar
+                }
+            })
+        })
         res.status(200).json({
             status: 'success',
             code: 200,
@@ -30,14 +46,28 @@ router.get('/:endpoint', async (req, res, next) => {
 
 router.get('/detail/:id', async (req, res, next) => {
     let id = req.params.id
-    var replies
+    var comments = []
     try {
-        replies = await CommentController.get(id)
-        if (replies) res.status(200).json({
+        var result = await CommentController.get(id)
+        result.forEach(e => {
+            comments.push({
+                id: e.id,
+                id_root: e.id_root,
+                endpoint: e.endpoint,
+                content: e.content,
+                files: e.files,
+                time: e.time,
+                user: {
+                    username: e.username,
+                    avatar: e.avatar
+                }
+            })
+        })
+        if (comments) res.status(200).json({
             status: 'success',
             code: 200,
             message: null,
-            data: replies
+            data: comments
         })
         else res.status(404).json({
             status: 'fail',
