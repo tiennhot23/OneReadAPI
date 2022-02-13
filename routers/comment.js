@@ -137,7 +137,7 @@ router.post('/:book_endpoint/:username', auth.verifyUser, async (req, res, next)
             res.status(200).json({
                 status: 'success',
                 code: 200,
-                message: null,
+                message: message.comment.add_success,
                 data: [comment]
             })
         }
@@ -212,7 +212,7 @@ router.delete('/:id', auth.verifyUser, async (req, res, next) => {
         if (comment) res.status(200).json({
             status: 'success',
             code: 200,
-            message: null,
+            message: message.comment.delete_success,
             data: [comment]
         })
         else res.status(404).json({

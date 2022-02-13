@@ -443,7 +443,7 @@ router.post('/', auth.verifyAdmin, slugify.get_endpoint, async (req, res, next) 
             res.status(200).json({
                 status: 'success',
                 code: 200,
-                message: null,
+                message: message.book.add_success,
                 data: [book]
             })
         }
@@ -530,7 +530,7 @@ router.post('/', auth.verifyAdmin, slugify.get_endpoint, async (req, res, next) 
         if (book) res.status(200).json({
             status: 'success',
             code: 200,
-            message: null,
+            message: message.book.update_success,
             data: [book]
         })
         else res.status(404).json({
@@ -620,7 +620,7 @@ router.patch('/finish/:endpoint', auth.verifyAdmin, async (req, res, next) => {
         if (book) res.status(200).json({
             status: 'success',
             code: 200,
-            message: null,
+            message: message.book.update_success,
             data: [book]
         })
         else res.status(404).json({
@@ -720,7 +720,7 @@ router.patch('/rate/:endpoint', auth.verifyUser, async (req, res, next) => {
                 res.status(200).json({
                     status: 'success',
                     code: 200,
-                    message: null,
+                    message: message.book.update_success,
                     data: [book]
                 })
             }
@@ -804,7 +804,7 @@ router.patch('/rate/:endpoint', auth.verifyUser, async (req, res, next) => {
         if (book) res.status(200).json({
             status: 'success',
             code: 200,
-            message: null,
+            message: message.book.delete_success,
             data: [book]
         })
         else res.status(404).json({

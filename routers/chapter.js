@@ -143,7 +143,7 @@ router.post('/', auth.verifyAdmin, slugify.get_endpoint, async (req, res, next) 
             return res.status(200).json({
                 status: 'success',
                 code: 200,
-                message: null,
+                message: message.chapter.add_success,
                 data: [chapter]
             })
         }
@@ -231,7 +231,7 @@ router.patch('/:book_endpoint/:chapter_endpoint', auth.verifyAdmin, slugify.get_
             return res.status(200).json({
                 status: 'success',
                 code: 200,
-                message: null,
+                message: message.chapter.update_success,
                 data: [chapter]
             })
         } else {
@@ -321,7 +321,7 @@ router.delete('/:book_endpoint/:chapter_endpoint', async (req, res, next) => {
         if (chapter) res.status(200).json({
             status: 'success',
             code: 200,
-            message: null,
+            message: message.chapter.delete_success,
             data: [chapter]
         })
         else res.status(404).json({

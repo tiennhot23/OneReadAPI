@@ -82,7 +82,7 @@ router.post('/', auth.verifyAdmin, slugify.get_endpoint, async (req, res, next) 
             res.status(200).json({
                 status: 'success',
                 code: 200,
-                message: null,
+                message: message.genre.add_success,
                 data: [genre]
             })
         } else {
@@ -141,7 +141,7 @@ router.patch('/:endpoint', auth.verifyAdmin, slugify.get_endpoint, async (req, r
         if (genre) res.status(200).json({
             status: 'success',
             code: 200,
-            message: null,
+            message: message.genre.update_success,
             data: [genre]
         })
         else res.status(404).json({
@@ -194,7 +194,7 @@ router.delete('/:endpoint', auth.verifyAdmin, async (req, res, next) => {
         if (genre) res.status(200).json({
             status: 'success',
             code: 200,
-            message: null,
+            message: message.genre.delete_success,
             data: [genre]
         })
         else res.status(404).json({

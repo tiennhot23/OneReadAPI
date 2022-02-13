@@ -108,7 +108,7 @@ router.post('/', auth.verifyAdmin, async (req, res, next) => {
             res.status(200).json({
                 status: 'success',
                 code: 200,
-                message: null,
+                message: message.notify.add_success,
                 data: [notify]
             })
         }
@@ -173,7 +173,7 @@ router.delete('/read-notify/:username', auth.verifyUser, async (req, res, next) 
         res.status(200).json({
             status: 'success',
             code: 200,
-            message: null,
+            message: message.notify.delete_success,
             data: notifys
         })
     } catch (err) {
@@ -200,7 +200,7 @@ router.delete('/:endpoint/:username', auth.verifyUser, async (req, res, next) =>
         if (notify) res.status(200).json({
             status: 'success',
             code: 200,
-            message: null,
+            message: message.notify.delete_success,
             data: [notify]
         })
         else res.status(404).json({

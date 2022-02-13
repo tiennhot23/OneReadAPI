@@ -230,7 +230,7 @@ router.post('/login', async (req, res, next) => {
                 res.status(200).json({
                     status: 'success',
                     code: 200,
-                    message: null,
+                    message: message.user.login_success,
                     data: [{
                         accessToken: accessToken,
                         user: user
@@ -611,7 +611,7 @@ router.post('/ban/:username', auth.verifyAdmin, async (req, res, next) => {
                     return res.status(200).json({
                         status: 'success',
                         code: 200,
-                        message: null,
+                        message: message.user.user_banned,
                         data: [user]
                     })
                     break
@@ -685,7 +685,7 @@ router.post('/unban/:username', auth.verifyAdmin, async (req, res, next) => {
         return res.status(200).json({
             status: 'success',
             code: 200,
-            message: null,
+            message: message.user.user_unbanned,
             data: [user]
         })
     } catch (err) {
@@ -710,7 +710,7 @@ router.patch('/:username', auth.verifyUser, async (req, res, next) => {
         return res.status(200).json({
             status: 'success',
             code: 200,
-            message: null,
+            message: message.user.update_success,
             data: [user]
         })
     } catch (err) {
@@ -734,7 +734,7 @@ router.patch('/up-role/:username', auth.verifyAdmin, async (req, res, next) => {
         return res.status(200).json({
             status: 'success',
             code: 200,
-            message: null,
+            message: message.user.update_success,
             data: [user]
         })
     } catch (err) {
@@ -767,7 +767,7 @@ router.patch('/change-password/:username', auth.verifyUser, encrypt.hash, async 
             return res.status(200).json({
                 status: 'success',
                 code: 200,
-                message: null,
+                message: message.user.password_updated,
                 data: [user]
             })
         }
@@ -799,7 +799,7 @@ router.delete('/:username', auth.verifyUser, async (req, res, next) => {
             if (user) return res.status(200).json({
                 status: 'success',
                 code: 200,
-                message: null,
+                message: message.user.delete_success,
                 data: [user]
             })
             else return res.status(404).json({

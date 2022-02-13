@@ -1,5 +1,8 @@
 module.exports = {
     book:{
+        add_success: 'Thêm thành công',
+        update_success: 'Cập nhật thành công',
+        delete_success: 'Xóa thành công',
         missing_title: 'Thiếu title',
         missing_endpoint: 'Thiếu endpoint',
         missing_type: 'Thiếu thể loại',
@@ -15,6 +18,9 @@ module.exports = {
         status_constraint: 'Tình trạng của sách: -1 - đã xoá, 0 - đang tiến hành, 1 - đã hoàn thành'
     },
     genre:{
+        add_success: 'Thêm thành công',
+        update_success: 'Cập nhật thành công',
+        delete_success: 'Xóa thành công',
         missing_title: 'Thiếu title',
         missing_endpoint: 'Thiếu endpoint',
         not_found: 'Thể loại này không tồn tại',
@@ -22,6 +28,9 @@ module.exports = {
         genre_pk: 'Tên thể loại bị trùng'
     },
     chapter:{
+        add_success: 'Thêm thành công',
+        update_success: 'Cập nhật thành công',
+        delete_success: 'Xóa thành công',
         missing_title: 'Thiếu title',
         missing_images: 'Thiếu images',
         missing_chapter_endpoint: 'Thiếu endpoint',
@@ -33,6 +42,9 @@ module.exports = {
         book_fk: 'Sách này không tồn tại'
     },
     report: {
+        add_success: 'Thêm thành công',
+        update_success: 'Cập nhật thành công',
+        delete_success: 'Xóa thành công',
         missing_endpoint: 'Thiếu endpoint',
         missing_type: 'Thiếu loại report',
         missing_reason: 'Thiếu lí do',
@@ -43,6 +55,9 @@ module.exports = {
         status_constraint: 'Trạng thái của report là 0: chưa xử lí hoặc 1: đã xử lí'
     },
     notify: {
+        add_success: 'Thêm thành công',
+        update_success: 'Cập nhật thành công',
+        delete_success: 'Xóa thành công',
         missing_endpoint: 'Thiếu endpoint',
         missing_username: 'Thiếu username',
         missing_content: 'Thiếu nội dung',
@@ -58,6 +73,9 @@ module.exports = {
         new_chapter_notification: 'Sách bạn đang follow có chương mới nhất rồi kìa, đọc ngay cho nóng!!'
     },
     comment: {
+        add_success: 'Thêm thành công',
+        update_success: 'Cập nhật thành công',
+        delete_success: 'Xóa thành công',
         missing_endpoint: 'Thiếu endpoint',
         missing_username: 'Thiếu username',
         missing_content: 'Thiếu nội dung',
@@ -73,6 +91,11 @@ module.exports = {
         choose_file: 'Vui lòng chọn file'
     },
     user:{
+        login_success: 'Đăng nhập thành công',
+        add_success: 'Thêm thành công',
+        update_success: 'Cập nhật thành công',
+        password_updated: 'Mật khẩ đã được cập nhật',
+        delete_success: 'Tài khoản này cùng toàn bộ dữ liệu liên qan đã bị xóa.',
         registed_success: 'Đăng kí thành công',
         registed_fail: 'Đăng kí thất bại',
         not_found: 'User không tồn tại',
@@ -88,6 +111,8 @@ module.exports = {
         email_veified: 'Email đã được xác minh',
         followed_book: 'Đã follow sách',
         unfollowed_book: 'Đã unfollow sách',
+        user_banned: 'User đã bị ban vô thời hạn',
+        user_unbanned: 'User đã được ân xá',
         can_not_follow_book: 'Không thể follow sách',
         can_not_unfollow_book: 'Không thể unfollow sách',
         can_not_ban_user: 'Không thể ban user này',
@@ -100,6 +125,8 @@ module.exports = {
         username_fk: 'User này không khả dụng'
     },
     history:{
+        add_success: 'Thêm thành công',
+        update_success: 'Cập nhật thành công',
         delete_all: 'Đã xoá toàn bộ lịch sử đọc',
         delete_success: 'Xoá thành công',
         not_found: 'Không tìm thấy lịch sử đọc nào'

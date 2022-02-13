@@ -158,7 +158,7 @@ router.post('/:username', slugify.get_endpoint, async (req, res, next) => {
             res.status(200).json({
                 status: 'success',
                 code: 200,
-                message: null,
+                message: message.report.add_success,
                 data: [report]
             })
         }
@@ -225,7 +225,7 @@ router.delete('/:type/:endpoint', async (req, res, next) => {
         if (report) res.status(200).json({
             status: 'success',
             code: 200,
-            message: null,
+            message: message.report.delete_success,
             data: [report]
         })
         else res.status(404).json({
@@ -256,7 +256,7 @@ router.delete('/read-report', async (req, res, next) => {
         res.status(200).json({
             status: 'success',
             code: 200,
-            message: null,
+            message: message.report.delete_success,
             data: reports
         })
     } catch (err) {
