@@ -46,9 +46,11 @@ router.get('/:endpoint', async (req, res, next) => {
 
 router.get('/detail/:id', async (req, res, next) => {
     let id = req.params.id
+    var page = req.query.page
+    if (!page) page = 1
     var comments = []
     try {
-        var result = await CommentController.get(id)
+        var result = await CommentController.get(id, page)
         result.forEach(e => {
             comments.push({
                 id: e.id,
@@ -92,8 +94,9 @@ router.get('/detail/:id', async (req, res, next) => {
  * @body {endpoint, username, id_root, content, files}
  * @returns comment
  */
-router.post('/:username', auth.verifyUser, async (req, res, next) => {
+router.post('/:book_endpoint/:username', auth.verifyUser, async (req, res, next) => {
     var comment = req.body
+    comment.endpoint = req.params.book_endpoint
     try {
         if (!comment.endpoint) {
             res.status(400).json({
@@ -155,6 +158,15 @@ router.post('/:username', auth.verifyUser, async (req, res, next) => {
                         status: 'fail',
                         code: 400,
                         message: message.comment.username_fk,
+                        data: null
+                    })
+                    break
+                }
+                case 'book_fk': {
+                    res.status(400).json({
+                        status: 'fail',
+                        code: 400,
+                        message: message.comment.book_fk,
                         data: null
                     })
                     break
