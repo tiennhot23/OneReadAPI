@@ -12,9 +12,19 @@ router.get('/:endpoint', async (req, res, next) => {
     var comments
     try {
         comments = await CommentController.list(endpoint)
-        res.status(200).json({comments: comments})
+        res.status(200).json({
+            status: 'success',
+            code: 200,
+            message: null,
+            data: comments
+        })
     } catch (err) {
-        res.status(500).json({message: err.message})
+        res.status(500).json({
+            status: 'fail',
+            code: 500,
+            message: err.message,
+            data: null
+        })
     }
 })
 
@@ -23,10 +33,25 @@ router.get('/detail/:id', async (req, res, next) => {
     var replies
     try {
         replies = await CommentController.get(id)
-        if (replies) res.status(200).json({comments: replies})
-        else res.status(404).json({message: message.comment.not_found})
+        if (replies) res.status(200).json({
+            status: 'success',
+            code: 200,
+            message: null,
+            data: replies
+        })
+        else res.status(404).json({
+            status: 'fail',
+            code: 404,
+            message: message.comment.not_found,
+            data: null
+        })
     } catch (err) {
-        res.status(500).json({message: err.message})
+        res.status(500).json({
+            status: 'fail',
+            code: 500,
+            message: err.message,
+            data: null
+        })
     }
 })
 
@@ -41,18 +66,33 @@ router.post('/:username', auth.verifyUser, async (req, res, next) => {
     var comment = req.body
     try {
         if (!comment.endpoint) {
-            res.status(400).json({message: message.comment.missing_endpoint})
+            res.status(400).json({
+                status: 'fail',
+                code: 400,
+                message: message.comment.missing_endpoint,
+                data: null
+            })
         } else if (!comment.username) {
-            res.status(400).json({message: message.comment.missing_username})
+            res.status(400).json({
+                status: 'fail',
+                code: 400,
+                message: message.comment.missing_username,
+                data: null
+            })
         } else if (!comment.content) {
-            res.status(400).json({message: message.comment.missing_content})
+            res.status(400).json({
+                status: 'fail',
+                code: 400,
+                message: message.comment.missing_content,
+                data: null
+            })
         } else {
             comment = await CommentController.add(comment)
             if (comment.id_root === null) comment.id_root = comment.id
             let tags = comment.content.split('@')
             tags.forEach(async (tag) => {
                 tag = tag.split(' ')[0]
-                if (tag){
+                if (tag) {
                     let notify = {
                         endpoint: `*comment*${comment.id_root}`,
                         username: tag,
@@ -61,29 +101,59 @@ router.post('/:username', auth.verifyUser, async (req, res, next) => {
                     NotifyController.add(notify)
                 }
             })
-            res.status(200).json({comment: comment})
+            res.status(200).json({
+                status: 'success',
+                code: 200,
+                message: null,
+                data: [comment]
+            })
         }
     } catch (err) {
-        if (err.constraint){
+        if (err.constraint) {
             switch (err.constraint) {
                 case 'comment_pk': {
-                    res.status(400).json({message: message.comment.comment_pk})
+                    res.status(400).json({
+                        status: 'fail',
+                        code: 400,
+                        message: message.comment.comment_pk,
+                        data: null
+                    })
                     break
                 }
                 case 'username_fk': {
-                    res.status(400).json({message: message.comment.username_fk})
+                    res.status(400).json({
+                        status: 'fail',
+                        code: 400,
+                        message: message.comment.username_fk,
+                        data: null
+                    })
                     break
                 }
                 case 'reply_constraint': {
-                    res.status(400).json({message: message.comment.reply_constraint})
+                    res.status(400).json({
+                        status: 'fail',
+                        code: 400,
+                        message: message.comment.reply_constraint,
+                        data: null
+                    })
                     break
                 }
                 default: {
-                    res.status(500).json({message: err.message})
+                    res.status(500).json({
+                        status: 'fail',
+                        code: 500,
+                        message: err.message,
+                        data: null
+                    })
                     break
                 }
             }
-        } else res.status(500).json({message: err.message})
+        } else res.status(500).json({
+            status: 'fail',
+            code: 500,
+            message: err.message,
+            data: null
+        })
     }
 })
 
@@ -92,15 +162,30 @@ router.post('/:username', auth.verifyUser, async (req, res, next) => {
  * @body 
  * @returns comment
  */
- router.delete('/:id', auth.verifyUser, async (req, res, next) => {
+router.delete('/:id', auth.verifyUser, async (req, res, next) => {
     let comment
     let id = req.params.id
     try {
         comment = await CommentController.delete(id)
-        if (comment) res.status(200).json({comment: comment})
-        else res.status(404).json({message: message.comment.not_found})
+        if (comment) res.status(200).json({
+            status: 'success',
+            code: 200,
+            message: null,
+            data: [comment]
+        })
+        else res.status(404).json({
+            status: 'fail',
+            code: 404,
+            message: message.comment.not_found,
+            data: null
+        })
     } catch (err) {
-        res.status(500).json({message: err.message})
+        res.status(500).json({
+            status: 'fail',
+            code: 500,
+            message: err.message,
+            data: null
+        })
     }
 })
 

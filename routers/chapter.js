@@ -15,9 +15,19 @@ router.get('/all/:book_endpoint', async (req, res, next) => {
     var chapters
     try {
         chapters = await ChapterController.list(book_endpoint)
-        res.status(200).json({chapters: chapters})
+        res.status(200).json({
+            status: 'success',
+            code: 200,
+            message: null,
+            data: chapters
+        })
     } catch (err) {
-        res.status(500).json({message: err.message})
+        res.status(500).json({
+            status: 'fail',
+            code: 500,
+            message: err.message,
+            data: null
+        })
     }
 })
 
@@ -30,7 +40,12 @@ router.get('/detail/:book_endpoint/:chapter_endpoint', async (req, res, next) =>
         if (chapter_endpoint) {
             chapter = await ChapterController.get(book_endpoint, chapter_endpoint)
             if (chapter) {
-                res.status(200).json({chapter: chapter})
+                res.status(200).json({
+                    status: 'success',
+                    code: 200,
+                    message: null,
+                    data: [chapter]
+                })
                 const authHeader = req.headers['authorization']
                 const token = authHeader && authHeader.split(' ')[1]
                 if (token) {
@@ -47,21 +62,35 @@ router.get('/detail/:book_endpoint/:chapter_endpoint', async (req, res, next) =>
                     }
                 }
                 if (view == 'true') {
-                    let time = new Date().toISOString().slice(0,10)
+                    let time = new Date().toISOString().slice(0, 10)
                     if (await BookController.get_view(book_endpoint, time)) {
                         await BookController.update_view(book_endpoint, time)
                     } else {
                         await BookController.add_view(book_endpoint, time)
                     }
-                    
+
                 }
-            }
-            else res.status(404).json({message: message.chapter.not_found})
+            } else res.status(404).json({
+                status: 'fail',
+                code: 404,
+                message: message.chapter.not_found,
+                data: null
+            })
         } else {
-            res.status(400).json({message: message.chapter.missing_chapter_endpoint})
+            res.status(400).json({
+                status: 'fail',
+                code: 400,
+                message: message.chapter.missing_chapter_endpoint,
+                data: null
+            })
         }
     } catch (err) {
-        res.status(500).json({message: err.message})
+        res.status(500).json({
+            status: 'fail',
+            code: 500,
+            message: err.message,
+            data: null
+        })
     }
 })
 
@@ -75,11 +104,26 @@ router.post('/', auth.verifyAdmin, slugify.get_endpoint, async (req, res, next) 
     }
     try {
         if (!chapter.title) {
-            res.status(400).json({message: message.chapter.missing_title})
+            res.status(400).json({
+                status: 'fail',
+                code: 400,
+                message: message.chapter.missing_title,
+                data: null
+            })
         } else if (!chapter.images || chapter.images.length == 0) {
-            res.status(400).json({message: message.chapter.missing_images})
+            res.status(400).json({
+                status: 'fail',
+                code: 400,
+                message: message.chapter.missing_images,
+                data: null
+            })
         } else if (!chapter.book_endpoint) {
-            res.status(400).json({message: message.chapter.missing_book_endpoint})
+            res.status(400).json({
+                status: 'fail',
+                code: 400,
+                message: message.chapter.missing_book_endpoint,
+                data: null
+            })
         } else {
             // await TransactionController.begin()
             chapter = await ChapterController.add(chapter)
@@ -96,31 +140,60 @@ router.post('/', auth.verifyAdmin, slugify.get_endpoint, async (req, res, next) 
                 }
                 await NotifyController.add(notify)
             })
-            return res.status(200).json({chapter: chapter})
+            return res.status(200).json({
+                status: 'success',
+                code: 200,
+                message: null,
+                data: [chapter]
+            })
         }
     } catch (err) {
         // await TransactionController.rollback()
-        if (err.constraint){
+        if (err.constraint) {
             switch (err.constraint) {
                 case 'chapter_pk': {
-                    res.status(400).json({message: message.chapter.chapter_pk})
+                    res.status(400).json({
+                        status: 'fail',
+                        code: 400,
+                        message: message.chapter.chapter_pk,
+                        data: null
+                    })
                     break
                 }
                 case 'chapter_detail_fk': {
-                    res.status(400).json({message: message.chapter.chapter_detail_fk})
+                    res.status(400).json({
+                        status: 'fail',
+                        code: 400,
+                        message: message.chapter.chapter_detail_fk,
+                        data: null
+                    })
                     break
                 }
                 case 'book_fk': {
-                    res.status(400).json({message: message.chapter.book_fk})
+                    res.status(400).json({
+                        status: 'fail',
+                        code: 400,
+                        message: message.chapter.book_fk,
+                        data: null
+                    })
                     break
                 }
                 default: {
-                    res.status(500).json({message: err.message})
+                    res.status(500).json({
+                        status: 'fail',
+                        code: 500,
+                        message: err.message,
+                        data: null
+                    })
                     break;
                 }
             }
-        }
-        else res.status(500).json({message: err.message})
+        } else res.status(500).json({
+            status: 'fail',
+            code: 500,
+            message: err.message,
+            data: null
+        })
     }
 })
 
@@ -129,7 +202,7 @@ router.post('/', auth.verifyAdmin, slugify.get_endpoint, async (req, res, next) 
  * @body {chapter_endpoint, (title), (description)}
  * @returns chapter
  */
- router.patch('/:book_endpoint/:chapter_endpoint', auth.verifyAdmin, slugify.get_endpoint, async (req, res, next) => {
+router.patch('/:book_endpoint/:chapter_endpoint', auth.verifyAdmin, slugify.get_endpoint, async (req, res, next) => {
     let chapter_endpoint = req.params.chapter_endpoint
     var chapter = {
         chapter_endpoint: req.body.endpoint,
@@ -139,15 +212,35 @@ router.post('/', auth.verifyAdmin, slugify.get_endpoint, async (req, res, next) 
     }
     try {
         if (!chapter.book_endpoint) {
-            return res.status(400).json({message: message.chapter.missing_book_endpoint})
+            return res.status(400).json({
+                status: 'fail',
+                code: 400,
+                message: message.chapter.missing_book_endpoint,
+                data: null
+            })
         } else if (!chapter.images || chapter.images.length == 0) {
-            return res.status(400).json({message: message.chapter.missing_images})
+            return res.status(400).json({
+                status: 'fail',
+                code: 400,
+                message: message.chapter.missing_images,
+                data: null
+            })
         }
         chapter = await ChapterController.update(chapter, chapter_endpoint)
         if (chapter) {
-            return res.status(200).json({chapter: chapter})
+            return res.status(200).json({
+                status: 'success',
+                code: 200,
+                message: null,
+                data: [chapter]
+            })
         } else {
-            return res.status(404).json({message: message.chapter.not_found})
+            return res.status(404).json({
+                status: 'fail',
+                code: 404,
+                message: message.chapter.not_found,
+                data: null
+            })
         }
         // await TransactionController.begin()
         // if (chapter.title) {
@@ -166,27 +259,51 @@ router.post('/', auth.verifyAdmin, slugify.get_endpoint, async (req, res, next) 
         // }
     } catch (err) {
         // await TransactionController.rollback()
-        if (err.constraint){
+        if (err.constraint) {
             switch (err.constraint) {
                 case 'chapter_pk': {
-                    res.status(400).json({message: message.chapter.chapter_pk})
+                    res.status(400).json({
+                        status: 'fail',
+                        code: 400,
+                        message: message.chapter.chapter_pk,
+                        data: null
+                    })
                     break
                 }
                 case 'chapter_detail_fk': {
-                    res.status(400).json({message: message.chapter.chapter_detail_fk})
+                    res.status(400).json({
+                        status: 'fail',
+                        code: 400,
+                        message: message.chapter.chapter_detail_fk,
+                        data: null
+                    })
                     break
                 }
                 case 'book_fk': {
-                    res.status(400).json({message: message.chapter.book_fk})
+                    res.status(400).json({
+                        status: 'fail',
+                        code: 400,
+                        message: message.chapter.book_fk,
+                        data: null
+                    })
                     break
                 }
                 default: {
-                    res.status(500).json({message: err.message})
+                    res.status(500).json({
+                        status: 'fail',
+                        code: 500,
+                        message: err.message,
+                        data: null
+                    })
                     break;
                 }
             }
-        }
-        else res.status(500).json({message: err.message})
+        } else res.status(500).json({
+            status: 'fail',
+            code: 500,
+            message: err.message,
+            data: null
+        })
     }
 })
 
@@ -195,16 +312,31 @@ router.post('/', auth.verifyAdmin, slugify.get_endpoint, async (req, res, next) 
  * @body {chapter_endpoint, title, (description)}
  * @returns chapter
  */
- router.delete('/:book_endpoint/:chapter_endpoint', async (req, res, next) => {
+router.delete('/:book_endpoint/:chapter_endpoint', async (req, res, next) => {
     var chapter
     let chapter_endpoint = req.params.chapter_endpoint
     let book_endpoint = req.params.book_endpoint
     try {
         chapter = await ChapterController.delete(book_endpoint, chapter_endpoint)
-        if (chapter) res.status(200).json({chapter: chapter})
-        else res.status(404).json({message: message.chapter.not_found})
+        if (chapter) res.status(200).json({
+            status: 'success',
+            code: 200,
+            message: null,
+            data: [chapter]
+        })
+        else res.status(404).json({
+            status: 'fail',
+            code: 404,
+            message: message.chapter.not_found,
+            data: null
+        })
     } catch (err) {
-        res.status(500).json({message: err.message})
+        res.status(500).json({
+            status: 'fail',
+            code: 500,
+            message: err.message,
+            data: null
+        })
     }
 })
 

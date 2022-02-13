@@ -11,9 +11,19 @@ router.get('/all/:username', auth.verifyUser, async (req, res, next) => {
     var notifys
     try {
         notifys = await NotifyController.list(user.username)
-        res.status(200).json({notifys: notifys})
+        res.status(200).json({
+            status: 'success',
+            code: 200,
+            message: null,
+            data: notifys
+        })
     } catch (err) {
-        res.status(500).json({message: err.message})
+        res.status(500).json({
+            status: 'fail',
+            code: 500,
+            message: err.message,
+            data: null
+        })
     }
 })
 
@@ -23,18 +33,42 @@ router.get('/:endpoint/:username', auth.verifyUser, async (req, res, next) => {
     var notify
     try {
         if (!endpoint) {
-            res.status(400).json({message: message.notify.missing_endpoint})
+            res.status(400).json({
+                status: 'fail',
+                code: 400,
+                message: message.notify.missing_endpoint,
+                data: null
+            })
         } else if (!username) {
-            res.status(400).json({message: message.notify.missing_username})
+            res.status(400).json({
+                status: 'fail',
+                code: 400,
+                message: message.notify.missing_username,
+                data: null
+            })
         } else {
             notify = await NotifyController.get(endpoint, username)
             if (notify) {
-                res.status(200).json({notify: notify})
-            }
-            else res.status(404).json({message: message.notify.not_found})
+                res.status(200).json({
+                    status: 'success',
+                    code: 200,
+                    message: null,
+                    data: [notify]
+                })
+            } else res.status(404).json({
+                status: 'fail',
+                code: 404,
+                message: message.notify.not_found,
+                data: null
+            })
         }
     } catch (err) {
-        res.status(500).json({message: err.message})
+        res.status(500).json({
+            status: 'fail',
+            code: 500,
+            message: err.message,
+            data: null
+        })
     }
 })
 
@@ -49,36 +83,81 @@ router.post('/', auth.verifyAdmin, async (req, res, next) => {
     var notify = req.body
     try {
         if (!notify.endpoint) {
-            res.status(400).json({message: message.notify.missing_endpoint})
+            res.status(400).json({
+                status: 'fail',
+                code: 400,
+                message: message.notify.missing_endpoint,
+                data: null
+            })
         } else if (!notify.username) {
-            res.status(400).json({message: message.notify.missing_username})
+            res.status(400).json({
+                status: 'fail',
+                code: 400,
+                message: message.notify.missing_username,
+                data: null
+            })
         } else if (!notify.content) {
-            res.status(400).json({message: message.notify.missing_content})
+            res.status(400).json({
+                status: 'fail',
+                code: 400,
+                message: message.notify.missing_content,
+                data: null
+            })
         } else {
             notify = await NotifyController.add(notify)
-            res.status(200).json({notify: notify})
+            res.status(200).json({
+                status: 'success',
+                code: 200,
+                message: null,
+                data: [notify]
+            })
         }
     } catch (err) {
-        if (err.constraint){
+        if (err.constraint) {
             switch (err.constraint) {
                 case 'notify_pk': {
-                    res.status(400).json({message: message.notify.notify_pk})
+                    res.status(400).json({
+                        status: 'fail',
+                        code: 400,
+                        message: message.notify.notify_pk,
+                        data: null
+                    })
                     break
                 }
                 case 'username_fk': {
-                    res.status(400).json({message: message.notify.username_fk})
+                    res.status(400).json({
+                        status: 'fail',
+                        code: 400,
+                        message: message.notify.username_fk,
+                        data: null
+                    })
                     break
                 }
                 case 'status_constraint': {
-                    res.status(400).json({message: message.notify.status_constraint})
+                    res.status(400).json({
+                        status: 'fail',
+                        code: 400,
+                        message: message.notify.status_constraint,
+                        data: null
+                    })
                     break
                 }
                 default: {
-                    res.status(500).json({message: err.message})
+                    res.status(500).json({
+                        status: 'fail',
+                        code: 500,
+                        message: err.message,
+                        data: null
+                    })
                     break
                 }
             }
-        } else res.status(500).json({message: err.message})
+        } else res.status(500).json({
+            status: 'fail',
+            code: 500,
+            message: err.message,
+            data: null
+        })
     }
 })
 
@@ -87,13 +166,23 @@ router.post('/', auth.verifyAdmin, async (req, res, next) => {
  * @body 
  * @returns notifys
  */
- router.delete('/read-notify/:username', auth.verifyUser, async (req, res, next) => {
+router.delete('/read-notify/:username', auth.verifyUser, async (req, res, next) => {
     let notifys
     try {
         notifys = await NotifyController.deleteRead()
-        res.status(200).json({notifys: notifys})
+        res.status(200).json({
+            status: 'success',
+            code: 200,
+            message: null,
+            data: notifys
+        })
     } catch (err) {
-        res.status(500).json({message: err.message})
+        res.status(500).json({
+            status: 'fail',
+            code: 500,
+            message: err.message,
+            data: null
+        })
     }
 })
 
@@ -102,16 +191,31 @@ router.post('/', auth.verifyAdmin, async (req, res, next) => {
  * @body 
  * @returns notify
  */
- router.delete('/:endpoint/:username', auth.verifyUser, async (req, res, next) => {
+router.delete('/:endpoint/:username', auth.verifyUser, async (req, res, next) => {
     let notify
     let endpoint = req.params.endpoint
     let username = req.user.username
     try {
         notify = await NotifyController.delete(endpoint, username)
-        if (notify) res.status(200).json({notify: notify})
-        else res.status(404).json({message: message.notify.not_found})
+        if (notify) res.status(200).json({
+            status: 'success',
+            code: 200,
+            message: null,
+            data: [notify]
+        })
+        else res.status(404).json({
+            status: 'fail',
+            code: 404,
+            message: message.notify.not_found,
+            data: null
+        })
     } catch (err) {
-        res.status(500).json({message: err.message})
+        res.status(500).json({
+            status: 'fail',
+            code: 500,
+            message: err.message,
+            data: null
+        })
     }
 })
 

@@ -84,9 +84,19 @@ router.get('/all', async (req, res, next) => {
     if (!page) page = 1
     try {
         books = await BookController.get_all(page)
-        res.status(200).json({books: books})
+        res.status(200).json({
+            status: 'success',
+            code: 200,
+            message: null,
+            data: books
+        })
     } catch (err) {
-        res.status(500).json({message: err.message})
+        res.status(500).json({
+            status: 'fail',
+            code: 500,
+            message: err.message,
+            data: null
+        })
     }
 })
 
@@ -100,9 +110,19 @@ router.post('/filter', async (req, res, next) => {
         } else {
             books = await BookController.filter_without_genres(req.body, page)
         }
-        res.status(200).json({books: books})
+        res.status(200).json({
+            status: 'success',
+            code: 200,
+            message: null,
+            data: books
+        })
     } catch (err) {
-        res.status(500).json({message: err.message})
+        res.status(500).json({
+            status: 'fail',
+            code: 500,
+            message: err.message,
+            data: null
+        })
     }
 })
 
@@ -111,9 +131,19 @@ router.get('/suggest-book/:username', auth.verifyUser, async (req, res, next) =>
     var books
     try {
         books = await BookController.get_suggest_book(user.username)
-        return res.status(200).json({books: books})
+        res.status(200).json({
+            status: 'success',
+            code: 200,
+            message: null,
+            data: books
+        })
     } catch (err) {
-        res.status(500).json({message: err.message})
+        res.status(500).json({
+            status: 'fail',
+            code: 500,
+            message: err.message,
+            data: null
+        })
     }
 })
 
@@ -121,9 +151,19 @@ router.get('/top-search', async (req, res, next) => {
     var books
     try {
         books = await BookController.get_top_search()
-        return res.status(200).json({books: books})
+        res.status(200).json({
+            status: 'success',
+            code: 200,
+            message: null,
+            data: books
+        })
     } catch (err) {
-        res.status(500).json({message: err.message})
+        res.status(500).json({
+            status: 'fail',
+            code: 500,
+            message: err.message,
+            data: null
+        })
     }
 })
 
@@ -131,9 +171,19 @@ router.get('/top-rating', async (req, res, next) => {
     var books
     try {
         books = await BookController.get_top_rating()
-        return res.status(200).json({books: books})
+        res.status(200).json({
+            status: 'success',
+            code: 200,
+            message: null,
+            data: books
+        })
     } catch (err) {
-        res.status(500).json({message: err.message})
+        res.status(500).json({
+            status: 'fail',
+            code: 500,
+            message: err.message,
+            data: null
+        })
     }
 })
 
@@ -141,9 +191,19 @@ router.get('/top-view-day', async (req, res, next) => {
     var books
     try {
         books = await BookController.get_top_day()
-        return res.status(200).json({books: books})
+        res.status(200).json({
+            status: 'success',
+            code: 200,
+            message: null,
+            data: books
+        })
     } catch (err) {
-        res.status(500).json({message: err.message})
+        res.status(500).json({
+            status: 'fail',
+            code: 500,
+            message: err.message,
+            data: null
+        })
     }
 })
 
@@ -151,9 +211,19 @@ router.get('/top-view-month', async (req, res, next) => {
     var books
     try {
         books = await BookController.get_top_month()
-        return res.status(200).json({books: books})
+        res.status(200).json({
+            status: 'success',
+            code: 200,
+            message: null,
+            data: books
+        })
     } catch (err) {
-        res.status(500).json({message: err.message})
+        res.status(500).json({
+            status: 'fail',
+            code: 500,
+            message: err.message,
+            data: null
+        })
     }
 })
 
@@ -161,9 +231,19 @@ router.get('/top-view-year', async (req, res, next) => {
     var books
     try {
         books = await BookController.get_top_year()
-        return res.status(200).json({books: books})
+        res.status(200).json({
+            status: 'success',
+            code: 200,
+            message: null,
+            data: books
+        })
     } catch (err) {
-        res.status(500).json({message: err.message})
+        res.status(500).json({
+            status: 'fail',
+            code: 500,
+            message: err.message,
+            data: null
+        })
     }
 })
 
@@ -171,9 +251,19 @@ router.get('/top-follow', async (req, res, next) => {
     var books
     try {
         books = await BookController.get_top_follow()
-        return res.status(200).json({books: books})
+        res.status(200).json({
+            status: 'success',
+            code: 200,
+            message: null,
+            data: books
+        })
     } catch (err) {
-        res.status(500).json({message: err.message})
+        res.status(500).json({
+            status: 'fail',
+            code: 500,
+            message: err.message,
+            data: null
+        })
     }
 })
 
@@ -182,9 +272,19 @@ router.get('/follower/:endpoint', async (req, res, next) => {
     var users
     try {
         users = await BookController.get_user_follow(endpoint)
-        return res.status(200).json({users: users})
+        res.status(200).json({
+            status: 'success',
+            code: 200,
+            message: null,
+            data: users
+        })
     } catch (err) {
-        res.status(500).json({message: err.message})
+        res.status(500).json({
+            status: 'fail',
+            code: 500,
+            message: err.message,
+            data: null
+        })
     }
 })
 
@@ -192,9 +292,19 @@ router.get('/last-update', async (req, res, next) => {
     var books
     try {
         books = await BookController.get_last_update()
-        return res.status(200).json({books: books})
+        res.status(200).json({
+            status: 'success',
+            code: 200,
+            message: null,
+            data: books
+        })
     } catch (err) {
-        res.status(500).json({message: err.message})
+        res.status(500).json({
+            status: 'fail',
+            code: 500,
+            message: err.message,
+            data: null
+        })
     }
 })
 
@@ -203,9 +313,19 @@ router.get('/relate-book/:endpoint', async (req, res, next) => {
     var books
     try {
         books = await BookController.get_relate_book(endpoint)
-        return res.status(200).json({books: books})
+        res.status(200).json({
+            status: 'success',
+            code: 200,
+            message: null,
+            data: books
+        })
     } catch (err) {
-        res.status(500).json({message: err.message})
+        res.status(500).json({
+            status: 'fail',
+            code: 500,
+            message: err.message,
+            data: null
+        })
     }
 })
 
@@ -222,14 +342,34 @@ router.get('/detail/:endpoint', async (req, res, next) => {
                     let search_number = await BookController.update_search_number(book)
                     book.search_number = search_number.search_number
                 }
-                res.status(200).json({book: book})
+                res.status(200).json({
+                    status: 'success',
+                    code: 200,
+                    message: null,
+                    data: [book]
+                })
             } 
-            else res.status(404).json({message: message.book.not_found})
+            else res.status(404).json({
+                status: 'fail',
+                code: 404,
+                message: message.book.not_found,
+                data: null
+            })
         } else {
-            res.status(400).json({message: message.book.missing_endpoint})
+            res.status(400).json({
+                status: 'fail',
+                code: 400,
+                message: message.book.missing_endpoint,
+                data: null
+            })
         }
     } catch (err) {
-        res.status(500).json({message: err.message})
+        res.status(500).json({
+            status: 'fail',
+            code: 500,
+            message: err.message,
+            data: null
+        })
     }
 })
 
@@ -240,12 +380,27 @@ router.get('/type/:type', async (req, res, next) => {
     try {
         if (type) {
             books = await BookController.get_book_of_type(type)
-            return res.status(200).json({books: books})
+            return res.status(200).json({
+                status: 'success',
+                code: 200,
+                message: null,
+                data: books
+            })
         } else {
-            return res.status(400).json({message: message.book.missing_type})
+            return res.status(400).json({
+                status: 'fail',
+                code: 400,
+                message: message.book.missing_type,
+                data: null
+            })
         }
     } catch (err) {
-        res.status(500).json({message: err.message})
+        res.status(500).json({
+            status: 'fail',
+            code: 500,
+            message: err.message,
+            data: null
+        })
     }
 })
 
@@ -259,9 +414,19 @@ router.post('/', auth.verifyAdmin, slugify.get_endpoint, async (req, res, next) 
     var book = req.body
     try {
         if (!book.title) {
-            res.status(400).json({message: message.book.missing_title})
+            res.status(400).json({
+                status: 'fail',
+                code: 400,
+                message: message.book.missing_title,
+                data: null
+            })
         } else if (!book.type) {
-            res.status(400).json({message: message.book.missing_type})
+            res.status(400).json({
+                status: 'fail',
+                code: 400,
+                message: message.book.missing_type,
+                data: null
+            })
         } else {
             // await TransactionController.begin()
             let genres = book.genres
@@ -275,35 +440,70 @@ router.post('/', auth.verifyAdmin, slugify.get_endpoint, async (req, res, next) 
             //     book.genres.push(genre)
             // })
             // await TransactionController.commit()
-            res.status(200).json({book: book})
+            res.status(200).json({
+                status: 'success',
+                code: 200,
+                message: null,
+                data: [book]
+            })
         }
     } catch (err) {
         // await TransactionController.rollback()
         if (err.constraint){
             switch (err.constraint) {
                 case 'book_pk': {
-                    res.status(400).json({message: message.book.book_pk})
+                    res.status(400).json({
+                        status: 'fail',
+                        code: 400,
+                        message: message.book.book_pk,
+                        data: null
+                    })
                     break
                 }
                 case 'type_constraint': {
-                    res.status(400).json({message: message.book.type_constraint})
+                    res.status(400).json({
+                        status: 'fail',
+                        code: 400,
+                        message: message.book.type_constraint,
+                        data: null
+                    })
                     break
                 }
                 case 'genre_fk': {
-                    res.status(400).json({message: message.genre.not_found})
+                    res.status(404).json({
+                        status: 'fail',
+                        code: 404,
+                        message: message.genre.not_found,
+                        data: null
+                    })
                     break
                 }
                 case 'book_fk': {
-                    res.status(400).json({message: message.book.not_found})
+                    res.status(404).json({
+                        status: 'fail',
+                        code: 404,
+                        message: message.book.not_found,
+                        data: null
+                    })
                     break
                 }
                 default:{
-                    res.status(500).json({message: err.message})
+                    res.status(500).json({
+                        status: 'fail',
+                        code: 500,
+                        message: err.message,
+                        data: null
+                    })
                     break
                 }
             }
         } else {
-            res.status(500).json({message: err.message})
+            res.status(500).json({
+                status: 'fail',
+                code: 500,
+                message: err.message,
+                data: null
+            })
         }
     }
 })
@@ -327,35 +527,75 @@ router.post('/', auth.verifyAdmin, slugify.get_endpoint, async (req, res, next) 
         }
         book = await BookController.update_info(book, endpoint)
         await TransactionController.commit()
-        if (book) res.status(200).json({book: book})
-        else res.status(404).json({message: message.book.not_found})
+        if (book) res.status(200).json({
+            status: 'success',
+            code: 200,
+            message: null,
+            data: [book]
+        })
+        else res.status(404).json({
+            status: 'fail',
+            code: 404,
+            message: message.book.not_found,
+            data: null
+        })
     } catch (err) {
         await TransactionController.rollback()
         if (err.constraint){
             switch (err.constraint) {
                 case 'book_pk': {
-                    res.status(400).json({message: message.book.book_pk})
+                    res.status(400).json({
+                        status: 'fail',
+                        code: 400,
+                        message: message.book.book_pk,
+                        data: null
+                    })
                     break
                 }
                 case 'type_constraint': {
-                    res.status(400).json({message: message.book.type_constraint})
+                    res.status(400).json({
+                        status: 'fail',
+                        code: 400,
+                        message: message.book.type_constraint,
+                        data: null
+                    })
                     break
                 }
                 case 'genre_fk': {
-                    res.status(400).json({message: message.genre.not_found})
+                    res.status(404).json({
+                        status: 'fail',
+                        code: 404,
+                        message: message.genre.not_found,
+                        data: null
+                    })
                     break
                 }
                 case 'book_fk': {
-                    res.status(400).json({message: message.book.not_found})
+                    res.status(404).json({
+                        status: 'fail',
+                        code: 404,
+                        message: message.book.not_found,
+                        data: null
+                    })
                     break
                 }
                 default:{
-                    res.status(500).json({message: err.message})
+                    res.status(500).json({
+                        status: 'fail',
+                        code: 500,
+                        message: err.message,
+                        data: null
+                    })
                     break
                 }
             }
         } else {
-            res.status(500).json({message: err.message})
+            res.status(500).json({
+                status: 'fail',
+                code: 500,
+                message: err.message,
+                data: null
+            })
         }
     }
 })
@@ -377,34 +617,74 @@ router.patch('/finish/:endpoint', auth.verifyAdmin, async (req, res, next) => {
             })
             
         }
-        if (book) res.status(200).json({book: book})
-        else res.status(404).json({message: message.book.not_found})  
+        if (book) res.status(200).json({
+            status: 'success',
+            code: 200,
+            message: null,
+            data: [book]
+        })
+        else res.status(404).json({
+            status: 'fail',
+            code: 404,
+            message: message.book.not_found,
+            data: null
+        })  
     } catch (err) {
         if (err.constraint){
             switch (err.constraint) {
                 case 'book_pk': {
-                    res.status(400).json({message: message.book.book_pk})
+                    res.status(400).json({
+                        status: 'fail',
+                        code: 400,
+                        message: message.book.book_pk,
+                        data: null
+                    })
                     break
                 }
                 case 'type_constraint': {
-                    res.status(400).json({message: message.book.type_constraint})
+                    res.status(400).json({
+                        status: 'fail',
+                        code: 400,
+                        message: message.book.type_constraint,
+                        data: null
+                    })
                     break
                 }
                 case 'genre_fk': {
-                    res.status(400).json({message: message.genre.not_found})
+                    res.status(404).json({
+                        status: 'fail',
+                        code: 404,
+                        message: message.genre.not_found,
+                        data: null
+                    })
                     break
                 }
                 case 'book_fk': {
-                    res.status(400).json({message: message.book.not_found})
+                    res.status(404).json({
+                        status: 'fail',
+                        code: 404,
+                        message: message.book.not_found,
+                        data: null
+                    })
                     break
                 }
                 default:{
-                    res.status(500).json({message: err.message})
+                    res.status(500).json({
+                        status: 'fail',
+                        code: 500,
+                        message: err.message,
+                        data: null
+                    })
                     break
                 }
             }
         } else {
-            res.status(500).json({message: err.message})
+            res.status(500).json({
+                status: 'fail',
+                code: 500,
+                message: err.message,
+                data: null
+            })
         }
     }
 })
@@ -414,9 +694,19 @@ router.patch('/rate/:endpoint', auth.verifyUser, async (req, res, next) => {
     var rating = req.body.rating
     try {
         if (!rating) {
-            return res.status(400).json({message: message.book.missing_rating})
+            return res.status(400).json({
+                status: 'fail',
+                code: 400,
+                message: message.book.missing_rating,
+                data: null
+            })
         } else if (rating > 5.0) {
-            return res.status(400).json({message: message.book.rating_constraint})
+            return res.status(400).json({
+                status: 'fail',
+                code: 400,
+                message: message.book.rating_constraint,
+                data: null
+            })
         } else {
             var book = await BookController.get(endpoint)
             if (book) {
@@ -427,36 +717,76 @@ router.patch('/rate/:endpoint', auth.verifyUser, async (req, res, next) => {
                 var obj = await BookController.update_rating(book, endpoint)
                 book.rating = obj.rating
                 book.rate_count = obj.rate_count
-                res.status(200).json({book: book})
+                res.status(200).json({
+                    status: 'success',
+                    code: 200,
+                    message: null,
+                    data: [book]
+                })
             }
-            else res.status(404).json({message: message.book.not_found})
+            else res.status(404).json({
+                status: 'fail',
+                code:404,
+                message: message.book.not_found,
+                data: null
+            })
         }
     } catch (err) {
         if (err.constraint){
             switch (err.constraint) {
                 case 'book_pk': {
-                    res.status(400).json({message: message.book.book_pk})
+                    res.status(400).json({
+                        status: 'fail',
+                        code: 400,
+                        message: message.book.book_pk,
+                        data: null
+                    })
                     break
                 }
                 case 'type_constraint': {
-                    res.status(400).json({message: message.book.type_constraint})
+                    res.status(400).json({
+                        status: 'fail',
+                        code: 400,
+                        message: message.book.type_constraint,
+                        data: null
+                    })
                     break
                 }
                 case 'genre_fk': {
-                    res.status(400).json({message: message.genre.not_found})
+                    res.status(404).json({
+                        status: 'fail',
+                        code: 404,
+                        message: message.genre.not_found,
+                        data: null
+                    })
                     break
                 }
                 case 'book_fk': {
-                    res.status(400).json({message: message.book.not_found})
+                    res.status(404).json({
+                        status: 'fail',
+                        code: 404,
+                        message: message.book.not_found,
+                        data: null
+                    })
                     break
                 }
                 default:{
-                    res.status(500).json({message: err.message})
+                    res.status(500).json({
+                        status: 'fail',
+                        code: 500,
+                        message: err.message,
+                        data: null
+                    })
                     break
                 }
             }
         } else {
-            res.status(500).json({message: err.message})
+            res.status(500).json({
+                status: 'fail',
+                code: 500,
+                message: err.message,
+                data: null
+            })
         }
     }
 })
@@ -471,10 +801,25 @@ router.patch('/rate/:endpoint', auth.verifyUser, async (req, res, next) => {
     let endpoint = req.params.endpoint
     try {
         book = await BookController.delete(endpoint)
-        if (book) res.status(200).json({book: book})
-        else res.status(404).json({message: message.book.not_found})
+        if (book) res.status(200).json({
+            status: 'success',
+            code: 200,
+            message: null,
+            data: [book]
+        })
+        else res.status(404).json({
+            status: 'fail',
+            code: 404,
+            message: message.book.not_found,
+            data: null
+        })
     } catch (err) {
-        res.status(500).json({message: err.message})
+        res.status(500).json({
+            status: 'fail',
+            code: 500,
+            message: err.message,
+            data: null
+        })
     }
 })
 
