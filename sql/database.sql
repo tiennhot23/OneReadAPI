@@ -154,7 +154,11 @@ create table "Comment"
 			references "Account"
 				on update cascade
                 on delete cascade,
-	endpoint varchar(255) not null,
+	endpoint varchar(255) not null
+		constraint book_fk
+			references "Book"
+				on update cascade
+                on delete cascade,
 	id_root int
 	    constraint reply_constraint
 	        references "Comment"

@@ -1,11 +1,12 @@
 const conn = require('../connection')
 
+const constants = require('../configs/constants')
 const db = {}
 
-db.get = (id) => {
+db.get = (id, page) => {
     return new Promise((resolve, reject) => {
-        let query = `select id, username, endpoint, id_root, content, files, to_char(time, 'DD-MM-YYYY hh:mm:ss') as time from "Comment" where id = $1 or id_root = $1`
-
+        let query = `select id, a.avatar, c.username, endpoint, id_root, content, files, to_char(time, 'DD-MM-YYYY hh:mm:ss') as time from "Comment" c, "Account" a where (id = $1 or id_root = $1) and c.username = a.username order by time desc`
+        query += ' limit ' + constants.limit_element + ' offset ' + (constants.limit_element * (page - 1))
         var params = [id]
         conn.query(query, params, (err, res) => {
             if (err) return reject(err)
@@ -14,9 +15,11 @@ db.get = (id) => {
     })
 }
 
-db.list = (endpoint) => {
+db.list = (endpoint, page) => {
     return new Promise((resolve, reject) => {
-        let query = `select id, username, endpoint, id_root, content, files, to_char(time, 'DD-MM-YYYY hh:mm:ss') as time from "Comment" where endpoint = $1 and id_root is null order by time desc`
+        let query = `select id, a.avatar, c.username, endpoint, id_root, content, files, to_char(time, 'DD-MM-YYYY hh:mm:ss') as time 
+        from "Comment" c, "Account" a where endpoint = $1 and id_root is null and c.username = a.username order by time desc`
+        query += ' limit ' + constants.limit_element + ' offset ' + (constants.limit_element * (page - 1))
         let params = [endpoint]
         conn.query(query, params, (err, res) => {
             if(err) return reject(err)
