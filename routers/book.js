@@ -100,15 +100,16 @@ router.get('/all', async (req, res, next) => {
     }
 })
 
-router.post('/filter', async (req, res, next) => {
+router.get('/filter', async (req, res, next) => {
     var books
+    var filter = JSON.parse(req.query.filter)
     var page = req.query.page
     if (!page) page = 1
     try {
-        if (req.body.genres && req.body.genres.length > 0) {
-            books = await BookController.filter_with_genres(req.body, page)
+        if (filter.genres && filter.genres.length > 0) {
+            books = await BookController.filter_with_genres(filter, page)
         } else {
-            books = await BookController.filter_without_genres(req.body, page)
+            books = await BookController.filter_without_genres(filter, page)
         }
         res.status(200).json({
             status: 'success',
