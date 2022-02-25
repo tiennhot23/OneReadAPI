@@ -1,0 +1,187 @@
+[
+  {
+    "endpoint": "trinh-tham",
+    "title": "Trinh thám",
+    "description": "Không có mô tả nào"
+  },
+  {
+    "endpoint": "manga",
+    "title": "Manga",
+    "description": "Truyện tranh nhật"
+  },
+  {
+    "endpoint": "comedy",
+    "title": "Comedy",
+    "description": "Hài hước"
+  },
+  {
+    "endpoint": "action",
+    "title": "Action",
+    "description": "Hành động"
+  },
+  {
+    "endpoint": "school-life",
+    "title": "School Life",
+    "description": "Ngữ cảnh diễn biến câu chuyện chủ yếu ở trường học"
+  },
+  {
+    "endpoint": "seinen",
+    "title": "Seinen",
+    "description": "Manga nhắm tới độc giả là nam giới trẻ và trưởng thành"
+  },
+  {
+    "endpoint": "slice-of-life",
+    "title": "Slice of life",
+    "description": "Nói về cuộc sống đời thường"
+  },
+  {
+    "endpoint": "manhua",
+    "title": "Manhua",
+    "description": "Truyện tranh của Trung Quốc"
+  },
+  {
+    "endpoint": "fantasy",
+    "title": "Fantasy",
+    "description": "Truyện giả tưởng"
+  },
+  {
+    "endpoint": "martial-arts",
+    "title": "Martial arts",
+    "description": "Võ thuật"
+  },
+  {
+    "endpoint": "horror",
+    "title": "Horror",
+    "description": "Truyện kinh dị"
+  },
+  {
+    "endpoint": "drama",
+    "title": "Drama",
+    "description": "Thể loại mang đến cho người xem những cảm xúc khác nhau: buồn bã, căng thẳng thậm chí là bi phẫn"
+  },
+  {
+    "endpoint": "manhwa",
+    "title": "Manhwa",
+    "description": "Truyện tranh Hàn Quốc"
+  },
+  {
+    "endpoint": "one-shot",
+    "title": "One shot",
+    "description": "Những truyện ngắn, thường là 1 chapter"
+  },
+  {
+    "endpoint": "shounen",
+    "title": "Shounen",
+    "description": "Đối tượng hướng tới của thể loại này là phái nam. Nội dung của những bộ manga này thường liên quan đến đánh nhau và/hoặc bạo lực (ở mức bình thường, không thái quá)"
+  },
+  {
+    "endpoint": "adventure",
+    "title": "Adventure",
+    "description": "Thể loại phiêu lưu, mạo hiểm, thường là hành trình của các nhân vật"
+  },
+  {
+    "endpoint": "romance",
+    "title": "Romance",
+    "description": "Thường là những câu chuyện về tình yêu, tình cảm lãng mạn. Ớ đây chúng ta sẽ lấy ví dụ như tình yêu giữa một người con trai và con gái, bên cạnh đó đặc điểm thể loại này là kích thích trí tưởng tượng của bạn về tình yêu"
+  },
+  {
+    "endpoint": "supernatural",
+    "title": "Supernatural",
+    "description": "Thể hiện những sức mạnh đáng kinh ngạc và không thể giải thích được, chúng thường đi kèm với những sự kiện trái ngược hoặc thách thức với những định luật vật lý"
+  },
+  {
+    "endpoint": "chuyen-sinh",
+    "title": "Chuyển Sinh",
+    "description": "Thể loại này là những câu chuyện về người ở một thế giới này xuyên đến một thế giới khác, có thể là thế giới mang phong cách trung cổ với kiếm sĩ và ma thuật, hay thế giới trong game, hoặc có thể là bạn chết ở nơi này và được chuyển sinh đến nơi khác"
+  },
+  {
+    "endpoint": "co-djai",
+    "title": "Cổ Đại",
+    "description": "Truyện có nội dung xảy ra ở thời cổ đại phong kiến."
+  },
+  {
+    "endpoint": "ecchi",
+    "title": "Ecchi",
+    "description": "Thường có những tình huống nhạy cảm nhằm lôi cuốn người xem"
+  },
+  {
+    "endpoint": "historical",
+    "title": "Historical",
+    "description": "Thể loại có liên quan đến thời xa xưa"
+  },
+  {
+    "endpoint": "mature",
+    "title": "Mature",
+    "description": "Thể loại dành cho lứa tuổi 17+ bao gồm các pha bạo lực, máu me, chém giết, tình dục ở mức độ vừa"
+  },
+  {
+    "endpoint": "mystery",
+    "title": "Mystery",
+    "description": "Thể loại thường xuất hiện những điều bí ấn không thể lí giải được và sau đó là những nỗ lực của nhân vật chính nhằm tìm ra câu trả lời thỏa đáng"
+  },
+  {
+    "endpoint": "sci-fi",
+    "title": "Sci-fi",
+    "description": "Bao gồm những chuyện khoa học viễn tưởng, đa phần chúng xoay quanh nhiều hiện tượng mà liên quan tới khoa học, công nghệ, tuy vậy thường thì những câu chuyện đó không gắn bó chặt chẽ với các thành tựu khoa học hiện thời, mà là do con người tưởng tượng ra"
+  },
+  {
+    "endpoint": "shoujo",
+    "title": "Shoujo",
+    "description": "Đối tượng hướng tới của thể loại này là phái nữ. Nội dung của những bộ manga này thường liên quan đến tình cảm lãng mạn, chú trọng đầu tư cho nhân vật (tính cách,...)"
+  },
+  {
+    "endpoint": "sports",
+    "title": "Sports",
+    "description": "Đúng như tên gọi, những môn thể thao như bóng đá, bóng chày, bóng chuyền, đua xe, cầu lông,... là một phần của thể loại này"
+  },
+  {
+    "endpoint": "tragedy",
+    "title": "Tragedy",
+    "description": "Thể loại chứa đựng những sự kiện mà dẫn đến kết cục là những mất mát hay sự rủi ro to lớn"
+  },
+  {
+    "endpoint": "xuyen-khong",
+    "title": "Xuyên Không",
+    "description": "Xuyên Không, Xuyên Việt là thể loại nhân vật chính vì một lý do nào đó mà bị đưa đến sinh sống ở một không gian hay một khoảng thời gian khác. Nhân vật chính có thể trực tiếp xuyên qua bằng thân xác mình hoặc sống lại bằng thân xác người khác."
+  },
+  {
+    "endpoint": "truong-thanh",
+    "title": "Trưởng Thành",
+    "description": "Thể loại Adult đề cập đến vấn đề nhạy cảm, chỉ dành cho tuổi 17+"
+  },
+  {
+    "endpoint": "psychological",
+    "title": "Psychological",
+    "description": "Thể loại liên quan đến những vấn đề về tâm lý của nhân vật ( tâm thần bất ổn, điên cuồng ...)"
+  },
+  {
+    "endpoint": "truyen-mau",
+    "title": "Truyện Màu",
+    "description": "Tổng hợp truyện tranh màu, rõ, đẹp"
+  },
+  {
+    "endpoint": "webtoon",
+    "title": "Webtoon",
+    "description": "Là truyện tranh được đăng dài kỳ trên internet của Hàn Quốc chứ không xuất bản theo cách thông thường"
+  },
+  {
+    "endpoint": "ngon-tinh",
+    "title": "Ngôn tình",
+    "description": "Truyện thuộc kiểu lãng mạn, kể về những sự kiện vui buồn trong tình yêu của nhân vật chính."
+  },
+  {
+    "endpoint": "tu-truyen",
+    "title": "Tự truyện",
+    "description": "Tác phẩm văn học thuộc thể loại tự sự, \n thường được viết bằng văn xuôi trong đó tác giả tự kể lại và miêu tả cuộc đời mình trong tác phẩm."
+  },
+  {
+    "endpoint": "tieu-thuyet",
+    "title": "Tiểu thuyết",
+    "description": "Tiểu thuyết là một thể loại văn xuôi có hư cấu"
+  },
+  {
+    "endpoint": "van-hoc",
+    "title": "Văn học",
+    "description": "Văn học"
+  }
+]

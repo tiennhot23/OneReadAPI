@@ -1,0 +1,30 @@
+[
+  {
+    "endpoint": "*chapter*giet-con-chim-nhai*chuong-7",
+    "username": "sai",
+    "content": "Sách bạn đang follow có chương mới nhất rồi kìa, đọc ngay cho nóng!!",
+    "status": 0,
+    "time": "2022-01-20 23:34:22.597312"
+  },
+  {
+    "endpoint": "*comment*null",
+    "username": "genos",
+    "content": "Hú hú!! Bạn vừa được ai đó nhắc đến trong comment",
+    "status": 0,
+    "time": "2022-01-23 22:51:01.134894"
+  },
+  {
+    "endpoint": "*comment*10",
+    "username": "genos",
+    "content": "Hú hú!! Bạn vừa được ai đó nhắc đến trong comment",
+    "status": 0,
+    "time": "2022-01-23 22:57:35.340558"
+  },
+  {
+    "endpoint": "*comment*9",
+    "username": "genos",
+    "content": "Hú hú!! Bạn vừa được ai đó nhắc đến trong comment",
+    "status": 0,
+    "time": "2022-01-23 22:58:52.445910"
+  }
+]

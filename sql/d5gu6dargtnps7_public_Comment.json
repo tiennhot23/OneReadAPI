@@ -1,0 +1,29 @@
+[
+  {
+    "id": 9,
+    "username": "sai",
+    "endpoint": "giet-con-chim-nhai",
+    "id_root": null,
+    "content": "@genos hello",
+    "time": "2022-01-23 22:51:00.834257",
+    "files": null
+  },
+  {
+    "id": 10,
+    "username": "sai",
+    "endpoint": "giet-con-chim-nhai",
+    "id_root": null,
+    "content": "@genos hello hello",
+    "time": "2022-01-23 22:57:35.046814",
+    "files": null
+  },
+  {
+    "id": 11,
+    "username": "sai",
+    "endpoint": "giet-con-chim-nhai",
+    "id_root": 9,
+    "content": "@genos dm hello",
+    "time": "2022-01-23 22:58:52.154044",
+    "files": null
+  }
+]
