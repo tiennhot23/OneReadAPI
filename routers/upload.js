@@ -9,7 +9,7 @@ const upload = multer({
     storage: multer.memoryStorage()
 })
 
-router.post('/upload/single', upload.single('file'), async (req, res, next) => {
+router.post('/upload/single', upload.any('file'), async (req, res, next) => {
     if (!req.file) {
         return res.status(400).json({
             status: 'fail',
