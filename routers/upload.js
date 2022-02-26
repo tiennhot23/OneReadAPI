@@ -10,7 +10,7 @@ const upload = multer({
 })
 
 router.post('/upload/single', upload.any('file'), async (req, res, next) => {
-    if (!req.file) {
+    if (!req.files[0]) {
         return res.status(400).json({
             status: 'fail',
             code: 400,
@@ -19,7 +19,7 @@ router.post('/upload/single', upload.any('file'), async (req, res, next) => {
         })
     }
 
-    const url = await FileController.upload(req.file, '')
+    const url = await FileController.upload(req.files[0], '')
 
     res.send(url)
 })
