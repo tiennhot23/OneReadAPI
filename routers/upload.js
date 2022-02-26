@@ -10,7 +10,7 @@ const upload = multer({
 })
 
 router.post('/upload/single', upload.any('file'), async (req, res, next) => {
-    if (!req.files[0]) {
+    if (!req.files || req.files.length == 0 || req.files[0].fieldname !== 'file') {
         return res.status(400).json({
             status: 'fail',
             code: 400,
