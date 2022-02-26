@@ -9,6 +9,7 @@ const user = require('./routers/user')
 const notify = require('./routers/notify')
 const comment = require('./routers/comment')
 const chapter = require('./routers/chapter')
+const upload = require('./routers/upload')
 
 require('dotenv').config()
 
@@ -36,6 +37,7 @@ app.use('/user', user)
 app.use('/notify', notify)
 app.use('/comment', comment)
 app.use('/chapter', chapter)
+app.use('/file', upload)
 app.use('/', (req, res, next) => {
     res.json({message: 'ONE'})
 })
