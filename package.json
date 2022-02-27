@@ -30,6 +30,7 @@
     "nodemailer": "^6.7.2",
     "pg": "^8.7.1",
     "postgres-pool": "^5.0.8",
-    "slugify": "^1.6.4"
+    "slugify": "^1.6.4",
+    "uuid": "^8.3.2"
   }
 }

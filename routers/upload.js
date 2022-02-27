@@ -19,7 +19,7 @@ router.post('/upload/single', upload.any('file'), async (req, res, next) => {
         })
     }
 
-    const url = await FileController.upload(req.files[0], '')
+    const url = await FileController.upload_single(req.files[0], '')
 
     res.send(url)
 })

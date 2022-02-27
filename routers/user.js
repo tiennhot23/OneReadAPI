@@ -704,7 +704,7 @@ router.post('/unban/:username', auth.verifyAdmin, async (req, res, next) => {
     }
 })
 
-router.patch('/:username', upload.any('avatar'), auth.verifyUser, async (req, res, next) => {
+router.patch('/:username', auth.verifyUser, upload.any('avatar'), async (req, res, next) => {
     var user = {
         username: req.params.username,
         email: req.body.email,
@@ -712,7 +712,7 @@ router.patch('/:username', upload.any('avatar'), auth.verifyUser, async (req, re
     }
 
     if (req.files && req.files.length > 0 && req.files[0].fieldname == 'avatar') {
-        user.avatar = await FileController.upload(req.files[0], 'avatar/')
+        user.avatar = await FileController.upload_single(req.files[0], 'avatar/')
     }
 
     try {
