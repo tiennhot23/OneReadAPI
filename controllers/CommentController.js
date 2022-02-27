@@ -30,17 +30,24 @@ db.list = (endpoint, page) => {
 
 db.add = (comment) => {
     return new Promise((resolve, reject) => {
+        let num = 4
+        var params = [comment.endpoint, comment.username, comment.content]
         let query = 'insert into "Comment" (endpoint, username, content' 
         + (comment.id_root?', id_root':'') 
         + (comment.files?', files':'') 
         + ') values ($1, $2, $3'
-        + (comment.id_root?', $4':'') 
-        + (comment.files?', $5':'')
-        + ') returning *'
 
-        var params = [comment.endpoint, comment.username, comment.content]
-        if (comment.id_root) params.push(comment.id_root)
-        if (comment.files) params.push(comment.files)
+        if (comment.id_root) {
+            if (num > 1) query += ', $' + num
+            num += 1
+            params.push(comment.id_root)
+        }
+        if (comment.files) {
+            if (num > 1) query += ', $' + num
+            num += 1
+            params.push(comment.files)
+        }
+        query += ') returning *'
 
         conn.query(query, params, (err, res) => {
             if (err) return reject(err)

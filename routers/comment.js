@@ -1,11 +1,19 @@
 const express = require('express')
+const multer = require('multer')
 
-const router = express.Router()
 const CommentController = require('../controllers/CommentController')
 const NotifyController = require('../controllers/NotifyController')
+const FileController = require('../controllers/FileController')
 const auth = require('../middlewares/auth')
-const slugify = require('../middlewares/slugify')
 const message = require('../configs/messages')
+const { memoryStorage } = require('multer')
+
+const router = express.Router()
+const upload = multer({
+    storage: memoryStorage()
+})
+
+
 
 router.get('/:endpoint', async (req, res, next) => {
     const endpoint = req.params.endpoint
@@ -94,9 +102,10 @@ router.get('/detail/:id', async (req, res, next) => {
  * @body {endpoint, username, id_root, content, files}
  * @returns comment
  */
-router.post('/:book_endpoint/:username', auth.verifyUser, async (req, res, next) => {
+router.post('/:book_endpoint/:username', auth.verifyUser, upload.any('file'), async (req, res, next) => {
     var comment = req.body
     comment.endpoint = req.params.book_endpoint
+    comment.username = req.params.username
     try {
         if (!comment.endpoint) {
             res.status(400).json({
@@ -120,11 +129,13 @@ router.post('/:book_endpoint/:username', auth.verifyUser, async (req, res, next)
                 data: null
             })
         } else {
+            comment.files = await FileController.upload_multi(req.files, 'comment/')
             comment = await CommentController.add(comment)
             if (comment.id_root === null) comment.id_root = comment.id
-            let tags = comment.content.split('@')
-            tags.forEach(async (tag) => {
-                tag = tag.split(' ')[0]
+            let tags = comment.content.match(/@[a-zA-Z0-9]+/g)
+            if (tags) tags.forEach(async (tag) => {
+                var arr = tag.split('@')
+                tag = arr[arr.length - 1]
                 if (tag) {
                     let notify = {
                         endpoint: `*comment*${comment.id_root}`,
