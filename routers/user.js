@@ -1,16 +1,22 @@
 const express = require('express')
+const multer = require('multer')
 
 const UserController = require('../controllers/UserController')
 const HistoryController = require('../controllers/HistoryController')
 const NotifyController = require('../controllers/NotifyController')
+const FileController = require('../controllers/FileController')
 const utils = require('../utils/utils')
 const encrypt = require('../middlewares/encrypt')
 const auth = require('../middlewares/auth')
 const constants = require('../configs/constants')
 const message = require('../configs/messages')
 const mail = require('../middlewares/mail')
+const { memoryStorage } = require('multer')
 
 const router = express.Router()
+const upload = multer({
+    storage: memoryStorage()
+})
 
 /**
  * Cập nhật trạng thái tài khoản thành đã xác thực
@@ -698,11 +704,15 @@ router.post('/unban/:username', auth.verifyAdmin, async (req, res, next) => {
     }
 })
 
-router.patch('/:username', auth.verifyUser, async (req, res, next) => {
+router.patch('/:username', upload.any('avatar'), auth.verifyUser, async (req, res, next) => {
     var user = {
         username: req.params.username,
         email: req.body.email,
         avatar: req.body.avatar
+    }
+
+    if (req.files && req.files.length > 0 && req.files[0].fieldname == 'avatar') {
+        user.avatar = await FileController.upload(req.files[0], 'avatar/')
     }
 
     try {
