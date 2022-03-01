@@ -80,7 +80,41 @@ f.upload_multi = (files, path) => {
     })
 }
 
+f.upload_multi_with_index = (files, path) => {
+    return new Promise((resolve, reject) => {
+        var urls = []
+        files.forEach((file, index, array) => {
+            var blob = firebase.bucket.file(path + index + getFileType(file))
+            let uuid = uuidv4();
+
+            var blobWriter = blob.createWriteStream({
+                metadata: {
+                    contentType: file.mimetype,
+                    metadata: {
+                        firebaseStorageDownloadTokens: uuid
+                    }
+                }
+            })
+
+            blobWriter.on('error', (ignored) => {})
+
+            blobWriter.on('finish', () => {
+                urls.push(getDonwloadURL(path + index + getFileType(file), uuid))
+                if (index == array.length - 1) resolve(urls)
+            })
+
+            blobWriter.end(file.buffer)
+            
+        })
+
+    })
+}
+
 function getDonwloadURL(path, uuid) {
     return `https://firebasestorage.googleapis.com/v0/b/oneread-7583c.appspot.com/o/${encodeURIComponent(path)}?alt=media&token=${uuid}`
+}
+
+function getFileType(file) {
+    return '.' + file.originalname.split('.').pop()
 }
 module.exports = f;

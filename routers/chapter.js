@@ -1,4 +1,5 @@
 const express = require('express')
+const multer = require('multer')
 
 const router = express.Router()
 const ChapterController = require('../controllers/ChapterController')
@@ -7,9 +8,16 @@ const UserController = require('../controllers/UserController')
 const HistoryController = require('../controllers/HistoryController')
 const NotifyController = require('../controllers/NotifyController')
 const BookController = require('../controllers/BookController')
+const FileController = require('../controllers/FileController')
 const slugify = require('../middlewares/slugify')
 const message = require('../configs/messages')
 const auth = require('../middlewares/auth')
+const { memoryStorage } = require('multer')
+
+const upload = multer({
+    storage: memoryStorage()
+})
+
 router.get('/all/:book_endpoint', async (req, res, next) => {
     let book_endpoint = req.params.book_endpoint
     var chapters
@@ -95,13 +103,18 @@ router.get('/detail/:book_endpoint/:chapter_endpoint', async (req, res, next) =>
 })
 
 
-router.post('/', auth.verifyAdmin, slugify.get_endpoint, async (req, res, next) => {
+/**
+ * postman: Any data sent using postman's formdata is considered as multipart/formdata. 
+ * You have to use multer or other similar library in order to parse formdata
+ */
+router.post('/:book_endpoint', upload.any(), auth.verifyAdmin, slugify.get_endpoint, async (req, res, next) => {
     var chapter = {
         chapter_endpoint: req.body.endpoint,
-        book_endpoint: req.body.book_endpoint,
-        title: req.body.title,
-        images: req.body.images
+        book_endpoint: req.params.book_endpoint,
+        title: req.body.title
     }
+    chapter.images = await FileController.upload_multi_with_index(req.files, 
+        'chapter/' + chapter.book_endpoint + '/' + chapter.chapter_endpoint + '/')
     try {
         if (!chapter.title) {
             res.status(400).json({
