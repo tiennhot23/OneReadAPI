@@ -56,6 +56,39 @@ db.add = (comment) => {
     })
 }
 
+/**
+ * update after add
+ * @param {*} comment 
+ * @returns 
+ */
+db.update = (comment) => {
+    return new Promise((resolve, reject) => {
+        let num = 1
+        let params = []
+        let query = `update "Comment" set `
+        if (comment.files) {
+            if (num > 1) query += ','
+            query += ' files = $' + num
+            num += 1
+            params.push(comment.files)
+        }
+        if (comment.id_root) {
+            if (num > 1) query += ','
+            query += ' id_root = $' + num
+            num += 1
+            params.push(comment.id_root)
+        }
+
+        query += ' where id = $' + num + ' returning *'
+        params.push(comment.id)
+
+        conn.query(query, params, (err, res) => {
+            if (err) return reject(err)
+            return resolve(res.rows[0])
+        })
+    })
+}
+
 db.delete = (id) => {
     return new Promise((resolve, reject) => {
         let query = 'delete from "Comment" where id = $1 returning *'

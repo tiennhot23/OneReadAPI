@@ -436,8 +436,10 @@ router.post('/', upload.fields([{name: 'thumb', maxCount: 1}, {name: 'theme', ma
                 data: null
             })
         } else {
-            book.thumb = await FileController.upload_single(req.files['thumb'][0], 'book/')
-            book.theme = await FileController.upload_single(req.files['theme'][0], 'book/')
+            book.thumb = await FileController.upload_single(req.files['thumb'][0], 
+            'book/' + book.endpoint + '/', 'thumb')
+            book.theme = await FileController.upload_single(req.files['theme'][0], 
+            'book/' + book.endpoint + '/', 'theme')
             // await TransactionController.begin()
             let genres = book.genres
             book = await BookController.add(book)

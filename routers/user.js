@@ -712,7 +712,8 @@ router.patch('/:username', auth.verifyUser, upload.any('avatar'), async (req, re
     }
 
     if (req.files && req.files.length > 0 && req.files[0].fieldname == 'avatar') {
-        user.avatar = await FileController.upload_single(req.files[0], 'avatar/')
+        user.avatar = await FileController.upload_single(req.files[0], 
+            'user/' + user.username + '/', 'avatar')
     }
 
     try {

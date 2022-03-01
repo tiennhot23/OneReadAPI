@@ -129,9 +129,12 @@ router.post('/:book_endpoint/:username', auth.verifyUser, upload.any('file'), as
                 data: null
             })
         } else {
-            comment.files = await FileController.upload_multi(req.files, 'comment/')
+            
             comment = await CommentController.add(comment)
+            comment.files = await FileController.upload_multi_with_index(req.files, 
+                'comment/' + comment.id + '/')
             if (comment.id_root === null) comment.id_root = comment.id
+            comment = await CommentController.update(comment)
             let tags = comment.content.match(/@[a-zA-Z0-9]+/g)
             if (tags) tags.forEach(async (tag) => {
                 var arr = tag.split('@')

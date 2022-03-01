@@ -23,9 +23,9 @@ const f = {}
  * @param {string} path : example 'avatar/'
  * @returns 
  */
-f.upload_single = (file, path) => {
+f.upload_single = (file, path, name) => {
     return new Promise((resolve, reject) => {
-        const blob = firebase.bucket.file(path + file.originalname)
+        const blob = firebase.bucket.file(path + name + getFileType(file))
         let uuid = uuidv4()
 
         const blobWriter = blob.createWriteStream({
@@ -42,7 +42,7 @@ f.upload_single = (file, path) => {
         })
 
         blobWriter.on('finish', () => {
-            resolve(getDonwloadURL(path + file.originalname, uuid))
+            resolve(getDonwloadURL(path + name + getFileType(file), uuid))
         })
 
         blobWriter.end(file.buffer)
