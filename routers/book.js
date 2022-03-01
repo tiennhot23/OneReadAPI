@@ -1,15 +1,22 @@
 const express = require('express')
+const multer = require('multer')
 
-const router = express.Router()
 const BookController = require('../controllers/BookController')
 const TransactionController = require('../controllers/TransactionContoller')
 const NotifyController = require('../controllers/NotifyController')
 const GenreController = require('../controllers/GenreController')
-
+const FileController = require('../controllers/FileController')
 const slugify = require('../middlewares/slugify')
 const message = require('../configs/messages')
 const auth = require('../middlewares/auth')
 const constants = require('../configs/constants')
+const { memoryStorage } = require('multer')
+
+const router = express.Router()
+const upload = multer({
+    storage: memoryStorage()
+})
+
 
 
 // //thêm dữ liệu từ web scraping
@@ -411,7 +418,7 @@ router.get('/type/:type', async (req, res, next) => {
  * @body {endpoint, title, (author), (thumb), (theme), (description), type, genres}
  * @returns book
  */
-router.post('/', auth.verifyAdmin, slugify.get_endpoint, async (req, res, next) => {
+router.post('/', upload.fields([{name: 'thumb', maxCount: 1}, {name: 'theme', maxCount: 1}]), auth.verifyAdmin, slugify.get_endpoint, async (req, res) => {    
     var book = req.body
     try {
         if (!book.title) {
@@ -429,6 +436,8 @@ router.post('/', auth.verifyAdmin, slugify.get_endpoint, async (req, res, next) 
                 data: null
             })
         } else {
+            book.thumb = await FileController.upload_single(req.files['thumb'][0], 'book/')
+            book.theme = await FileController.upload_single(req.files['theme'][0], 'book/')
             // await TransactionController.begin()
             let genres = book.genres
             book = await BookController.add(book)
