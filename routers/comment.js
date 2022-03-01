@@ -56,28 +56,34 @@ router.get('/detail/:id', async (req, res, next) => {
     let id = req.params.id
     var page = req.query.page
     if (!page) page = 1
-    var comments = []
+    var replies = []
+    var comment
     try {
         var result = await CommentController.get(id, page)
-        result.forEach(e => {
-            comments.push({
-                id: e.id,
-                id_root: e.id_root,
-                endpoint: e.endpoint,
-                content: e.content,
-                files: e.files,
-                time: e.time,
-                user: {
-                    username: e.username,
-                    avatar: e.avatar
-                }
-            })
+        result.forEach((e, index, array) => {
+            if (index != array.length - 1) {
+                replies.push({
+                    id: e.id,
+                    id_root: e.id_root,
+                    endpoint: e.endpoint,
+                    content: e.content,
+                    files: e.files,
+                    time: e.time,
+                    user: {
+                        username: e.username,
+                        avatar: e.avatar
+                    }
+                })
+            } else {
+                comment = e
+            }
         })
-        if (comments) res.status(200).json({
+        comment.replies = replies
+        if (comment) res.status(200).json({
             status: 'success',
             code: 200,
             message: null,
-            data: comments
+            data: [comment]
         })
         else res.status(404).json({
             status: 'fail',
