@@ -10,7 +10,9 @@ const slugify = require('../middlewares/slugify')
 const message = require('../configs/messages')
 const auth = require('../middlewares/auth')
 const constants = require('../configs/constants')
-const { memoryStorage } = require('multer')
+const {
+    memoryStorage
+} = require('multer')
 
 const router = express.Router()
 const upload = multer({
@@ -356,8 +358,7 @@ router.get('/detail/:endpoint', async (req, res, next) => {
                     message: null,
                     data: [book]
                 })
-            } 
-            else res.status(404).json({
+            } else res.status(404).json({
                 status: 'fail',
                 code: 404,
                 message: message.book.not_found,
@@ -418,7 +419,15 @@ router.get('/type/:type', async (req, res, next) => {
  * @body {endpoint, title, (author), (thumb), (theme), (description), type, genres}
  * @returns book
  */
-router.post('/', upload.fields([{name: 'thumb', maxCount: 1}, {name: 'theme', maxCount: 1}]), auth.verifyAdmin, slugify.get_endpoint, async (req, res) => {    
+router.post('/', upload.fields([{
+        name: 'thumb',
+        maxCount: 1
+    },
+    {
+        name: 'theme',
+        maxCount: 1
+    }
+]), auth.verifyAdmin, slugify.get_endpoint, async (req, res) => {
     var book = req.body
     try {
         if (!book.title) {
@@ -435,16 +444,32 @@ router.post('/', upload.fields([{name: 'thumb', maxCount: 1}, {name: 'theme', ma
                 message: message.book.missing_type,
                 data: null
             })
+        } else if (!req.files['thumb']) {
+            res.status(400).json({
+                status: 'fail',
+                code: 400,
+                message: message.book.missing_thumb,
+                data: null
+            })
+        } else if (!req.files['theme']) {
+            res.status(400).json({
+                status: 'fail',
+                code: 400,
+                message: message.book.missing_theme,
+                data: null
+            })
         } else {
-            book.thumb = await FileController.upload_single(req.files['thumb'][0], 
-            'book/' + book.endpoint + '/', 'thumb')
-            book.theme = await FileController.upload_single(req.files['theme'][0], 
-            'book/' + book.endpoint + '/', 'theme')
+            book.thumb = await FileController.upload_single(req.files['thumb'][0],
+                'book/' + book.endpoint + '/', 'thumb')
+            book.theme = await FileController.upload_single(req.files['theme'][0],
+                'book/' + book.endpoint + '/', 'theme')
+            console.log(book)
+            return
             // await TransactionController.begin()
             let genres = book.genres
             book = await BookController.add(book)
             if (genres) await BookController.add_book_genres(book.endpoint, genres)
-            let view = await BookController.add_view(book.endpoint, new Date().toISOString().slice(0,10))
+            let view = await BookController.add_view(book.endpoint, new Date().toISOString().slice(0, 10))
             book.view = view.view
             book.genres = genres
             // genres.forEach(async (genre) => {
@@ -461,7 +486,7 @@ router.post('/', upload.fields([{name: 'thumb', maxCount: 1}, {name: 'theme', ma
         }
     } catch (err) {
         // await TransactionController.rollback()
-        if (err.constraint){
+        if (err.constraint) {
             switch (err.constraint) {
                 case 'book_pk': {
                     res.status(400).json({
@@ -499,7 +524,7 @@ router.post('/', upload.fields([{name: 'thumb', maxCount: 1}, {name: 'theme', ma
                     })
                     break
                 }
-                default:{
+                default: {
                     res.status(500).json({
                         status: 'fail',
                         code: 500,
@@ -526,7 +551,15 @@ router.post('/', upload.fields([{name: 'thumb', maxCount: 1}, {name: 'theme', ma
  * @body {endpoint, title, (author), (thumb), (theme), (description), type}
  * @returns book
  */
- router.patch('/:endpoint', auth.verifyAdmin, slugify.get_endpoint, async (req, res, next) => {
+router.patch('/:endpoint', upload.fields([{
+        name: 'thumb',
+        maxCount: 1
+    },
+    {
+        name: 'theme',
+        maxCount: 1
+    }
+]), auth.verifyAdmin, slugify.get_endpoint, async (req, res, next) => {
     var book = req.body
     let endpoint = req.params.endpoint
     try {
@@ -537,6 +570,10 @@ router.post('/', upload.fields([{name: 'thumb', maxCount: 1}, {name: 'theme', ma
                 await BookController.add_book_genres(endpoint, genre_endpoint)
             })
         }
+        if (req.files['thumb']) book.thumb = await FileController.upload_single(req.files['thumb'][0],
+            'book/' + book.endpoint + '/', 'thumb')
+        if (req.files['theme']) book.theme = await FileController.upload_single(req.files['theme'][0],
+            'book/' + book.endpoint + '/', 'theme')
         book = await BookController.update_info(book, endpoint)
         await TransactionController.commit()
         if (book) res.status(200).json({
@@ -553,7 +590,7 @@ router.post('/', upload.fields([{name: 'thumb', maxCount: 1}, {name: 'theme', ma
         })
     } catch (err) {
         await TransactionController.rollback()
-        if (err.constraint){
+        if (err.constraint) {
             switch (err.constraint) {
                 case 'book_pk': {
                     res.status(400).json({
@@ -591,7 +628,7 @@ router.post('/', upload.fields([{name: 'thumb', maxCount: 1}, {name: 'theme', ma
                     })
                     break
                 }
-                default:{
+                default: {
                     res.status(500).json({
                         status: 'fail',
                         code: 500,
@@ -627,7 +664,7 @@ router.patch('/finish/:endpoint', auth.verifyAdmin, async (req, res, next) => {
                 }
                 NotifyController.add(notify)
             })
-            
+
         }
         if (book) res.status(200).json({
             status: 'success',
@@ -640,9 +677,9 @@ router.patch('/finish/:endpoint', auth.verifyAdmin, async (req, res, next) => {
             code: 404,
             message: message.book.not_found,
             data: null
-        })  
+        })
     } catch (err) {
-        if (err.constraint){
+        if (err.constraint) {
             switch (err.constraint) {
                 case 'book_pk': {
                     res.status(400).json({
@@ -680,7 +717,7 @@ router.patch('/finish/:endpoint', auth.verifyAdmin, async (req, res, next) => {
                     })
                     break
                 }
-                default:{
+                default: {
                     res.status(500).json({
                         status: 'fail',
                         code: 500,
@@ -724,7 +761,7 @@ router.patch('/rate/:endpoint', auth.verifyUser, async (req, res, next) => {
             if (book) {
                 rating = Math.max(rating, 3.5) // :D hehe tất cả các đánh giá dưới 3.5 đều chuyển thành 3.5 để ko ảnh hưởng lớn đến điểm rating
                 book.rate_count = Math.min(book.rate_count + 1, constants.max_int)
-                book.rating = ((book.rating * (book.rate_count - 1)) + rating)/book.rate_count
+                book.rating = ((book.rating * (book.rate_count - 1)) + rating) / book.rate_count
                 book.rating = book.rating.toFixed(1)
                 var obj = await BookController.update_rating(book, endpoint)
                 book.rating = obj.rating
@@ -735,16 +772,15 @@ router.patch('/rate/:endpoint', auth.verifyUser, async (req, res, next) => {
                     message: message.book.update_success,
                     data: [book]
                 })
-            }
-            else res.status(404).json({
+            } else res.status(404).json({
                 status: 'fail',
-                code:404,
+                code: 404,
                 message: message.book.not_found,
                 data: null
             })
         }
     } catch (err) {
-        if (err.constraint){
+        if (err.constraint) {
             switch (err.constraint) {
                 case 'book_pk': {
                     res.status(400).json({
@@ -782,7 +818,7 @@ router.patch('/rate/:endpoint', auth.verifyUser, async (req, res, next) => {
                     })
                     break
                 }
-                default:{
+                default: {
                     res.status(500).json({
                         status: 'fail',
                         code: 500,
@@ -808,7 +844,7 @@ router.patch('/rate/:endpoint', auth.verifyUser, async (req, res, next) => {
  * @body {}
  * @returns book
  */
- router.delete('/:endpoint', async (req, res, next) => {
+router.delete('/:endpoint', async (req, res, next) => {
     let book
     let endpoint = req.params.endpoint
     try {

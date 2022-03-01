@@ -21,7 +21,7 @@ user.login = (username, password) => {
         conn.query(query, params, (err, res) => {
             if (err) return reject(err)
             else {
-                if(!bcrypt.compareSync(password, res.rows[0].password)){
+                if(res.rows.length == 0 || !bcrypt.compareSync(password, res.rows[0].password)){
                     return resolve(null)
                 }else{
                     return resolve(res.rows[0])
@@ -35,7 +35,6 @@ user.get = (username) => {
     return new Promise((resolve, reject) => {
         let query = 'select username, avatar, email, status, role from "Account" where username = $1 limit 1'
         let params = [username]
-        console.log("no")
 
         conn.query(query, params, (err, res) => {
             if (err) return reject(err)

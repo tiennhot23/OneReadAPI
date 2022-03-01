@@ -55,7 +55,7 @@ f.upload_multi = (files, path) => {
         var urls = []
         files.forEach((file, index, array) => {
             var blob = firebase.bucket.file(path + file.originalname)
-            let uuid = uuidv4();
+            let uuid = uuidv4()
 
             var blobWriter = blob.createWriteStream({
                 metadata: {
@@ -86,7 +86,7 @@ f.upload_multi_with_index = (files, path) => {
         var count = 0
         files.forEach((file, index, array) => {
             var blob = firebase.bucket.file(path + index + getFileType(file))
-            let uuid = uuidv4();
+            let uuid = uuidv4()
 
             var blobWriter = blob.createWriteStream({
                 metadata: {
@@ -111,6 +111,20 @@ f.upload_multi_with_index = (files, path) => {
             
         })
 
+    })
+}
+
+
+f.delete = (path) => {
+    return new Promise((resolve, reject) => {
+        const bucket = firebase.bucket
+        bucket.deleteFiles({
+            prefix: path
+        }, err => {
+            if (err){
+                reject(err)
+            } else {resolve(true)}
+        })
     })
 }
 

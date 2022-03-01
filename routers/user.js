@@ -707,8 +707,7 @@ router.post('/unban/:username', auth.verifyAdmin, async (req, res, next) => {
 router.patch('/:username', auth.verifyUser, upload.any('avatar'), async (req, res, next) => {
     var user = {
         username: req.params.username,
-        email: req.body.email,
-        avatar: req.body.avatar
+        email: req.body.email
     }
 
     if (req.files && req.files.length > 0 && req.files[0].fieldname == 'avatar') {
@@ -807,12 +806,15 @@ router.delete('/:username', auth.verifyUser, async (req, res, next) => {
             })
         } else {
             user = await UserController.delete(user.username)
-            if (user) return res.status(200).json({
-                status: 'success',
-                code: 200,
-                message: message.user.delete_success,
-                data: [user]
-            })
+            if (user) {
+                FileController.delete('user/' + user.username + '/')
+                return res.status(200).json({
+                    status: 'success',
+                    code: 200,
+                    message: message.user.delete_success,
+                    data: [user]
+                })
+            }
             else return res.status(404).json({
                 status: 'fail',
                 code: 404,

@@ -9,6 +9,8 @@ module.exports = {
         missing_rating: 'Thiếu điểm rating',
         missing_rate_count: 'Thiếu lượt đánh giá',
         missing_genre: 'Thêm ít nhất một thể loại cho sách',
+        missing_thumb: 'Thiếu thumb',
+        missing_theme: 'Thiếu theme',
         book_finish: 'Sách đã hoàn thành',
         not_found: 'Sách này không tồn tại',
         exist: 'Sách này đã tồn tại',
