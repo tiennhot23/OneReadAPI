@@ -1,5 +1,5 @@
 const admin = require('firebase-admin')
-const firebaseServiceKey = require('../firebaseServiceKey.json')
+// const firebaseServiceKey = require('../firebaseServiceKey.json')
 
 // Initialize firebase admin SDK
 admin.initializeApp({
