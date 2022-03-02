@@ -6,6 +6,13 @@ const auth = require('../middlewares/auth')
 const slugify = require('../middlewares/slugify')
 const message = require('../configs/messages')
 
+/**
+ * Lấy danh sách các thông báo của user theo từng trang
+ * @query page
+ * @body 
+ * @return 
+    data[{endpoint, username, content, status, time}]
+ */
 router.get('/all/:username', auth.verifyUser, async (req, res, next) => {
     var page = req.query.page
     if (!page) page = 1
@@ -30,6 +37,13 @@ router.get('/all/:username', auth.verifyUser, async (req, res, next) => {
     }
 })
 
+/**
+ * Lấy chi tiết thông báo và cập nhật status = 1 là đã đọc
+ * @query 
+ * @body 
+ * @return 
+    data[{endpoint, username, content, status, time}]
+ */
 router.get('/:endpoint/:username', auth.verifyUser, async (req, res, next) => {
     let username = req.user.username
     let endpoint = req.params.endpoint
@@ -78,9 +92,11 @@ router.get('/:endpoint/:username', auth.verifyUser, async (req, res, next) => {
 
 
 /**
- * thêm notify
+ * tThêm thông báo tới user
+ * @query 
  * @body {endpoint, username, content}
- * @returns notify
+ * @return 
+    data[{endpoint, username, content, status, time}]
  */
 router.post('/', auth.verifyAdmin, async (req, res, next) => {
     var notify = req.body
@@ -165,9 +181,11 @@ router.post('/', auth.verifyAdmin, async (req, res, next) => {
 })
 
 /**
- * xoá các notify đã đọc
+ * Xóa các thông báo đã đọc
+ * @query 
  * @body 
- * @returns notifys
+ * @return 
+    data[{endpoint, username, content, status, time}]
  */
 router.delete('/read-notify/:username', auth.verifyUser, async (req, res, next) => {
     let notifys
@@ -190,9 +208,11 @@ router.delete('/read-notify/:username', auth.verifyUser, async (req, res, next) 
 })
 
 /**
- * xoá notify
+ * Xóa thông báo
+ * @query 
  * @body 
- * @returns notify
+ * @return 
+    data[{endpoint, username, content, status, time}]
  */
 router.delete('/:endpoint/:username', auth.verifyUser, async (req, res, next) => {
     let notify

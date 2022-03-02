@@ -16,7 +16,7 @@ db.get = (endpoint, type) => {
 
 db.list = () => {
     return new Promise((resolve, reject) => {
-        let query = `select *, to_char(time, 'DD-MM-YYYY hh:mm:ss') as time from "Report" order by status`
+        let query = `select *, to_char(time, 'DD-MM-YYYY hh:mm:ss') as time from "Report" order by time desc`
 
         conn.query(query, (err, res) => {
             if(err) return reject(err)

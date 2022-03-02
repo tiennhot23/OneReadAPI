@@ -7,6 +7,13 @@ const slugify = require('../middlewares/slugify')
 const message = require('../configs/messages')
 const auth = require('../middlewares/auth')
 
+/**
+ * Lấy toàn bộ tag thể loại
+ * @query
+ * @body 
+ * @return 
+    data[{endpoint, title,description}]
+ */
 router.get('/all', async (req, res, next) => {
     var genres
     try {
@@ -27,6 +34,13 @@ router.get('/all', async (req, res, next) => {
     }
 })
 
+/**
+ * Chi tiết thể loại
+ * @query
+ * @body 
+ * @return 
+    data[{endpoint, title, description}]
+ */
 router.get('/detail/:endpoint', async (req, res, next) => {
     let endpoint = req.params.endpoint
     var genre
@@ -66,9 +80,11 @@ router.get('/detail/:endpoint', async (req, res, next) => {
 
 
 /**
- * thêm genre
- * @body {endpoint, title, (description)}
- * @returns genre
+ * Thêm thể loại
+ * @query
+ * @body {title, (description)}
+ * @return 
+    data[{endpoint, title, description}]
  */
 router.post('/', auth.verifyAdmin, slugify.get_endpoint, async (req, res, next) => {
     var genre = {
@@ -125,9 +141,11 @@ router.post('/', auth.verifyAdmin, slugify.get_endpoint, async (req, res, next) 
 })
 
 /**
- * cập nhật genre
- * @body {endpoint, (title), (description)}
- * @returns genre
+ * Cập nhật thể loại
+ * @query
+ * @body {title, (description)}
+ * @return 
+    data[{endpoint, title, description}]
  */
 router.patch('/:endpoint', auth.verifyAdmin, slugify.get_endpoint, async (req, res, next) => {
     var genre = {
@@ -182,9 +200,11 @@ router.patch('/:endpoint', auth.verifyAdmin, slugify.get_endpoint, async (req, r
 })
 
 /**
- * xoá genre
- * @body {endpoint, title, (description)}
- * @returns genre
+ * Xóa thể loại
+ * @query
+ * @body {title, (description)}
+ * @return 
+    data[{endpoint, title, description}]
  */
 router.delete('/:endpoint', auth.verifyAdmin, async (req, res, next) => {
     let genre

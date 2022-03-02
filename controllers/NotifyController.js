@@ -17,7 +17,7 @@ db.get = (endpoint, username) => {
 
 db.list = (username, page) => {
     return new Promise((resolve, reject) => {
-        let query = `select *, to_char(time, 'DD-MM-YYYY hh:mm:ss') as time from "Notify" where username = $1 order by status`
+        let query = `select *, to_char(time, 'DD-MM-YYYY hh:mm:ss') as time from "Notify" where username = $1 order by time desc`
         query += ' limit ' + constants.limit_element + ' offset ' + (constants.limit_element * (page - 1))
         var params = [username]
         conn.query(query, params, (err, res) => {

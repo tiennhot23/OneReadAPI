@@ -6,6 +6,14 @@ const ReportController = require('../controllers/ReportController')
 const slugify = require('../middlewares/slugify')
 const message = require('../configs/messages')
 
+/**
+ * Lấy danh sách các báo cáo xắp xếp theo mới nhất
+ * @query 
+ * @body 
+ * @return 
+    data[{endpoint (id for type C, username for type A), 
+        type (A: account, C: comment), num, reason, status, time}]
+ */
 router.get('/all', async (req, res, next) => {
     var reports
     try {
@@ -26,6 +34,14 @@ router.get('/all', async (req, res, next) => {
     }
 })
 
+/**
+ * Cập nhật trạng thái của thông báo
+ * @query 
+ * @body {status}
+ * @return 
+    data[{endpoint (id for type C, username for type A), 
+        type (A: account, C: comment), num, reason, status, time}]
+ */
 router.patch('/:type/:endpoint', async (req, res, next) => {
     var report = {
         type: req.params.type,
@@ -121,11 +137,14 @@ router.patch('/:type/:endpoint', async (req, res, next) => {
 
 
 /**
- * thêm report
- * @body {endpoint, type {A,C}, reason}
- * @returns report
+ * Thêm báo cáo, cập nhật số lần báo cáo num nếu trùng
+ * @query 
+ * @body {endpoint, type (A hoặc C), reason}
+ * @return 
+    data[{endpoint (id for type C, username for type A), 
+        type (A: account, C: comment), num, reason, status, time}]
  */
-router.post('/:username', slugify.get_endpoint, async (req, res, next) => {
+router.post('/:username', async (req, res, next) => {
     var report = req.body
     try {
         if (!report.endpoint) {
@@ -212,9 +231,12 @@ router.post('/:username', slugify.get_endpoint, async (req, res, next) => {
 })
 
 /**
- * xoá report
- * @body 
- * @returns report
+ * Xóa hoàn toàn báo cáo
+ * @query 
+ * @body
+ * @return 
+    data[{endpoint (id for type C, username for type A), 
+        type (A: account, C: comment), num, reason, status, time}]
  */
 router.delete('/:type/:endpoint', async (req, res, next) => {
     let report
@@ -245,9 +267,12 @@ router.delete('/:type/:endpoint', async (req, res, next) => {
 })
 
 /**
- * xoá các report đã được xử lí
- * @body 
- * @returns reports
+ * Xóa các báo cáo đã đọc
+ * @query 
+ * @body
+ * @return 
+    data[{endpoint (id for type C, username for type A), 
+        type (A: account, C: comment), num, reason, status, time}]
  */
 router.delete('/read-report', async (req, res, next) => {
     let reports
