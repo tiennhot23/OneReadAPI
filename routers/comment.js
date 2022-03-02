@@ -40,6 +40,7 @@ router.get('/:endpoint', async (req, res, next) => {
             status: 'success',
             code: 200,
             message: null,
+            page: Number(page),
             data: comments
         })
     } catch (err) {
@@ -83,6 +84,7 @@ router.get('/detail/:id', async (req, res, next) => {
             status: 'success',
             code: 200,
             message: null,
+            page: Number(page),
             data: [comment]
         })
         else res.status(404).json({

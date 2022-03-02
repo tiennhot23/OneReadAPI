@@ -7,14 +7,17 @@ const slugify = require('../middlewares/slugify')
 const message = require('../configs/messages')
 
 router.get('/all/:username', auth.verifyUser, async (req, res, next) => {
+    var page = req.query.page
+    if (!page) page = 1
     const user = req.user
     var notifys
     try {
-        notifys = await NotifyController.list(user.username)
+        notifys = await NotifyController.list(user.username, page)
         res.status(200).json({
             status: 'success',
             code: 200,
             message: null,
+            page: Number(page),
             data: notifys
         })
     } catch (err) {

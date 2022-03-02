@@ -97,6 +97,7 @@ router.get('/all', async (req, res, next) => {
             status: 'success',
             code: 200,
             message: null,
+            page: Number(page),
             data: books
         })
     } catch (err) {
@@ -124,6 +125,7 @@ router.get('/filter', async (req, res, next) => {
             status: 'success',
             code: 200,
             message: null,
+            page: Number(page),
             data: books
         })
     } catch (err) {
