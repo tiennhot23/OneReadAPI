@@ -25,7 +25,7 @@ db.get = (endpoint) => {
 
 db.get_user_follow = (book_endpoint) => {
     return new Promise((resolve, reject) => {
-        let query = `select * from "BookFollows" where book_endpoint = $1`
+        let query = `select username, avatar from "Account" where username in (select username from "BookFollows" where book_endpoint = $1)`
 
         var params = [book_endpoint]
         conn.query(query, params, (err, res) => {

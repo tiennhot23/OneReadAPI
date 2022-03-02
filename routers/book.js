@@ -117,7 +117,8 @@ router.get('/all', async (req, res, next) => {
 
 /**
  * Lọc sách theo title, author, type, status, genre phân theo từng trang
- * @query page
+ * @query page, filter (typeof json)
+ *       ex: filter={"title":"one",%20"genres":["action","shounen"]}
  * @param 
  * @body 
  * @return 
@@ -158,6 +159,16 @@ router.get('/filter', async (req, res, next) => {
     }
 })
 
+/**
+ * Top 10 sách gợi ý cho người dùng dựa trên các thể loại của sách mà người dùng follow
+ * @query 
+ * @param username
+ * @body 
+ * @return 
+    data[{endpoint, title, author, thumb,
+    theme, description, type, rating,
+    rate_count, status, search_number}]
+ */
 router.get('/suggest-book/:username', auth.verifyUser, async (req, res, next) => {
     var user = req.user
     var books
@@ -179,6 +190,16 @@ router.get('/suggest-book/:username', auth.verifyUser, async (req, res, next) =>
     }
 })
 
+/**
+ * Top 10 tìm kiếm
+ * @query
+ * @param 
+ * @body 
+ * @return 
+    data[{endpoint, title, author, thumb,
+    theme, description, type, rating,
+    rate_count, status, search_number}]
+ */
 router.get('/top-search', async (req, res, next) => {
     var books
     try {
@@ -199,6 +220,16 @@ router.get('/top-search', async (req, res, next) => {
     }
 })
 
+/**
+ * Top 10 rating
+ * @query
+ * @param 
+ * @body 
+ * @return 
+    data[{endpoint, title, author, thumb,
+    theme, description, type, rating,
+    rate_count, status, search_number}]
+ */
 router.get('/top-rating', async (req, res, next) => {
     var books
     try {
@@ -218,6 +249,7 @@ router.get('/top-rating', async (req, res, next) => {
         })
     }
 })
+
 
 router.get('/top-view-day', async (req, res, next) => {
     var books
@@ -299,6 +331,14 @@ router.get('/top-follow', async (req, res, next) => {
     }
 })
 
+/**
+ * Danh sách các user follow sách
+ * @query
+ * @param endpoint
+ * @body 
+ * @return 
+    data[{username, avatar}]
+ */
 router.get('/follower/:endpoint', async (req, res, next) => {
     let endpoint = req.params.endpoint
     var users
