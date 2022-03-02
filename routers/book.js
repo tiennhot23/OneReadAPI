@@ -83,9 +83,14 @@ const upload = multer({
 // })
 
 /**
- * Lấy danh sách các sách với filter nếu có và phân trang
- * @body filter{author (không dùng %%), type, genre, status (0, 1)}
- * @returns books
+ * Lấy toàn bộ sách theo từng trang
+ * @query page
+ * @param 
+ * @body 
+ * @return 
+    data[{endpoint, title, author, thumb,
+    theme, description, type, rating,
+    rate_count, status, search_number}]
  */
 router.get('/all', async (req, res, next) => {
     var books
@@ -110,9 +115,24 @@ router.get('/all', async (req, res, next) => {
     }
 })
 
+/**
+ * Lọc sách theo title, author, type, status, genre phân theo từng trang
+ * @query page
+ * @param 
+ * @body 
+ * @return 
+    data[{endpoint, title, author, thumb,
+    theme, description, type, rating,
+    rate_count, status, search_number}]
+ */
 router.get('/filter', async (req, res, next) => {
     var books
-    var filter = JSON.parse(req.query.filter)
+    var filter
+    try {
+        filter = JSON.parse(req.query.filter)
+    } catch (ignored) {
+        filter = {}
+    }
     var page = req.query.page
     if (!page) page = 1
     try {
