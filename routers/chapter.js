@@ -18,6 +18,13 @@ const upload = multer({
     storage: memoryStorage()
 })
 
+/**
+ * Lấy danh sách các chapter của sách
+ * @query 
+ * @body 
+ * @return 
+    data[{chapter_endpoint, book_endpoint, title, time}]
+ */
 router.get('/all/:book_endpoint', async (req, res, next) => {
     let book_endpoint = req.params.book_endpoint
     var chapters
@@ -39,6 +46,13 @@ router.get('/all/:book_endpoint', async (req, res, next) => {
     }
 })
 
+/**
+ * chi tiết sách, tự động cập nhật lịch sử xem của người dùng
+ * @query view=true sẽ tăng lượt view của sách
+ * @body 
+ * @return 
+    data[{chapter_endpoint, book_endpoint, title, time, images[]}]
+ */
 router.get('/detail/:book_endpoint/:chapter_endpoint', async (req, res, next) => {
     let chapter_endpoint = req.params.chapter_endpoint
     let book_endpoint = req.params.book_endpoint
@@ -103,6 +117,13 @@ router.get('/detail/:book_endpoint/:chapter_endpoint', async (req, res, next) =>
 })
 
 
+/**
+ * Thêm chapter
+ * @query 
+ * @body {title, images}
+ * @return 
+    data[{chapter_endpoint, book_endpoint, title, time, images[]}]
+ */
 /**
  * postman: Any data sent using postman's formdata is considered as multipart/formdata. 
  * You have to use multer or other similar library in order to parse formdata
@@ -211,9 +232,11 @@ router.post('/:book_endpoint', upload.any(), auth.verifyAdmin, slugify.get_endpo
 })
 
 /**
- * cập nhật chapter
- * @body {chapter_endpoint, (title), (description)}
- * @returns chapter
+ * Thêm chapter
+ * @query 
+ * @body {(title)}
+ * @return 
+    data[{chapter_endpoint, book_endpoint, title, time, images[]}]
  */
 router.patch('/:book_endpoint/:chapter_endpoint', auth.verifyAdmin, slugify.get_endpoint, async (req, res, next) => {
     let chapter_endpoint = req.params.chapter_endpoint
@@ -321,9 +344,11 @@ router.patch('/:book_endpoint/:chapter_endpoint', auth.verifyAdmin, slugify.get_
 })
 
 /**
- * xoá chapter
- * @body {chapter_endpoint, title, (description)}
- * @returns chapter
+ * Xóa chapter
+ * @query 
+ * @body
+ * @return 
+    data[{chapter_endpoint, book_endpoint, title, time, images[]}]
  */
 router.delete('/:book_endpoint/:chapter_endpoint', async (req, res, next) => {
     var chapter

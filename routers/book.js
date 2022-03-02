@@ -85,7 +85,6 @@ const upload = multer({
 /**
  * Lấy toàn bộ sách theo từng trang
  * @query page
- * @param 
  * @body 
  * @return 
     data[{endpoint, title, author, thumb,
@@ -119,7 +118,6 @@ router.get('/all', async (req, res, next) => {
  * Lọc sách theo title, author, type, status, genre phân theo từng trang
  * @query page, filter (typeof json)
  *       ex: filter={"title":"one",%20"genres":["action","shounen"]}
- * @param 
  * @body 
  * @return 
     data[{endpoint, title, author, thumb,
@@ -162,7 +160,6 @@ router.get('/filter', async (req, res, next) => {
 /**
  * Top 10 sách gợi ý cho người dùng dựa trên các thể loại của sách mà người dùng follow
  * @query 
- * @param username
  * @body 
  * @return 
     data[{endpoint, title, author, thumb,
@@ -193,7 +190,6 @@ router.get('/suggest-book/:username', auth.verifyUser, async (req, res, next) =>
 /**
  * Top 10 tìm kiếm
  * @query
- * @param 
  * @body 
  * @return 
     data[{endpoint, title, author, thumb,
@@ -223,7 +219,6 @@ router.get('/top-search', async (req, res, next) => {
 /**
  * Top 10 rating
  * @query
- * @param 
  * @body 
  * @return 
     data[{endpoint, title, author, thumb,
@@ -334,7 +329,6 @@ router.get('/top-follow', async (req, res, next) => {
 /**
  * Danh sách các user follow sách
  * @query
- * @param endpoint
  * @body 
  * @return 
     data[{username, avatar}]
@@ -380,6 +374,15 @@ router.get('/last-update', async (req, res, next) => {
     }
 })
 
+/**
+ * Top 10 sách tương tự được lọc dựa trên thể loại của sách hiện tại
+ * @query
+ * @body 
+ * @return 
+    data[{endpoint, title, author, thumb,
+    theme, description, type, rating,
+    rate_count, status, search_number}]
+ */
 router.get('/relate-book/:endpoint', async (req, res, next) => {
     let endpoint = req.params.endpoint
     var books
@@ -401,6 +404,17 @@ router.get('/relate-book/:endpoint', async (req, res, next) => {
     }
 })
 
+/**
+ * Chi tiết sách
+ * @query search: nếu search=true thì tăng lượt tìm kiếm search_number scuar sách lên 1
+ * @body 
+ * @return 
+    data[{endpoint, title, author, thumb,
+    theme, description, type, rating,
+    rate_count, status, search_number,
+    genres[]: {endpoint, title,description}
+    follow, view}]
+ */
 router.get('/detail/:endpoint', async (req, res, next) => {
     let endpoint = req.params.endpoint
     let search = req.query.search
@@ -414,6 +428,8 @@ router.get('/detail/:endpoint', async (req, res, next) => {
                     let search_number = await BookController.update_search_number(book)
                     book.search_number = search_number.search_number
                 }
+                book.follow = Number(book.follow)
+                book.view = Number(book.view)
                 res.status(200).json({
                     status: 'success',
                     code: 200,
@@ -445,12 +461,23 @@ router.get('/detail/:endpoint', async (req, res, next) => {
 })
 
 
+/**
+ * Lấy sách theo thể loại Comic, Novel, Literature
+ * @query page
+ * @body 
+ * @return 
+    data[{endpoint, title, author, thumb,
+    theme, description, type, rating,
+    rate_count, status, search_number}]
+ */
 router.get('/type/:type', async (req, res, next) => {
     let type = req.params.type
+    var page = req.query.page
+    if (!page) page = 1
     var books
     try {
         if (type) {
-            books = await BookController.get_book_of_type(type)
+            books = await BookController.get_book_of_type(type, page)
             return res.status(200).json({
                 status: 'success',
                 code: 200,
@@ -477,9 +504,14 @@ router.get('/type/:type', async (req, res, next) => {
 
 
 /**
- * thêm sách cùng với thể loại của sách 
- * @body {endpoint, title, (author), (thumb), (theme), (description), type, genres}
- * @returns book
+ * Thêm sách
+ * @query 
+ * @body {title, (author), (thumb), (theme),
+    (description), type, genres[]: genre_endpoint}
+ * @return 
+    data[{endpoint, title, author, thumb,
+    theme, description, type, rating,
+    rate_count, status, search_number}]
  */
 router.post('/', upload.fields([{
         name: 'thumb',
@@ -525,15 +557,11 @@ router.post('/', upload.fields([{
                 'book/' + book.endpoint + '/', 'thumb')
             book.theme = await FileController.upload_single(req.files['theme'][0],
                 'book/' + book.endpoint + '/', 'theme')
-            console.log(book)
-            return
             // await TransactionController.begin()
             let genres = book.genres
             book = await BookController.add(book)
             if (genres) await BookController.add_book_genres(book.endpoint, genres)
-            let view = await BookController.add_view(book.endpoint, new Date().toISOString().slice(0, 10))
-            book.view = view.view
-            book.genres = genres
+            await BookController.add_view(book.endpoint, new Date().toISOString().slice(0, 10))
             // genres.forEach(async (genre) => {
             //     genre = await GenreController.get(genre)
             //     book.genres.push(genre)
@@ -609,9 +637,14 @@ router.post('/', upload.fields([{
 
 
 /**
- * cập nhật book
- * @body {endpoint, title, (author), (thumb), (theme), (description), type}
- * @returns book
+ * Cập nhật sách
+ * @query 
+ * @body {title, (author), (thumb), (theme),
+    (description), type, genres[]: genre_endpoint}
+ * @return 
+    data[{endpoint, title, author, thumb,
+    theme, description, type, rating,
+    rate_count, status, search_number}]
  */
 router.patch('/:endpoint', upload.fields([{
         name: 'thumb',
@@ -711,6 +744,15 @@ router.patch('/:endpoint', upload.fields([{
     }
 })
 
+/**
+ * Cập nhật sách đã hoàn thành
+ * @query 
+ * @body 
+ * @return 
+    data[{endpoint, title, author, thumb,
+    theme, description, type, rating,
+    rate_count, status, search_number}]
+ */
 router.patch('/finish/:endpoint', auth.verifyAdmin, async (req, res, next) => {
     let endpoint = req.params.endpoint
     try {
@@ -800,6 +842,15 @@ router.patch('/finish/:endpoint', auth.verifyAdmin, async (req, res, next) => {
     }
 })
 
+/**
+ * Đánh giá sách
+ * @query 
+ * @body {rating}
+ * @return 
+    data[{endpoint, title, author, thumb,
+    theme, description, type, rating,
+    rate_count, status, search_number}]
+ */
 router.patch('/rate/:endpoint', auth.verifyUser, async (req, res, next) => {
     let endpoint = req.params.endpoint
     var rating = req.body.rating
@@ -902,9 +953,13 @@ router.patch('/rate/:endpoint', auth.verifyUser, async (req, res, next) => {
 })
 
 /**
- * xoá book - cập nhật status = -1
- * @body {}
- * @returns book
+ * Xóa sách (set status = -1)
+ * @query 
+ * @body
+ * @return 
+    data[{endpoint, title, author, thumb,
+    theme, description, type, rating,
+    rate_count, status, search_number}]
  */
 router.delete('/:endpoint', async (req, res, next) => {
     let book

@@ -82,7 +82,7 @@ module.exports = {
         missing_username: 'Thiếu username',
         missing_content: 'Thiếu nội dung',
         missing_root_comment: 'Thiếu comment gốc',
-        not_found: 'Không tìm thấy thông báo',
+        not_found: 'Không tìm thấy comment',
         comment_pk: 'Thông báo này đã tồn tại',
         username_fk: 'User này không tồn tại',
         book_fk: 'Sách nà không tồn tại',

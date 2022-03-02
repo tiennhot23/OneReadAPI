@@ -47,7 +47,7 @@ db.add = (comment) => {
             num += 1
             params.push(comment.files)
         }
-        query += ') returning *'
+        query += ') returning id, id_root, endpoint, content, time, files'
 
         conn.query(query, params, (err, res) => {
             if (err) return reject(err)

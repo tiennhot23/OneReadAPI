@@ -202,9 +202,10 @@ db.get_relate_book = (endpoint) => {
     })
 }
 
-db.get_book_of_type = (type) => {
+db.get_book_of_type = (type, page) => {
     return new Promise((resolve, reject) => {
-        let query = `select * from "Book" b where b.type = $1 order by rate_count desc, rating desc limit 10`
+        let query = `select * from "Book" b where b.type = $1 order by rate_count desc, rating desc`
+        query += ' limit ' + constants.limit_element + ' offset ' + (constants.limit_element * (page - 1))
         let params = [type]
 
         conn.query(query, params, (err, res) => {

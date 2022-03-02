@@ -4,6 +4,7 @@ const multer = require('multer')
 const CommentController = require('../controllers/CommentController')
 const NotifyController = require('../controllers/NotifyController')
 const FileController = require('../controllers/FileController')
+const UserController = require('../controllers/UserController')
 const auth = require('../middlewares/auth')
 const message = require('../configs/messages')
 const { memoryStorage } = require('multer')
@@ -14,7 +15,13 @@ const upload = multer({
 })
 
 
-
+/**
+ * Lấy danh sách các comment gốc của sách theo trang
+ * @query page
+ * @body 
+ * @return 
+    data[{id, endpoint, id_root, content, time, files[], user:{usernae, avatar}}]
+ */
 router.get('/:endpoint', async (req, res, next) => {
     const endpoint = req.params.endpoint
     var page = req.query.page
@@ -53,6 +60,15 @@ router.get('/:endpoint', async (req, res, next) => {
     }
 })
 
+
+/**
+ * LComment gốc và danh sách các reply của comment theo từng trang
+ * @query page
+ * @body 
+ * @return 
+    data[{id, endpoint, id_root, content, time, files[], user:{usernae, avatar},
+    replies: [comments]}]
+ */
 router.get('/detail/:id', async (req, res, next) => {
     let id = req.params.id
     var page = req.query.page
@@ -79,7 +95,7 @@ router.get('/detail/:id', async (req, res, next) => {
                 comment = e
             }
         })
-        comment.replies = replies
+        if (comment) comment.replies = replies
         if (comment) res.status(200).json({
             status: 'success',
             code: 200,
@@ -106,9 +122,11 @@ router.get('/detail/:id', async (req, res, next) => {
 
 
 /**
- * thêm comment
- * @body {endpoint, username, id_root, content, files}
- * @returns comment
+ * Thêm comment, thông báo đến user được tag trong comment
+ * @query 
+ * @body {content, image files}
+ * @return 
+    data[{id, endpoint, id_root, content, time, files[], user:{usernae, avatar}}]
  */
 router.post('/:book_endpoint/:username', auth.verifyUser, upload.any('file'), async (req, res, next) => {
     var comment = req.body
@@ -139,6 +157,11 @@ router.post('/:book_endpoint/:username', auth.verifyUser, upload.any('file'), as
         } else {
             
             comment = await CommentController.add(comment)
+            var user = await UserController.get(req.params.username)
+            comment.user = {
+                username: user.username,
+                avatar: user.avatar
+            }
             comment.files = await FileController.upload_multi_with_index(req.files, 
                 'comment/' + comment.id + '/')
             if (comment.id_root === null) comment.id_root = comment.id
@@ -222,9 +245,11 @@ router.post('/:book_endpoint/:username', auth.verifyUser, upload.any('file'), as
 })
 
 /**
- * xoá comment
- * @body 
- * @returns comment
+ * Xóa hoàn toàn comment và các replies
+ * @query 
+ * @body
+ * @return 
+    data[{id, endpoint, username, id_root, content, time, files[]}]
  */
 router.delete('/:id', auth.verifyUser, async (req, res, next) => {
     let comment
