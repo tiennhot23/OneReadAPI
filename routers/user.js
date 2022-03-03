@@ -19,7 +19,11 @@ const upload = multer({
 })
 
 /**
- * Cập nhật trạng thái tài khoản thành đã xác thực
+ * Xác thực token và cập nhật trang thái tài khoản thành đã xác thực email (status = 1)
+ * @query token
+ * @body
+ * @return
+ * data[]
  */
 router.get('/verify-email/:username', auth.verifyUser, async (req, res, next) => {
     var user = req.user
@@ -64,7 +68,11 @@ router.get('/verify-email/:username', auth.verifyUser, async (req, res, next) =>
 })
 
 /**
- * Lấy thông tin user gồm username, avatar, status, email
+ * Lấy thông tin gồm username, avatar, status, email của user
+ * @query 
+ * @body
+ * @return
+ * data[{username, avatar, status, email}]
  */
 router.get('/info/:username', async (req, res, next) => {
     let username = req.params.username
@@ -104,6 +112,11 @@ router.get('/info/:username', async (req, res, next) => {
 
 /**
  * Lấy danh sách các sách mà user đang follow
+ * @query 
+ * @body
+ * @return
+ * data[{chapter_title, endpoint, title, author, thumb, theme, description, type,
+    rating, rate_count, status, search_number}]
  */
 router.get('/book-following/:username', auth.verifyUser, async (req, res, next) => {
     let username = req.user.username
@@ -137,10 +150,14 @@ router.get('/book-following/:username', auth.verifyUser, async (req, res, next) 
 
 /**
  * Lịch sử comment của user
+ * @query 
+ * @body
+ * @return
+ * data[{id, username, endpoint, id_root, content, time, files}]
  */
 router.get('/comment-history/:username', auth.verifyAdmin, async (req, res, next) => {
     let username = req.params.username
-    var comments
+    var comments = []
     try {
         if (!username) {
             res.status(400).json({
@@ -150,7 +167,21 @@ router.get('/comment-history/:username', auth.verifyAdmin, async (req, res, next
                 data: null
             })
         } else {
-            comments = await UserController.get_comment_history(username)
+            var result = await UserController.get_comment_history(username)
+            result.forEach(e => {
+                comments.push({
+                    id: e.id,
+                    id_root: e.id_root,
+                    endpoint: e.endpoint,
+                    content: e.content,
+                    files: e.files,
+                    time: e.time,
+                    user: {
+                        username: e.username,
+                        avatar: e.avatar
+                    }
+                })
+            })
             res.status(200).json({
                 status: 'success',
                 code: 200,
@@ -169,7 +200,12 @@ router.get('/comment-history/:username', auth.verifyAdmin, async (req, res, next
 })
 
 /**
- * Lịch sử xem của user
+ * Lịch sủ các sách đã xem của user
+ * @query 
+ * @body
+ * @return
+ * data[{chapter_title, endpoint, title, author, thumb, theme, description, type,
+    rating, rate_count, status, search_number}]
  */
 router.get('/history/:username', auth.verifyUser, async (req, res, next) => {
     let username = req.user.username
@@ -202,7 +238,13 @@ router.get('/history/:username', auth.verifyUser, async (req, res, next) => {
 })
 
 
-
+/**
+ * Đăng nhập
+ * @query 
+ * @body {username, password}
+ * @return
+ * data[{accesstoken, user: {username, avatar, status, email}}]
+ */
 router.post('/login', async (req, res, next) => {
     var user = req.body
 
@@ -263,8 +305,11 @@ router.post('/login', async (req, res, next) => {
 
 
 /**
- * Đăng kí tài khoản, trả về message đăng kí thàn công hay thất bại
- * @body user: {username, password, email, (avatar)}
+ * Đăng kí tài khoản
+ * @query 
+ * @body {username, password, email}
+ * @return
+ * data[]
  */
 router.post('/register', encrypt.hash, async (req, res, next) => {
     var user = req.body
@@ -367,7 +412,11 @@ router.post('/register', encrypt.hash, async (req, res, next) => {
 })
 
 /**
- * Gửi email xác thực
+ * Gửi mail chứa link xác thực email
+ * @query 
+ * @body 
+ * @return
+ * data[]
  */
 router.post('/verify-email/:username', auth.verifyUser, async (req, res, next) => {
     var user = req.user
@@ -402,7 +451,11 @@ router.post('/verify-email/:username', auth.verifyUser, async (req, res, next) =
 })
 
 /**
- * follow sách
+ * Follow sách
+ * @query 
+ * @body 
+ * @return
+ * data[]
  */
 router.post('/follow-book/:book_endpoint/:username', auth.verifyUser, async (req, res, next) => {
     var obj = {
@@ -483,6 +536,13 @@ router.post('/follow-book/:book_endpoint/:username', auth.verifyUser, async (req
     }
 })
 
+/**
+ * Unfollow sách
+ * @query 
+ * @body 
+ * @return
+ * data[]
+ */
 router.post('/unfollow-book/:book_endpoint/:username', auth.verifyUser, async (req, res, next) => {
     var obj = {
         username: req.user.username,
@@ -563,7 +623,11 @@ router.post('/unfollow-book/:book_endpoint/:username', auth.verifyUser, async (r
 })
 
 /**
- * ban user
+ * Ban user và tự động thông báo tới user bị ban
+ * @query 
+ * @body 
+ * @return
+ * data[]
  */
 router.post('/ban/:username', auth.verifyAdmin, async (req, res, next) => {
     var user = {
@@ -598,8 +662,8 @@ router.post('/ban/:username', auth.verifyAdmin, async (req, res, next) => {
         return res.status(200).json({
             status: 'success',
             code: 200,
-            message: null,
-            data: [user]
+            message: message.user.user_banned,
+            data: null
         })
     } catch (err) {
         if (err.constraint) {
@@ -658,6 +722,13 @@ router.post('/ban/:username', auth.verifyAdmin, async (req, res, next) => {
     }
 })
 
+/**
+ * Unban user và tự động thông báo tới user được ân xá
+ * @query 
+ * @body 
+ * @return
+ * data[]
+ */
 router.post('/unban/:username', auth.verifyAdmin, async (req, res, next) => {
     var user = {
         username: req.params.username,
@@ -692,7 +763,7 @@ router.post('/unban/:username', auth.verifyAdmin, async (req, res, next) => {
             status: 'success',
             code: 200,
             message: message.user.user_unbanned,
-            data: [user]
+            data: null
         })
     } catch (err) {
         res.status(500).json({
@@ -704,6 +775,13 @@ router.post('/unban/:username', auth.verifyAdmin, async (req, res, next) => {
     }
 })
 
+/**
+ * Cập nhật thông tin user gồm email hoặc avatar
+ * @query 
+ * @body {email, avatar file}
+ * @return
+ * data[]
+ */
 router.patch('/:username', auth.verifyUser, upload.any('avatar'), async (req, res, next) => {
     var user = {
         username: req.params.username,
@@ -733,10 +811,17 @@ router.patch('/:username', auth.verifyUser, upload.any('avatar'), async (req, re
     }
 })
 
-router.patch('/up-role/:username', auth.verifyAdmin, async (req, res, next) => {
+/**
+ * Cập nhật role của user lên admin
+ * @query 
+ * @body 
+ * @return
+ * data[]
+ */
+router.patch('/change-role/:username', auth.verifyAdmin, async (req, res, next) => {
     var user = {
         username: req.params.username,
-        role: '1'
+        role: req.body.role
     }
 
     try {
@@ -745,7 +830,7 @@ router.patch('/up-role/:username', auth.verifyAdmin, async (req, res, next) => {
             status: 'success',
             code: 200,
             message: message.user.update_success,
-            data: [user]
+            data: null
         })
     } catch (err) {
         return res.status(500).json({
@@ -758,6 +843,13 @@ router.patch('/up-role/:username', auth.verifyAdmin, async (req, res, next) => {
 
 })
 
+/**
+ * Thay đổi password
+ * @query 
+ * @body 
+ * @return
+ * data[]
+ */
 router.patch('/change-password/:username', auth.verifyUser, encrypt.hash, async (req, res, next) => {
     var user = {
         username: req.params.username,
@@ -778,7 +870,7 @@ router.patch('/change-password/:username', auth.verifyUser, encrypt.hash, async 
                 status: 'success',
                 code: 200,
                 message: message.user.password_updated,
-                data: [user]
+                data: null
             })
         }
     } catch (err) {
@@ -791,6 +883,14 @@ router.patch('/change-password/:username', auth.verifyUser, encrypt.hash, async 
     }
 })
 
+/**
+ * Xóa user cùng toàn bộ dữ liệu liên quan 
+ * gồm lịch sử xem, comment , thông báo, sách theo dõi
+ * @query 
+ * @body 
+ * @return
+ * data[]
+ */
 router.delete('/:username', auth.verifyUser, async (req, res, next) => {
     var user = {
         username: req.params.username
@@ -812,7 +912,7 @@ router.delete('/:username', auth.verifyUser, async (req, res, next) => {
                     status: 'success',
                     code: 200,
                     message: message.user.delete_success,
-                    data: [user]
+                    data: null
                 })
             }
             else return res.status(404).json({
@@ -832,6 +932,13 @@ router.delete('/:username', auth.verifyUser, async (req, res, next) => {
     }
 })
 
+/**
+ * Xóa toàn bộ lịch sử xem của user
+ * @query 
+ * @body 
+ * @return
+ * data[]
+ */
 router.delete('/history/all/:username', auth.verifyUser, async (req, res, next) => {
     var history = {
         username: req.user.username
@@ -870,9 +977,16 @@ router.delete('/history/all/:username', auth.verifyUser, async (req, res, next) 
     }
 })
 
-router.delete('/history/single/:username', auth.verifyUser, async (req, res, next) => {
+/**
+ * Xóa lịch sử xem của một sách
+ * @query 
+ * @body 
+ * @return
+ * data[]
+ */
+router.delete('/history/single/:book_endpoint/:username', auth.verifyUser, async (req, res, next) => {
     var history = {
-        book_endpoint: req.body.book_endpoint,
+        book_endpoint: req.params.book_endpoint,
         username: req.user.username
     }
 
