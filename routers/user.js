@@ -115,7 +115,7 @@ router.get('/info/:username', async (req, res, next) => {
  * @query 
  * @body
  * @return
- * data[{chapter_title, endpoint, title, author, thumb, theme, description, type,
+ * data[{endpoint, title, author, thumb, theme, description, type,
     rating, rate_count, status, search_number}]
  */
 router.get('/book-following/:username', auth.verifyUser, async (req, res, next) => {
@@ -812,7 +812,7 @@ router.patch('/:username', auth.verifyUser, upload.any('avatar'), async (req, re
 })
 
 /**
- * Cập nhật role của user lên admin
+ * Cập nhật role của tài khoản
  * @query 
  * @body 
  * @return
@@ -846,7 +846,7 @@ router.patch('/change-role/:username', auth.verifyAdmin, async (req, res, next) 
 /**
  * Thay đổi password
  * @query 
- * @body 
+ * @body {password}
  * @return
  * data[]
  */

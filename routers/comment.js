@@ -62,7 +62,7 @@ router.get('/:endpoint', async (req, res, next) => {
 
 
 /**
- * LComment gốc và danh sách các reply của comment theo từng trang
+ * Comment gốc và danh sách các reply của comment theo từng trang
  * @query page
  * @body 
  * @return 
@@ -251,7 +251,7 @@ router.post('/:book_endpoint/:username', auth.verifyUser, upload.any('file'), as
  * @return 
     data[{id, endpoint, username, id_root, content, time, files[]}]
  */
-router.delete('/:id', auth.verifyUser, async (req, res, next) => {
+router.delete('/:id', auth.verifyAdmin, async (req, res, next) => {
     let comment
     let id = req.params.id
     try {

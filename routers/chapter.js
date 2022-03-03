@@ -47,7 +47,7 @@ router.get('/all/:book_endpoint', async (req, res, next) => {
 })
 
 /**
- * chi tiết sách, tự động cập nhật lịch sử xem của người dùng
+ * chi tiết sách, tự động cập nhật lịch sử xem của người dùng nếu token authorize
  * @query view=true sẽ tăng lượt view của sách
  * @body 
  * @return 
@@ -118,7 +118,7 @@ router.get('/detail/:book_endpoint/:chapter_endpoint', async (req, res, next) =>
 
 
 /**
- * Thêm chapter
+ * Thêm chapter, thông báo tới user đang follow sách
  * @query 
  * @body {title, images}
  * @return 
@@ -232,7 +232,7 @@ router.post('/:book_endpoint', upload.any(), auth.verifyAdmin, slugify.get_endpo
 })
 
 /**
- * Thêm chapter
+ * Cập nhật chapter
  * @query 
  * @body {(title)}
  * @return 
@@ -350,7 +350,7 @@ router.patch('/:book_endpoint/:chapter_endpoint', auth.verifyAdmin, slugify.get_
  * @return 
     data[{chapter_endpoint, book_endpoint, title, time, images[]}]
  */
-router.delete('/:book_endpoint/:chapter_endpoint', async (req, res, next) => {
+router.delete('/:book_endpoint/:chapter_endpoint', auth.verifyAdmin, async (req, res, next) => {
     var chapter
     let chapter_endpoint = req.params.chapter_endpoint
     let book_endpoint = req.params.book_endpoint

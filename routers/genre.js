@@ -202,7 +202,7 @@ router.patch('/:endpoint', auth.verifyAdmin, slugify.get_endpoint, async (req, r
 /**
  * Xóa thể loại
  * @query
- * @body {title, (description)}
+ * @body 
  * @return 
     data[{endpoint, title, description}]
  */

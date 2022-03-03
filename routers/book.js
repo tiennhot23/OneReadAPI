@@ -745,7 +745,7 @@ router.patch('/:endpoint', upload.fields([{
 })
 
 /**
- * Cập nhật sách đã hoàn thành
+ * Cập nhật sách đã hoàn thành, tự động thông báo tới các user đang follow sách
  * @query 
  * @body 
  * @return 
@@ -851,7 +851,7 @@ router.patch('/finish/:endpoint', auth.verifyAdmin, async (req, res, next) => {
     theme, description, type, rating,
     rate_count, status, search_number}]
  */
-router.patch('/rate/:endpoint', auth.verifyUser, async (req, res, next) => {
+router.patch('/rate/:endpoint/:username', auth.verifyUser, async (req, res, next) => {
     let endpoint = req.params.endpoint
     var rating = req.body.rating
     try {
@@ -961,7 +961,7 @@ router.patch('/rate/:endpoint', auth.verifyUser, async (req, res, next) => {
     theme, description, type, rating,
     rate_count, status, search_number}]
  */
-router.delete('/:endpoint', async (req, res, next) => {
+router.delete('/:endpoint', auth.verifyAdmin, async (req, res, next) => {
     let book
     let endpoint = req.params.endpoint
     try {

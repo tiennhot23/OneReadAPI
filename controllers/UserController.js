@@ -80,7 +80,7 @@ user.unfollow_book = (book_endpoint, username) => {
 user.get_book_following = (username) => {
     return new Promise((resolve, reject) => {
         let params = [username]
-        let query = `select b.* from "Book" b, (select * from "BookFollows" where username = $1) bf
+        let query = `select b.* from "Book" b, (select * from "BookFollows" where username = $1) bf 
         where b.endpoint = bf.book_endpoint`
         conn.query(query, params, (err, res) => {
             if (err) return reject(err)

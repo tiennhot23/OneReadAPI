@@ -92,7 +92,7 @@ router.get('/:endpoint/:username', auth.verifyUser, async (req, res, next) => {
 
 
 /**
- * tThêm thông báo tới user
+ * Thêm thông báo tới user
  * @query 
  * @body {endpoint, username, content}
  * @return 
