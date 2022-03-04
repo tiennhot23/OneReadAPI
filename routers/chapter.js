@@ -78,7 +78,7 @@ router.get('/detail/:book_endpoint/:chapter_endpoint', async (req, res, next) =>
                         username: user.username
                     }
                     if (await HistoryController.get(history)) {
-                        history = await HistoryController.update(history)
+                        history = await HistoryController.update(history, new Date())
                     } else {
                         history = await HistoryController.add(history)
                     }

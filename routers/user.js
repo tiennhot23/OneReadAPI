@@ -204,12 +204,12 @@ router.get('/comment-history/:username', auth.verifyAdmin, async (req, res, next
  * @query 
  * @body
  * @return
- * data[{chapter_title, endpoint, title, author, thumb, theme, description, type,
-    rating, rate_count, status, search_number}]
+ * data[book:{{endpoint, title, author, thumb, theme, description, type,
+    rating, rate_count, status, search_number}, chapter {chapter_endpoint, title}, time}]
  */
 router.get('/history/:username', auth.verifyUser, async (req, res, next) => {
     let username = req.user.username
-    var books
+    var books = []
     try {
         if (!username) {
             res.status(400).json({
@@ -219,7 +219,87 @@ router.get('/history/:username', auth.verifyUser, async (req, res, next) => {
                 data: null
             })
         } else {
-            books = await HistoryController.list(username)
+            var result = await HistoryController.list(username)
+            var book = {
+                endpoint: result[0].endpoint,
+                title: result[0].title,
+                author: result[0].author,
+                thumb: result[0].thumb,
+                theme: result[0].theme,
+                description: result[0].description,
+                type: result[0].type,
+                rating: result[0].rating,
+                rate_count: result[0].rate_count,
+                status: result[0].status,
+                search_number: result[0].search_number
+            }
+            var chapter = {
+                chapter_endpoint: result[0].chapter_endpoint,
+                title: result[0].chapter_title
+            }
+            books.push({book, chapter, time: result[0].time})
+            res.status(200).json({
+                status: 'success',
+                code: 200,
+                message: null,
+                data: books
+            })
+        }
+    } catch (err) {
+        res.status(500).json({
+            status: 'fail',
+            code: 500,
+            message: err.message,
+            data: null
+        })
+    }
+})
+
+/**
+ * Lịch sử xem của 1 sách, chapter đọc gần đây nhất
+ * @query 
+ * @body
+ * @return
+ * data[book:{{endpoint, title, author, thumb, theme, description, type,
+    rating, rate_count, status, search_number}, chapter {chapter_endpoint, title}, time}]
+ */
+router.get('/history/:book_endpoint/:username', auth.verifyUser, async (req, res, next) => {
+    let username = req.user.username
+    let book_endpoint = req.params.book_endpoint
+    var books = []
+    try {
+        if (!username) {
+            res.status(400).json({
+                status: 'fail',
+                code: 400,
+                message: message.user.missing_username,
+                data: null
+            })
+        } else {
+            var result = await HistoryController.get({
+                book_endpoint: book_endpoint,
+                username: username
+            })
+            if (result.length > 0) {
+                var book = {
+                    endpoint: result[0].endpoint,
+                    title: result[0].title,
+                    author: result[0].author,
+                    thumb: result[0].thumb,
+                    theme: result[0].theme,
+                    description: result[0].description,
+                    type: result[0].type,
+                    rating: result[0].rating,
+                    rate_count: result[0].rate_count,
+                    status: result[0].status,
+                    search_number: result[0].search_number
+                }
+                var chapter = {
+                    chapter_endpoint: result[0].chapter_endpoint,
+                    title: result[0].chapter_title
+                }
+                books.push({book, chapter, time: result[0].time})
+            }
             res.status(200).json({
                 status: 'success',
                 code: 200,
