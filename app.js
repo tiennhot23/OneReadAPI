@@ -30,6 +30,8 @@ function postTrimmer(req, res, next) {
   
 app.use(postTrimmer)
 
+process.env.TZ = 'Asia/Ho_Chi_Minh'
+
 app.use('/genre', genre)
 app.use('/book', book)
 app.use('/report', report)
