@@ -40,7 +40,6 @@ module.exports = {
         not_found: 'Chapter này không tồn tại',
         exist: 'Chapter này đã tồn tại',
         chapter_pk: 'Chapter bị trùng',
-        chapter_detail_fk: 'Chapter bị trùng',
         book_fk: 'Sách này không tồn tại'
     },
     report: {

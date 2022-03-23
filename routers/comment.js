@@ -14,6 +14,52 @@ const upload = multer({
     storage: memoryStorage()
 })
 
+function onResponse(res, status, code, message, page, data) {
+    if (page) {
+        res.status(code).json({
+            status: status,
+            code: code,
+            message: message,
+            page: Number(page),
+            data: data
+        })
+    } else {
+        res.status(code).json({
+            status: status,
+            code: code,
+            message: message,
+            data: data
+        })
+    }
+}
+
+function onCatchError(err, res) {
+    if (err.constraint) {
+        switch (err.constraint) {
+            case 'comment_pk': {
+                onResponse(res, 'fail', 400,  message.comment.comment_pk, null, null)
+                break
+            }
+            case 'username_fk': {
+                onResponse(res, 'fail', 400,  message.comment.username_fk, null, null)
+                break
+            }
+            case 'book_fk': {
+                onResponse(res, 'fail', 400,  message.comment.book_fk, null, null)
+                break
+            }
+            case 'reply_constraint': {
+                onResponse(res, 'fail', 400,  message.comment.reply_constraint, null, null)
+                break
+            }
+            default: {
+                onResponse(res, 'fail', 500, err.message, null, null)
+                break
+            }
+        }
+    } else onResponse(res, 'fail', 500, err.message, null, null)
+}
+
 
 /**
  * Lấy danh sách các comment gốc của sách theo trang
@@ -43,20 +89,9 @@ router.get('/:endpoint', async (req, res, next) => {
                 }
             })
         })
-        res.status(200).json({
-            status: 'success',
-            code: 200,
-            message: null,
-            page: Number(page),
-            data: comments
-        })
+        onResponse(res, 'success', 200,  null, page, comments)
     } catch (err) {
-        res.status(500).json({
-            status: 'fail',
-            code: 500,
-            message: err.message,
-            data: null
-        })
+        onCatchError(err, res)
     }
 })
 
@@ -96,26 +131,10 @@ router.get('/detail/:id', async (req, res, next) => {
             }
         })
         if (comment) comment.replies = replies
-        if (comment) res.status(200).json({
-            status: 'success',
-            code: 200,
-            message: null,
-            page: Number(page),
-            data: [comment]
-        })
-        else res.status(404).json({
-            status: 'fail',
-            code: 404,
-            message: message.comment.not_found,
-            data: null
-        })
+        if (comment) onResponse(res, 'success', 200,  null, page, [comment])
+        else onResponse(res, 'fail', 404,  message.comment.not_found, null, null)
     } catch (err) {
-        res.status(500).json({
-            status: 'fail',
-            code: 500,
-            message: err.message,
-            data: null
-        })
+        onCatchError(err, res)
     }
 })
 
@@ -134,28 +153,12 @@ router.post('/:book_endpoint/:username', auth.verifyUser, upload.any('file'), as
     comment.username = req.params.username
     try {
         if (!comment.endpoint) {
-            res.status(400).json({
-                status: 'fail',
-                code: 400,
-                message: message.comment.missing_endpoint,
-                data: null
-            })
+            onResponse(res, 'fail', 400,  message.comment.missing_endpoint, null, null)
         } else if (!comment.username) {
-            res.status(400).json({
-                status: 'fail',
-                code: 400,
-                message: message.comment.missing_username,
-                data: null
-            })
+            onResponse(res, 'fail', 400,  message.comment.missing_username, null, null)
         } else if (!comment.content) {
-            res.status(400).json({
-                status: 'fail',
-                code: 400,
-                message: message.comment.missing_content,
-                data: null
-            })
+            onResponse(res, 'fail', 400,  message.comment.missing_content, null, null)
         } else {
-            
             comment = await CommentController.add(comment)
             var user = await UserController.get(req.params.username)
             comment.user = {
@@ -179,68 +182,14 @@ router.post('/:book_endpoint/:username', auth.verifyUser, upload.any('file'), as
                     NotifyController.add(notify)
                 }
             })
-            res.status(200).json({
-                status: 'success',
-                code: 200,
-                message: message.comment.add_success,
-                data: [comment]
-            })
+            onResponse(res, 'success', 200,  message.comment.add_success, null, [comment])
         }
     } catch (err) {
-        if (err.constraint) {
-            switch (err.constraint) {
-                case 'comment_pk': {
-                    res.status(400).json({
-                        status: 'fail',
-                        code: 400,
-                        message: message.comment.comment_pk,
-                        data: null
-                    })
-                    break
-                }
-                case 'username_fk': {
-                    res.status(400).json({
-                        status: 'fail',
-                        code: 400,
-                        message: message.comment.username_fk,
-                        data: null
-                    })
-                    break
-                }
-                case 'book_fk': {
-                    res.status(400).json({
-                        status: 'fail',
-                        code: 400,
-                        message: message.comment.book_fk,
-                        data: null
-                    })
-                    break
-                }
-                case 'reply_constraint': {
-                    res.status(400).json({
-                        status: 'fail',
-                        code: 400,
-                        message: message.comment.reply_constraint,
-                        data: null
-                    })
-                    break
-                }
-                default: {
-                    res.status(500).json({
-                        status: 'fail',
-                        code: 500,
-                        message: err.message,
-                        data: null
-                    })
-                    break
-                }
-            }
-        } else res.status(500).json({
-            status: 'fail',
-            code: 500,
-            message: err.message,
-            data: null
-        })
+        if (err.constraint == 'notify_pk') {
+            onResponse(res, 'success', 200,  message.comment.add_success, null, [comment])
+        } else {
+            onCatchError(err, res)
+        }
     }
 })
 
@@ -256,25 +205,11 @@ router.delete('/:id', auth.verifyAdmin, async (req, res, next) => {
     let id = req.params.id
     try {
         comment = await CommentController.delete(id)
-        if (comment) res.status(200).json({
-            status: 'success',
-            code: 200,
-            message: message.comment.delete_success,
-            data: [comment]
-        })
-        else res.status(404).json({
-            status: 'fail',
-            code: 404,
-            message: message.comment.not_found,
-            data: null
-        })
+        if (comment) {
+            onResponse(res, 'success', 200,  message.comment.delete_success, null, [comment])
+        } else onResponse(res, 'fail', 404,  message.comment.not_found, null, null)
     } catch (err) {
-        res.status(500).json({
-            status: 'fail',
-            code: 500,
-            message: err.message,
-            data: null
-        })
+        onCatchError(err)
     }
 })
 

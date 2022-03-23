@@ -3,7 +3,6 @@ const multer = require('multer')
 
 const router = express.Router()
 const ChapterController = require('../controllers/ChapterController')
-const TransactionController = require('../controllers/TransactionContoller')
 const UserController = require('../controllers/UserController')
 const HistoryController = require('../controllers/HistoryController')
 const NotifyController = require('../controllers/NotifyController')
@@ -18,6 +17,44 @@ const upload = multer({
     storage: memoryStorage()
 })
 
+function onResponse(res, status, code, message, page, data) {
+    if (page) {
+        res.status(code).json({
+            status: status,
+            code: code,
+            message: message,
+            page: Number(page),
+            data: data
+        })
+    } else {
+        res.status(code).json({
+            status: status,
+            code: code,
+            message: message,
+            data: data
+        })
+    }
+}
+
+function onCatchError(err, res) {
+    if (err.constraint) {
+        switch (err.constraint) {
+            case 'chapter_pk': {
+                onResponse(res, 'fail', 400, message.chapter.chapter_pk, null, null)
+                break
+            }
+            case 'book_fk': {
+                onResponse(res, 'fail', 400, message.chapter.book_fk, null, null)
+                break
+            }
+            default: {
+                onResponse(res, 'fail', 500, err.message, null, null)
+                break
+            }
+        }
+    } else onResponse(res, 'fail', 500, err.message, null, null)
+}
+
 /**
  * Lấy danh sách các chapter của sách
  * @query 
@@ -30,19 +67,9 @@ router.get('/all/:book_endpoint', async (req, res, next) => {
     var chapters
     try {
         chapters = await ChapterController.list(book_endpoint)
-        res.status(200).json({
-            status: 'success',
-            code: 200,
-            message: null,
-            data: chapters
-        })
+        onResponse(res, 'success', 200,  null, null, chapters)
     } catch (err) {
-        res.status(500).json({
-            status: 'fail',
-            code: 500,
-            message: err.message,
-            data: null
-        })
+        onCatchError(err, res)
     }
 })
 
@@ -62,12 +89,7 @@ router.get('/detail/:book_endpoint/:chapter_endpoint', async (req, res, next) =>
         if (chapter_endpoint) {
             chapter = await ChapterController.get(book_endpoint, chapter_endpoint)
             if (chapter) {
-                res.status(200).json({
-                    status: 'success',
-                    code: 200,
-                    message: null,
-                    data: [chapter]
-                })
+                onResponse(res, 'success', 200,  null, null, [chapter])
                 const authHeader = req.headers['authorization']
                 const token = authHeader && authHeader.split(' ')[1]
                 if (token) {
@@ -92,27 +114,10 @@ router.get('/detail/:book_endpoint/:chapter_endpoint', async (req, res, next) =>
                     }
 
                 }
-            } else res.status(404).json({
-                status: 'fail',
-                code: 404,
-                message: message.chapter.not_found,
-                data: null
-            })
-        } else {
-            res.status(400).json({
-                status: 'fail',
-                code: 400,
-                message: message.chapter.missing_chapter_endpoint,
-                data: null
-            })
-        }
+            } else onResponse(res, 'fail', 404,  message.chapter.not_found, null, null)
+        } else onResponse(res, 'fail', 400,  message.chapter.missing_chapter_endpoint, null, null)
     } catch (err) {
-        res.status(500).json({
-            status: 'fail',
-            code: 500,
-            message: err.message,
-            data: null
-        })
+        onCatchError(err, res)
     }
 })
 
@@ -138,33 +143,13 @@ router.post('/:book_endpoint', upload.any(), auth.verifyAdmin, slugify.get_endpo
         'chapter/' + chapter.book_endpoint + '/' + chapter.chapter_endpoint + '/')
     try {
         if (!chapter.title) {
-            res.status(400).json({
-                status: 'fail',
-                code: 400,
-                message: message.chapter.missing_title,
-                data: null
-            })
+            onResponse(res, 'fail', 400,  message.chapter.missing_title, null, null)
         } else if (!chapter.images || chapter.images.length == 0) {
-            res.status(400).json({
-                status: 'fail',
-                code: 400,
-                message: message.chapter.missing_images,
-                data: null
-            })
+            onResponse(res, 'fail', 400,  message.chapter.missing_images, null, null)
         } else if (!chapter.book_endpoint) {
-            res.status(400).json({
-                status: 'fail',
-                code: 400,
-                message: message.chapter.missing_book_endpoint,
-                data: null
-            })
+            onResponse(res, 'fail', 400,  message.chapter.missing_book_endpoint, null, null)
         } else {
-            // await TransactionController.begin()
             chapter = await ChapterController.add(chapter)
-            // chapter.images = req.body.images
-            // let images = await ChapterController.add_chapter_detail(chapter)
-            // chapter.images = images.images
-            // await TransactionController.commit()
             var followers = await BookController.get_user_follow(chapter.book_endpoint)
             followers.forEach(async (user) => {
                 let notify = {
@@ -174,60 +159,14 @@ router.post('/:book_endpoint', upload.any(), auth.verifyAdmin, slugify.get_endpo
                 }
                 await NotifyController.add(notify)
             })
-            return res.status(200).json({
-                status: 'success',
-                code: 200,
-                message: message.chapter.add_success,
-                data: [chapter]
-            })
+            onResponse(res, 'success', 200,  message.chapter.add_success, null, [chapter])
         }
     } catch (err) {
-        // await TransactionController.rollback()
-        if (err.constraint) {
-            switch (err.constraint) {
-                case 'chapter_pk': {
-                    res.status(400).json({
-                        status: 'fail',
-                        code: 400,
-                        message: message.chapter.chapter_pk,
-                        data: null
-                    })
-                    break
-                }
-                case 'chapter_detail_fk': {
-                    res.status(400).json({
-                        status: 'fail',
-                        code: 400,
-                        message: message.chapter.chapter_detail_fk,
-                        data: null
-                    })
-                    break
-                }
-                case 'book_fk': {
-                    res.status(400).json({
-                        status: 'fail',
-                        code: 400,
-                        message: message.chapter.book_fk,
-                        data: null
-                    })
-                    break
-                }
-                default: {
-                    res.status(500).json({
-                        status: 'fail',
-                        code: 500,
-                        message: err.message,
-                        data: null
-                    })
-                    break;
-                }
-            }
-        } else res.status(500).json({
-            status: 'fail',
-            code: 500,
-            message: err.message,
-            data: null
-        })
+        if (err.constraint == 'notify_pk') {
+            onResponse(res, 'success', 200,  message.chapter.add_success, null, [chapter])
+        } else {
+           onCatchError(err, res)
+        }
     }
 })
 
@@ -248,98 +187,18 @@ router.patch('/:book_endpoint/:chapter_endpoint', auth.verifyAdmin, slugify.get_
     }
     try {
         if (!chapter.book_endpoint) {
-            return res.status(400).json({
-                status: 'fail',
-                code: 400,
-                message: message.chapter.missing_book_endpoint,
-                data: null
-            })
+            onResponse(res, 'fail', 400, message.chapter.missing_book_endpoint, null, null)
         } else if (!chapter.images || chapter.images.length == 0) {
-            return res.status(400).json({
-                status: 'fail',
-                code: 400,
-                message: message.chapter.missing_images,
-                data: null
-            })
+            onResponse(res, 'fail', 400, message.chapter.missing_images, null, null)
         }
         chapter = await ChapterController.update(chapter, chapter_endpoint)
         if (chapter) {
-            return res.status(200).json({
-                status: 'success',
-                code: 200,
-                message: message.chapter.update_success,
-                data: [chapter]
-            })
+            onResponse(res, 'success', 200, message.chapter.update_success, null, [chapter])
         } else {
-            return res.status(404).json({
-                status: 'fail',
-                code: 404,
-                message: message.chapter.not_found,
-                data: null
-            })
+            onResponse(res, 'fail', 404, message.chapter.not_found, null, null)
         }
-        // await TransactionController.begin()
-        // if (chapter.title) {
-        //     chapter = await ChapterController.update(chapter, chapter_endpoint)
-        // } 
-        // if (chapter) {
-        //     if (chapter.images && chapter.images.length != 0) {
-        //         chapter.images = req.body.images
-        //         chapter.images = await ChapterController.update_chapter_images(chapter)
-        //     }
-        //     await TransactionController.commit()
-        //     return res.status(200).json({chapter: chapter})
-        // } else {
-        //     await TransactionController.commit()
-        //     return res.status(404).json({message: message.chapter.not_found})
-        // }
     } catch (err) {
-        // await TransactionController.rollback()
-        if (err.constraint) {
-            switch (err.constraint) {
-                case 'chapter_pk': {
-                    res.status(400).json({
-                        status: 'fail',
-                        code: 400,
-                        message: message.chapter.chapter_pk,
-                        data: null
-                    })
-                    break
-                }
-                case 'chapter_detail_fk': {
-                    res.status(400).json({
-                        status: 'fail',
-                        code: 400,
-                        message: message.chapter.chapter_detail_fk,
-                        data: null
-                    })
-                    break
-                }
-                case 'book_fk': {
-                    res.status(400).json({
-                        status: 'fail',
-                        code: 400,
-                        message: message.chapter.book_fk,
-                        data: null
-                    })
-                    break
-                }
-                default: {
-                    res.status(500).json({
-                        status: 'fail',
-                        code: 500,
-                        message: err.message,
-                        data: null
-                    })
-                    break;
-                }
-            }
-        } else res.status(500).json({
-            status: 'fail',
-            code: 500,
-            message: err.message,
-            data: null
-        })
+        onCatchError(err, res)
     }
 })
 
@@ -356,25 +215,10 @@ router.delete('/:book_endpoint/:chapter_endpoint', auth.verifyAdmin, async (req,
     let book_endpoint = req.params.book_endpoint
     try {
         chapter = await ChapterController.delete(book_endpoint, chapter_endpoint)
-        if (chapter) res.status(200).json({
-            status: 'success',
-            code: 200,
-            message: message.chapter.delete_success,
-            data: [chapter]
-        })
-        else res.status(404).json({
-            status: 'fail',
-            code: 404,
-            message: message.chapter.not_found,
-            data: null
-        })
+        if (chapter) onResponse(res, 'success', 200, message.chapter.delete_success, null, [chapter])
+        else onResponse(res, 'fail', 404, message.chapter.not_found, null, null)
     } catch (err) {
-        res.status(500).json({
-            status: 'fail',
-            code: 500,
-            message: err.message,
-            data: null
-        })
+        onCatchError(err, res)
     }
 })
 

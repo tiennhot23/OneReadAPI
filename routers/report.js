@@ -6,6 +6,48 @@ const ReportController = require('../controllers/ReportController')
 const slugify = require('../middlewares/slugify')
 const message = require('../configs/messages')
 
+function onResponse(res, status, code, message, page, data) {
+    if (page) {
+        res.status(code).json({
+            status: status,
+            code: code,
+            message: message,
+            page: Number(page),
+            data: data
+        })
+    } else {
+        res.status(code).json({
+            status: status,
+            code: code,
+            message: message,
+            data: data
+        })
+    }
+}
+
+function onCatchError(err, res) {
+    if (err.constraint) {
+        switch (err.constraint) {
+            case 'report_pk': {
+                onResponse(res, 'fail', 400, message.report.report_pk, null, null)
+                break
+            }
+            case 'type_constraint': {
+                onResponse(res, 'fail', 400, message.report.type_constraint, null, null)
+                break
+            }
+            case 'status_constraint': {
+                onResponse(res, 'fail', 400, message.report.status_constraint, null, null)
+                break
+            }
+            default: {
+                onResponse(res, 'fail', 500, err.message, null, null)
+                break
+            }
+        }
+    } else onResponse(res, 'fail', 500, err.message, null, null)
+}
+
 /**
  * Lấy danh sách các báo cáo xắp xếp theo mới nhất
  * @query 
@@ -18,19 +60,9 @@ router.get('/all', async (req, res, next) => {
     var reports
     try {
         reports = await ReportController.list()
-        res.status(200).json({
-            status: 'success',
-            code: 200,
-            message: null,
-            data: reports
-        })
+        onResponse(res, 'success', 200, null, null, reports)
     } catch (err) {
-        res.status(500).json({
-            status: 'fail',
-            code: 500,
-            message: err.message,
-            data: null
-        })
+        onCatchError(err, res)
     }
 })
 
@@ -50,87 +82,18 @@ router.patch('/:type/:endpoint', async (req, res, next) => {
     }
     try {
         if (!report.endpoint) {
-            res.status(400).json({
-                status: 'fail',
-                code: 400,
-                message: message.report.missing_endpoint,
-                data: null
-            })
+            onResponse(res, 'fail', 400, message.report.missing_endpoint, null, null)
         } else if (!report.type) {
-            res.status(400).json({
-                status: 'fail',
-                code: 400,
-                message: message.report.missing_type,
-                data: null
-            })
+            onResponse(res, 'fail', 400, message.report.missing_type, null, null)
         } else if (!report.status) {
-            res.status(400).json({
-                status: 'fail',
-                code: 400,
-                message: message.report.missing_status,
-                data: null
-            })
+            onResponse(res, 'fail', 400, message.report.missing_status, null, null)
         } else {
             report = await ReportController.update_status(report)
-            if (report) res.status(200).json({
-                status: 'success',
-                code: 200,
-                message: null,
-                data: [report]
-            })
-            else res.status(404).json({
-                status: 'fail',
-                code: 404,
-                message: message.report.not_found,
-                data: null
-            })
+            if (report) onResponse(res, 'success', 200, message.report.update_success, null, [report])
+            else onResponse(res, 'fail', 404, message.report.not_found, null, null)
         }
     } catch (err) {
-        if (err.constraint) {
-            switch (err.constraint) {
-                case 'report_pk': {
-                    res.status(400).json({
-                        status: 'fail',
-                        code: 400,
-                        message: message.report.report_pk,
-                        data: null
-                    })
-                    break
-                }
-                case 'type_constraint': {
-                    res.status(400).json({
-                        status: 'fail',
-                        code: 400,
-                        message: message.report.type_constraint,
-                        data: null
-                    })
-                    break
-                }
-                case 'status_constraint': {
-                    res.status(400).json({
-                        status: 'fail',
-                        code: 400,
-                        message: message.report.status_constraint,
-                        data: null
-                    })
-                    break
-                }
-                default: {
-                    res.status(500).json({
-                        status: 'fail',
-                        code: 500,
-                        message: err.message,
-                        data: null
-                    })
-                    break
-                }
-            }
-        } else res.status(500).json({
-            status: 'fail',
-            code: 500,
-            message: err.message,
-            data: null
-        })
+        onCatchError(err, res)
     }
 })
 
@@ -148,85 +111,21 @@ router.post('/:username', async (req, res, next) => {
     var report = req.body
     try {
         if (!report.endpoint) {
-            res.status(400).json({
-                status: 'fail',
-                code: 400,
-                message: message.report.missing_endpoint,
-                data: null
-            })
+            onResponse(res, 'fail', 400, message.report.missing_endpoint, null, null)
         } else if (!report.type) {
-            res.status(400).json({
-                status: 'fail',
-                code: 400,
-                message: message.report.missing_type,
-                data: null
-            })
+            onResponse(res, 'fail', 400, message.report.missing_type, null, null)
         } else if (!report.reason) {
-            res.status(400).json({
-                status: 'fail',
-                code: 400,
-                message: message.report.missing_reason,
-                data: null
-            })
+            onResponse(res, 'fail', 400, message.report.missing_reason, null, null)
         } else {
             if (await ReportController.get(report.endpoint, report.type)) {
                 report = await ReportController.add_exist(report)
             } else {
                 report = await ReportController.add(report)
             }
-            res.status(200).json({
-                status: 'success',
-                code: 200,
-                message: message.report.add_success,
-                data: [report]
-            })
+            onResponse(res, 'success', 200, message.report.add_success, null, [report])
         }
     } catch (err) {
-        if (err.constraint) {
-            switch (err.constraint) {
-                case 'report_pk': {
-                    res.status(400).json({
-                        status: 'fail',
-                        code: 400,
-                        message: message.report.report_pk,
-                        data: null
-                    })
-                    break
-                }
-                case 'type_constraint': {
-                    res.status(400).json({
-                        status: 'fail',
-                        code: 400,
-                        message: message.report.type_constraint,
-                        data: null
-                    })
-                    break
-                }
-                case 'status_constraint': {
-                    res.status(400).json({
-                        status: 'fail',
-                        code: 400,
-                        message: message.report.status_constraint,
-                        data: null
-                    })
-                    break
-                }
-                default: {
-                    res.status(500).json({
-                        status: 'fail',
-                        code: 500,
-                        message: err.message,
-                        data: null
-                    })
-                    break
-                }
-            }
-        } else res.status(500).json({
-            status: 'fail',
-            code: 500,
-            message: err.message,
-            data: null
-        })
+        onCatchError(err, res)
     }
 })
 
@@ -244,25 +143,10 @@ router.delete('/:type/:endpoint', async (req, res, next) => {
     let type = req.params.type
     try {
         report = await ReportController.delete(endpoint, type)
-        if (report) res.status(200).json({
-            status: 'success',
-            code: 200,
-            message: message.report.delete_success,
-            data: [report]
-        })
-        else res.status(404).json({
-            status: 'fail',
-            code: 404,
-            message: message.report.not_found,
-            data: null
-        })
+        if (report) onResponse(res, 'success', 200, message.report.delete_success, null, [report])
+        else onResponse(res, 'fail', 404, message.report.not_found, null, null)
     } catch (err) {
-        res.status(500).json({
-            status: 'fail',
-            code: 500,
-            message: err.message,
-            data: null
-        })
+        onCatchError(err, res)
     }
 })
 
@@ -278,19 +162,9 @@ router.delete('/read-report', async (req, res, next) => {
     let reports
     try {
         reports = await ReportController.deleteRead()
-        res.status(200).json({
-            status: 'success',
-            code: 200,
-            message: message.report.delete_success,
-            data: reports
-        })
+        onResponse(res, 'success', 200, message.report.delete_success, null, reports)
     } catch (err) {
-        res.status(500).json({
-            status: 'fail',
-            code: 500,
-            message: err.message,
-            data: null
-        })
+        onCatchError(err, res)
     }
 })
 

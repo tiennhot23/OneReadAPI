@@ -18,6 +18,64 @@ const upload = multer({
     storage: memoryStorage()
 })
 
+function onResponse(res, status, code, message, page, data) {
+    if (page) {
+        res.status(code).json({
+            status: status,
+            code: code,
+            message: message,
+            page: Number(page),
+            data: data
+        })
+    } else {
+        res.status(code).json({
+            status: status,
+            code: code,
+            message: message,
+            data: data
+        })
+    }
+}
+
+function onCatchError(err, res) {
+    if (err.constraint) {
+        switch (err.constraint) {
+            case 'account_pk': {
+                onResponse(res, 'fail', 400, message.user.account_pk, null, null)
+                break
+            }
+            case 'status_constraint': {
+                onResponse(res, 'fail', 400, message.user.status_constraint, null, null)
+                break
+            }
+            case 'role_constraint': {
+                onResponse(res, 'fail', 400, message.user.role_constraint, null, null)
+                break
+            }
+            case 'Account_email_key': {
+                onResponse(res, 'fail', 400, message.user.email_exist, null, null)
+                break
+            }
+            case 'book_follows_pk': {
+                onResponse(res, 'fail', 400, message.user.book_follows_pk, null, null)
+                break
+            }
+            case 'book_fk': {
+                onResponse(res, 'fail', 400, message.user.book_fk, null, null)
+                break
+            }
+            case 'username_fk': {
+                onResponse(res, 'fail', 400, message.user.username_fk, null, null)
+                break
+            }
+            default: {
+                onResponse(res, 'fail', 500, err.message, null, null)
+                break
+            }
+        }
+    } else onResponse(res, 'fail', 500, err.message, null, null)
+}
+
 /**
  * Xác thực token và cập nhật trang thái tài khoản thành đã xác thực email (status = 1)
  * @query token
@@ -31,39 +89,19 @@ router.get('/verify-email/:username', auth.verifyUser, async (req, res, next) =>
 
     try {
         if (!token) {
-            return res.status(400).json({
-                status: 'fail',
-                code: 400,
-                message: message.auth.token_invalid,
-                data: null
-            })
+            onResponse(res, 'fail', 400, message.auth.token_invalid, null, null)
         } else {
             var data = await UserController.get_data_from_token(token)
             if (data.username && data.email &&
                 user.username == data.username && user.email == data.email) {
                 user = await UserController.verify_email(data.username)
-                return res.status(200).json({
-                    status: 'success',
-                    code: 200,
-                    message: message.user.email_veified,
-                    data: null
-                })
+                onResponse(res, 'success', 200, message.user.email_veified, null, null)
             } else {
-                return res.status(404).json({
-                    status: 'fail',
-                    code: 404,
-                    message: message.user.not_found,
-                    data: null
-                })
+                onResponse(res, 'fail', 404, message.user.not_found, null, null)
             }
         }
     } catch (err) {
-        res.status(500).json({
-            status: 'fail',
-            code: 500,
-            message: err.message,
-            data: null
-        })
+        onResponse(res, 'fail', 500, err.message, null, null) 
     }
 })
 
@@ -80,33 +118,13 @@ router.get('/info/:username', async (req, res, next) => {
     try {
         if (username) {
             user = await UserController.get(username)
-            if (user) res.status(200).json({
-                status: 'success',
-                code: 200,
-                message: null,
-                data: [user]
-            })
-            else res.status(404).json({
-                status: 'fail',
-                code: 404,
-                message: message.user.not_found,
-                data: null
-            })
+            if (user) onResponse(res, 'success', 200, null, null, [user])
+            else onResponse(res, 'fail', 404, message.user.not_found, null, null)
         } else {
-            res.status(400).json({
-                status: 'fail',
-                code: 400,
-                message: message.user.missing_username,
-                data: null
-            })
+            onResponse(res, 'fail', 400, message.user.missing_username, null, null)
         }
     } catch (err) {
-        res.status(500).json({
-            status: 'fail',
-            code: 500,
-            message: err.message,
-            data: null
-        })
+        onResponse(res, 'fail', 500, err.message, null, null)
     }
 })
 
@@ -123,28 +141,13 @@ router.get('/book-following/:username', auth.verifyUser, async (req, res, next) 
     var books
     try {
         if (!username) {
-            res.status(400).json({
-                status: 'fail',
-                code: 400,
-                message: message.user.missing_username,
-                data: null
-            })
+            onResponse(res, 'fail', 400, message.user.missing_username, null, null)
         } else {
             books = await UserController.get_book_following(username)
-            res.status(200).json({
-                status: 'success',
-                code: 200,
-                message: null,
-                data: books
-            })
+            onResponse(res, 'success', 200, null, null, books)
         }
     } catch (err) {
-        res.status(500).json({
-            status: 'fail',
-            code: 500,
-            message: err.message,
-            data: null
-        })
+        onResponse(res, 'fail', 500, err.message, null, null)
     }
 })
 
@@ -160,12 +163,7 @@ router.get('/comment-history/:username', auth.verifyAdmin, async (req, res, next
     var comments = []
     try {
         if (!username) {
-            res.status(400).json({
-                status: 'fail',
-                code: 400,
-                message: message.user.missing_username,
-                data: null
-            })
+            onResponse(res, 'fail', 400, message.user.missing_username, null, null)
         } else {
             var result = await UserController.get_comment_history(username)
             result.forEach(e => {
@@ -182,20 +180,10 @@ router.get('/comment-history/:username', auth.verifyAdmin, async (req, res, next
                     }
                 })
             })
-            res.status(200).json({
-                status: 'success',
-                code: 200,
-                message: null,
-                data: comments
-            })
+            onResponse(res, 'success', 200, null, null, comments)
         }
     } catch (err) {
-        res.status(500).json({
-            status: 'fail',
-            code: 500,
-            message: err.message,
-            data: null
-        })
+        onResponse(res, 'fail', 500, err.message, null, null)
     }
 })
 
@@ -212,12 +200,7 @@ router.get('/history/:username', auth.verifyUser, async (req, res, next) => {
     var books = []
     try {
         if (!username) {
-            res.status(400).json({
-                status: 'fail',
-                code: 400,
-                message: message.user.missing_username,
-                data: null
-            })
+            onResponse(res, 'fail', 400, message.user.missing_username, null, null)
         } else {
             var result = await HistoryController.list(username)
             var book = {
@@ -238,20 +221,10 @@ router.get('/history/:username', auth.verifyUser, async (req, res, next) => {
                 title: result[0].chapter_title
             }
             books.push({book, chapter, time: result[0].time})
-            res.status(200).json({
-                status: 'success',
-                code: 200,
-                message: null,
-                data: books
-            })
+            onResponse(res, 'success', 200, null, null, books)
         }
     } catch (err) {
-        res.status(500).json({
-            status: 'fail',
-            code: 500,
-            message: err.message,
-            data: null
-        })
+        onResponse(res, 'fail', 500, err.message, null, null)
     }
 })
 
@@ -269,12 +242,7 @@ router.get('/history/:book_endpoint/:username', auth.verifyUser, async (req, res
     var books = []
     try {
         if (!username) {
-            res.status(400).json({
-                status: 'fail',
-                code: 400,
-                message: message.user.missing_username,
-                data: null
-            })
+            onResponse(res, 'fail', 400, message.user.missing_username, null, null)
         } else {
             var result = await HistoryController.get({
                 book_endpoint: book_endpoint,
@@ -300,20 +268,10 @@ router.get('/history/:book_endpoint/:username', auth.verifyUser, async (req, res
                 }
                 books.push({book, chapter, time: result[0].time})
             }
-            res.status(200).json({
-                status: 'success',
-                code: 200,
-                message: null,
-                data: books
-            })
+            onResponse(res, 'success', 200, null, null, books)
         }
     } catch (err) {
-        res.status(500).json({
-            status: 'fail',
-            code: 500,
-            message: err.message,
-            data: null
-        })
+        onResponse(res, 'fail', 500, err.message, null, null)
     }
 })
 
@@ -330,19 +288,9 @@ router.post('/login', async (req, res, next) => {
 
     try {
         if (!user.username) {
-            return res.status(400).json({
-                status: 'fail',
-                code: 400,
-                message: message.user.missing_username,
-                data: null
-            })
+            onResponse(res, 'fail', 400, message.user.missing_username, null, null) 
         } else if (!user.password) {
-            return res.status(400).json({
-                status: 'fail',
-                code: 400,
-                message: message.user.missing_password,
-                data: null
-            })
+            onResponse(res, 'fail', 400, message.user.missing_password, null, null)
         } else {
             user = await UserController.login(user.username, user.password)
             if (user) {
@@ -355,31 +303,16 @@ router.post('/login', async (req, res, next) => {
                  * ... jwt.sign({user}, ...
                  */
                 const accessToken = utils.generateAccessToken(user)
-                res.status(200).json({
-                    status: 'success',
-                    code: 200,
-                    message: message.user.login_success,
-                    data: [{
-                        accessToken: accessToken,
-                        user: user
-                    }]
-                })
+                onResponse(res, 'success', 200, message.user.login_success, null, [{
+                    accessToken: accessToken,
+                    user: user
+                }])
             } else {
-                return res.status(500).json({
-                    status: 'fail',
-                    code: 500,
-                    messsage: message.user.incorrect_account,
-                    data: null
-                })
+                onResponse(res, 'fail', 500, message.user.incorrect_account, null, null)
             }
         }
     } catch (err) {
-        res.status(500).json({
-            status: 'fail',
-            code: 500,
-            message: err.message,
-            data: null
-        })
+        onResponse(res, 'fail', 500, err.message, null, null)
     }
 })
 
@@ -396,98 +329,18 @@ router.post('/register', encrypt.hash, async (req, res, next) => {
 
     try {
         if (!user.username) {
-            return res.status(400).json({
-                status: 'fail',
-                code: 400,
-                message: message.user.missing_username,
-                data: null
-            })
+            onResponse(res, 'fail', 400, message.user.missing_username, null, null)
         } else if (!user.password) {
-            return res.status(400).json({
-                status: 'fail',
-                code: 400,
-                message: message.user.missing_password,
-                data: null
-            })
+            onResponse(res, 'fail', 400, message.user.missing_password, null, null)
         } else if (!user.email) {
-            return res.status(400).json({
-                status: 'fail',
-                code: 400,
-                message: message.user.missing_email,
-                data: null
-            })
+            onResponse(res, 'fail', 400, message.user.missing_email, null, null)
         } else {
             user = await UserController.add(user)
-            if (user) return res.status(200).json({
-                status: 'success',
-                code: 200,
-                message: message.user.registed_success,
-                data: null
-            })
-            else return res.status(500).json({
-                status: 'fail',
-                code: 500,
-                message: message.user.registed_fail,
-                data: null
-            })
+            if (user) onResponse(res, 'success', 200, message.user.registed_success, null, null)
+            else onResponse(res, 'fail', 500, message.user.registed_fail, null, null)
         }
     } catch (err) {
-        if (err.constraint) {
-            switch (err.constraint) {
-                case 'account_pk': {
-                    res.status(400).json({
-                        status: 'fail',
-                        code: 400,
-                        message: message.user.account_pk,
-                        data: null
-                    })
-                    break
-                }
-                case 'status_constraint': {
-                    res.status(400).json({
-                        status: 'fail',
-                        code: 400,
-                        message: message.user.status_constraint,
-                        data: null
-                    })
-                    break
-                }
-                case 'role_constraint': {
-                    res.status(400).json({
-                        status: 'fail',
-                        code: 400,
-                        message: message.user.role_constraint,
-                        data: null
-                    })
-                    break
-                }
-                case 'Account_email_key': {
-                    res.status(400).json({
-                        status: 'fail',
-                        code: 400,
-                        message: message.user.email_exist,
-                        data: null
-                    })
-                    break
-                }
-                default: {
-                    res.status(500).json({
-                        status: 'fail',
-                        code: 500,
-                        message: err.message,
-                        data: null
-                    })
-                    break
-                }
-            }
-        } else {
-            res.status(500).json({
-                status: 'fail',
-                code: 500,
-                message: err.message,
-                data: null
-            })
-        }
+        onCatchError(err, res)
     }
 })
 
@@ -502,31 +355,16 @@ router.post('/verify-email/:username', auth.verifyUser, async (req, res, next) =
     var user = req.user
     try {
         if (!user.username || !req.body.username) {
-            return res.status(400).json({
-                status: 'fail',
-                code: 400,
-                message: message.user.missing_username,
-                data: null
-            })
+            onResponse(res, 'fail', 400, message.user.missing_username, null, null) 
         } else {
             // token = bcrypt.hashSync(username, constants.saltRounds)
             const authHeader = req.headers['authorization']
             const token = authHeader && authHeader.split(' ')[1]
             mail.sendVerification(user.email, constants.baseURL + 'user/verify-email?token=' + token)
-            return res.status(200).json({
-                status: 'success',
-                code: 200,
-                message: message.auth.verify_email,
-                data: null
-            })
+            onResponse(res, 'success', 200, message.auth.verify_email, null, null)
         }
     } catch (err) {
-        res.status(500).json({
-            status: 'fail',
-            code: 500,
-            message: err.message,
-            data: null
-        })
+        onResponse(res, 'fail', 500, err.message, null, null)
     }
 })
 
@@ -544,75 +382,16 @@ router.post('/follow-book/:book_endpoint/:username', auth.verifyUser, async (req
     }
     try {
         if (!obj.username) {
-            return res.status(400).json({
-                status: 'fail',
-                code: 400,
-                message: message.user.missing_username,
-                data: null
-            })
+            onResponse(res, 'fail', 400, message.user.missing_username, null, null)
         }
         if (!obj.book_endpoint) {
-            return res.status(400).json({
-                status: 'fail',
-                code: 400,
-                message: message.book.missing_endpoint,
-                data: null
-            })
+            onResponse(res, 'fail', 400, message.book.missing_endpoint, null, null)
         } else {
             obj = await UserController.follow_book(obj.book_endpoint, obj.username)
-            return res.status(200).json({
-                status: 'success',
-                code: 200,
-                message: message.user.followed_book,
-                data: null
-            })
+            onResponse(res, 'success', 200, message.user.followed_book, null, null)
         }
     } catch (err) {
-        if (err.constraint) {
-            switch (err.constraint) {
-                case 'book_follows_pk': {
-                    res.status(400).json({
-                        status: 'fail',
-                        code: 400,
-                        message: message.user.book_follows_pk,
-                        data: null
-                    })
-                    break
-                }
-                case 'book_fk': {
-                    res.status(400).json({
-                        status: 'fail',
-                        code: 400,
-                        message: message.user.book_fk,
-                        data: null
-                    })
-                    break
-                }
-                case 'username_fk': {
-                    res.status(400).json({
-                        status: 'fail',
-                        code: 400,
-                        message: message.user.username_fk,
-                        data: null
-                    })
-                    break
-                }
-                default: {
-                    res.status(500).json({
-                        status: 'fail',
-                        code: 500,
-                        message: err.message,
-                        data: null
-                    })
-                    break
-                }
-            }
-        } else res.status(500).json({
-            status: 'fail',
-            code: 500,
-            message: err.message,
-            data: null
-        })
+        onCatchError(err, res)
     }
 })
 
@@ -630,75 +409,16 @@ router.post('/unfollow-book/:book_endpoint/:username', auth.verifyUser, async (r
     }
     try {
         if (!obj.username) {
-            return res.status(400).json({
-                status: 'fail',
-                code: 400,
-                message: message.user.missing_username,
-                data: null
-            })
+            onResponse(res, 'fail', 400, message.user.missing_username, null, null)
         }
         if (!obj.book_endpoint) {
-            return res.status(400).json({
-                status: 'fail',
-                code: 400,
-                message: message.book.missing_endpoint,
-                data: null
-            })
+            onResponse(res, 'fail', 400, message.book.missing_endpoint, null, null)
         } else {
             obj = await UserController.unfollow_book(obj.book_endpoint, obj.username)
-            return res.status(200).json({
-                status: 'success',
-                code: 200,
-                message: message.user.unfollowed_book,
-                data: null
-            })
+            onResponse(res, 'success', 200, message.user.unfollowed_book, null, null)
         }
     } catch (err) {
-        if (err.constraint) {
-            switch (err.constraint) {
-                case 'book_follows_pk': {
-                    res.status(400).json({
-                        status: 'fail',
-                        code: 400,
-                        message: message.user.book_follows_pk,
-                        data: null
-                    })
-                    break
-                }
-                case 'book_fk': {
-                    res.status(400).json({
-                        status: 'fail',
-                        code: 400,
-                        message: message.user.book_fk,
-                        data: null
-                    })
-                    break
-                }
-                case 'username_fk': {
-                    res.status(400).json({
-                        status: 'fail',
-                        code: 400,
-                        message: message.user.username_fk,
-                        data: null
-                    })
-                    break
-                }
-                default: {
-                    res.status(500).json({
-                        status: 'fail',
-                        code: 500,
-                        message: err.message,
-                        data: null
-                    })
-                    break
-                }
-            }
-        } else res.status(500).json({
-            status: 'fail',
-            code: 500,
-            message: err.message,
-            data: null
-        })
+        onCatchError(err, res)
     }
 })
 
@@ -716,12 +436,7 @@ router.post('/ban/:username', auth.verifyAdmin, async (req, res, next) => {
     }
     try {
         if (user.username == req.user.username) {
-            return res.status(403).json({
-                status: 'fail',
-                code : 403,
-                message: message.user.can_not_ban_user,
-                data: null
-            })
+            onResponse(res, 'fail', 403, message.user.can_not_ban_user, null, null)
         }
         user = await UserController.update(user)
         if (user) {
@@ -731,74 +446,17 @@ router.post('/ban/:username', auth.verifyAdmin, async (req, res, next) => {
                 content: message.notify.ban_notication
             }
             NotifyController.add(notify)
+            onResponse(res, 'success', 200, message.user.user_banned, null, null)
         } else {
-            res.status(404).json({
-                status: 'fail',
-                code: 404,
-                message: message.user.not_found,
-                data: null
-            })
+            onResponse(res, 'fail', 404, message.user.not_found, null, null)
         }
-        return res.status(200).json({
-            status: 'success',
-            code: 200,
-            message: message.user.user_banned,
-            data: null
-        })
     } catch (err) {
-        if (err.constraint) {
-            switch (err.constraint) {
-                case 'account_pk': {
-                    res.status(400).json({
-                        status: 'fail',
-                        code: 400,
-                        message: message.user.account_pk,
-                        data: null
-                    })
-                    break
-                }
-                case 'notify_pk': {
-                    return res.status(200).json({
-                        status: 'success',
-                        code: 200,
-                        message: message.user.user_banned,
-                        data: [user]
-                    })
-                    break
-                }
-                case 'role_constraint': {
-                    res.status(400).json({
-                        status: 'fail',
-                        code: 400,
-                        message: message.user.role_constraint
-                    })
-                    break
-                }
-                case 'status_constraint': {
-                    res.status(400).json({
-                        status: 'fail',
-                        code: 400,
-                        message: message.user.status_constraint,
-                        data: null
-                    })
-                    break
-                }
-                default: {
-                    res.status(500).json({
-                        status: 'fail',
-                        code: 500,
-                        message: err.message,
-                        data: null
-                    })
-                    break
-                }
-            }
-        } else res.status(500).json({
-            status: 'fail',
-            code: 500,
-            message: err.message,
-            data: null
-        })
+        if (err.constants == 'notify_pk') {
+            onResponse(res, 'success', 200, message.user.user_banned, null, [user])
+        } else {
+            onCatchError(err, res)
+        }
+       
     }
 })
 
@@ -816,12 +474,7 @@ router.post('/unban/:username', auth.verifyAdmin, async (req, res, next) => {
     }
     try {
         if (user.username == req.user.username) {
-            return res.status(403).json({
-                status: 'fail',
-                code: 403,
-                message: message.user.can_not_unban_user,
-                data: null
-            })
+            onResponse(res, 'fail', 403, message.user.can_not_unban_user, null, null)
         }
         user = await UserController.update(user)
         if (user) {
@@ -831,27 +484,16 @@ router.post('/unban/:username', auth.verifyAdmin, async (req, res, next) => {
                 content: message.notify.unban_notification
             }
             NotifyController.add(notify)
+            onResponse(res, 'success', 200, message.user.user_unbanned, null, null)
         } else {
-            res.status(404).json({
-                status: 'fail',
-                code: 404,
-                message: message.user.not_found,
-                data: null
-            })
+            onResponse(res, 'fail', 404, message.user.not_found, null, null)
         }
-        return res.status(200).json({
-            status: 'success',
-            code: 200,
-            message: message.user.user_unbanned,
-            data: null
-        })
     } catch (err) {
-        res.status(500).json({
-            status: 'fail',
-            code: 500,
-            message: err.message,
-            data: null
-        })
+        if (err.constants == 'notify_pk') {
+            onResponse(res, 'success', 200, message.user.user_unbanned, null, [user])
+        } else {
+            onCatchError(err, res)
+        }
     }
 })
 
@@ -875,19 +517,9 @@ router.patch('/:username', auth.verifyUser, upload.any('avatar'), async (req, re
 
     try {
         user = await UserController.update(user)
-        return res.status(200).json({
-            status: 'success',
-            code: 200,
-            message: message.user.update_success,
-            data: [user]
-        })
+        onResponse(res, 'success', 200, message.user.update_success, null, [user])
     } catch (err) {
-        return res.status(500).json({
-            status: 'fail',
-            code: 500,
-            message: err.message,
-            data: null
-        })
+        onResponse(res, 'fail', 500, err.message, null, null)
     }
 })
 
@@ -906,19 +538,9 @@ router.patch('/change-role/:username', auth.verifyAdmin, async (req, res, next) 
 
     try {
         user = await UserController.update(user)
-        return res.status(200).json({
-            status: 'success',
-            code: 200,
-            message: message.user.update_success,
-            data: null
-        })
+        onResponse(res, 'success', 200, message.user.update_success, null, null)
     } catch (err) {
-        return res.status(500).json({
-            status: 'fail',
-            code: 500,
-            message: err.message,
-            data: null
-        })
+        onResponse(res, 'fail', 500, err.message, null, null)
     }
 
 })
@@ -938,28 +560,13 @@ router.patch('/change-password/:username', auth.verifyUser, encrypt.hash, async 
 
     try {
         if (!user.password) {
-            return res.status(400).json({
-                status: 'fail',
-                code: 400,
-                message: message.user.missing_password,
-                data: null
-            })
+            onResponse(res, 'fail', 400, message.user.missing_password, null, null)
         } else {
             user = await UserController.update(user)
-            return res.status(200).json({
-                status: 'success',
-                code: 200,
-                message: message.user.password_updated,
-                data: null
-            })
+            onResponse(res, 'success', 200, message.user.password_updated, null, null)
         }
     } catch (err) {
-        return res.status(500).json({
-            status: 'fail',
-            code: 500,
-            message: err.message,
-            data: null
-        })
+        onResponse(res, 'fail', 500, err.message, null, null)
     }
 })
 
@@ -978,37 +585,19 @@ router.delete('/:username', auth.verifyUser, async (req, res, next) => {
 
     try {
         if (!user.username) {
-            return res.status(400).json({
-                status: 'fail',
-                code: 400,
-                message: message.user.missing_username,
-                data: null
-            })
+            onResponse(res, 'fail', 400, message.user.missing_username, null, null)
         } else {
             user = await UserController.delete(user.username)
             if (user) {
                 FileController.delete('user/' + user.username + '/')
-                return res.status(200).json({
-                    status: 'success',
-                    code: 200,
-                    message: message.user.delete_success,
-                    data: null
-                })
+                onResponse(res, 'success', 200, message.user.delete_success, null, null)
             }
-            else return res.status(404).json({
-                status: 'fail',
-                code: 404,
-                message: message.user.not_found,
-                data: null
-            })
+            else {
+                onResponse(res, 'fail', 404, message.user.not_found, null, null)
+            }
         }
     } catch (err) {
-        return res.status(500).json({
-            status: 'fail',
-            code: 500,
-            message: err.message,
-            data: null
-        })
+        onResponse(res, 'fail', 500, err.message, null, null)
     }
 })
 
@@ -1026,34 +615,18 @@ router.delete('/history/all/:username', auth.verifyUser, async (req, res, next) 
 
     try {
         if (!history.username) {
-            return res.status(400).json({
-                status: 'fail',
-                code: 400,
-                message: message.user.missing_username,
-                data: null
-            })
+            onResponse(res, 'fail', 400, message.user.missing_username, null, null)
         } else {
             history = await HistoryController.delete_all(history)
-            if (history && history.length > 0) return res.status(200).json({
-                status: 'success',
-                code: 200,
-                message: message.history.delete_all,
-                data: null
-            })
-            else return res.status(404).json({
-                status: 'fail',
-                code: 404,
-                message: message.history.not_found,
-                data: null
-            })
+            if (history && history.length > 0) {
+                onResponse(res, 'success', 200, message.history.delete_all, null, null)
+            }
+            else {
+                onResponse(res, 'fail', 404, message.history.not_found, null, null)
+            }
         }
     } catch (err) {
-        return res.status(500).json({
-            status: 'fail',
-            code: 500,
-            message: err.message,
-            data: null
-        })
+        onResponse(res, 'fail', 500, err.message, null, null)
     }
 })
 
@@ -1072,41 +645,19 @@ router.delete('/history/single/:book_endpoint/:username', auth.verifyUser, async
 
     try {
         if (!history.username) {
-            return res.status(400).json({
-                status: 'fail',
-                code: 400,
-                message: message.user.missing_username,
-                data: null
-            })
+            onResponse(res, 'fail', 400, message.user.missing_username, null, null)
         } else if (!history.book_endpoint) {
-            return res.status(400).json({
-                status: 'fail',
-                code: 400,
-                message: message.book.missing_endpoint,
-                data: null
-            })
+            onResponse(res, 'fail', 400, message.book.missing_endpoint, null, null)
         } else {
             history = await HistoryController.delete(history)
-            if (history) return res.status(200).json({
-                status: 'success',
-                code: 200,
-                message: message.history.delete_success,
-                data: null
-            })
-            else return res.status(404).json({
-                status: 'fail',
-                code: 404,
-                message: message.history.not_found,
-                data: null
-            })
+            if (history) {
+                onResponse(res, 'success', 200, message.history.delete_success, null, null)
+            } else {
+                onResponse(res, 'fail', 404, message.history.not_found, null, null)
+            }
         }
     } catch (err) {
-        return res.status(500).json({
-            status: 'fail',
-            code: 500,
-            message: err.message,
-            data: null
-        })
+        onResponse(res, 'fail', 500, err.message, null, null)
     }
 })
 

@@ -7,6 +7,40 @@ const slugify = require('../middlewares/slugify')
 const message = require('../configs/messages')
 const auth = require('../middlewares/auth')
 
+function onResponse(res, status, code, message, page, data) {
+    if (page) {
+        res.status(code).json({
+            status: status,
+            code: code,
+            message: message,
+            page: Number(page),
+            data: data
+        })
+    } else {
+        res.status(code).json({
+            status: status,
+            code: code,
+            message: message,
+            data: data
+        })
+    }
+}
+
+function onCatchError(err, res) {
+    if (err.constraint) {
+        switch (err.constraint) {
+            case 'genre_pk': {
+                onResponse(res, 'fail', 400, message.genre.genre_pk, null, null)
+                break
+            }
+            default: {
+                onResponse(res, 'fail', 500, err.message, null, null)
+                break
+            }
+        }
+    } else onResponse(res, 'fail', 500, err.message, null, null)
+}
+
 /**
  * Lấy toàn bộ tag thể loại
  * @query
@@ -18,19 +52,9 @@ router.get('/all', async (req, res, next) => {
     var genres
     try {
         genres = await GenreController.list()
-        res.status(200).json({
-            status: 'success',
-            code: 200,
-            message: null,
-            data: genres
-        })
+        onResponse(res, 'success', 200, null, null, genres)
     } catch (err) {
-        res.status(500).json({
-            status: 'fail',
-            code: 500,
-            message: err.message,
-            data: null
-        })
+        onCatchError(err, res)
     }
 })
 
@@ -47,33 +71,13 @@ router.get('/detail/:endpoint', async (req, res, next) => {
     try {
         if (endpoint) {
             genre = await GenreController.get(endpoint)
-            if (genre) res.status(200).json({
-                status: 'success',
-                code: 200,
-                message: null,
-                data: [genre]
-            })
-            else res.status(404).json({
-                status: 'fail',
-                code: 404,
-                message: message.genre.not_found,
-                data: null
-            })
+            if (genre) onResponse(res, 'success', 200, null, null, [genre])
+            else onResponse(res, 'fail', 404, message.genre.not_found, null, null)
         } else {
-            res.status(400).json({
-                status: 'fail',
-                code: 400,
-                message: message.genre.missing_endpoint,
-                data: null
-            })
+            onResponse(res, 'fail', 400, message.genre.missing_endpoint, null, null)
         }
     } catch (err) {
-        res.status(500).json({
-            status: 'fail',
-            code: 500,
-            message: err.message,
-            data: null
-        })
+        onCatchError(err, res)
     }
 })
 
@@ -95,48 +99,12 @@ router.post('/', auth.verifyAdmin, slugify.get_endpoint, async (req, res, next) 
     try {
         if (genre.title) {
             genre = await GenreController.add(genre)
-            res.status(200).json({
-                status: 'success',
-                code: 200,
-                message: message.genre.add_success,
-                data: [genre]
-            })
+            onResponse(res, 'success', 200, message.genre.add_success, null, [genre])
         } else {
-            res.status(400).json({
-                status: 'fail',
-                code: 400,
-                message: message.genre.missing_title,
-                data: null
-            })
+            onResponse(res, 'fail', 400, message.genre.missing_title, null, null)
         }
     } catch (err) {
-        if (err.constraint) {
-            switch (err.constraint) {
-                case 'genre_pk': {
-                    res.status(400).json({
-                        status: 'fail',
-                        code: 400,
-                        message: message.genre.genre_pk,
-                        data: null
-                    })
-                    break
-                }
-                default: {
-                    res.status(500).json({
-                        status: 'fail',
-                        code: 500,
-                        message: err.message,
-                        data: null
-                    })
-                    break;
-                }
-            }
-        } else res.status(500).json({
-            status: 'fail',
-            code: 500,
-            message: err.message,
-            data: null
-        })
+        onCatchError(err, res)
     }
 })
 
@@ -156,46 +124,10 @@ router.patch('/:endpoint', auth.verifyAdmin, slugify.get_endpoint, async (req, r
     let endpoint = req.params.endpoint
     try {
         genre = await GenreController.update(genre, endpoint)
-        if (genre) res.status(200).json({
-            status: 'success',
-            code: 200,
-            message: message.genre.update_success,
-            data: [genre]
-        })
-        else res.status(404).json({
-            status: 'fail',
-            code: 404,
-            message: message.genre.not_found,
-            data: null
-        })
+        if (genre) onResponse(res, 'success', 200, message.genre.update_success, null, [genre])
+        else onResponse(res, 'fail', 404, message.genre.not_found, null, null)
     } catch (err) {
-        if (err.constraint) {
-            switch (err.constraint) {
-                case 'genre_pk': {
-                    res.status(400).json({
-                        status: 'fail',
-                        code: 400,
-                        message: message.genre.genre_pk,
-                        data: null
-                    })
-                    break
-                }
-                default: {
-                    res.status(500).json({
-                        status: 'fail',
-                        code: 500,
-                        message: err.message,
-                        data: null
-                    })
-                    break;
-                }
-            }
-        } else res.status(500).json({
-            status: 'fail',
-            code: 500,
-            message: err.message,
-            data: null
-        })
+        onCatchError(err, res)
     }
 })
 
@@ -211,25 +143,10 @@ router.delete('/:endpoint', auth.verifyAdmin, async (req, res, next) => {
     let endpoint = req.params.endpoint
     try {
         genre = await GenreController.delete(endpoint)
-        if (genre) res.status(200).json({
-            status: 'success',
-            code: 200,
-            message: message.genre.delete_success,
-            data: [genre]
-        })
-        else res.status(404).json({
-            status: 'fail',
-            code: 404,
-            message: message.genre.not_found,
-            data: null
-        })
+        if (genre) onResponse(res, 'success', 200, message.genre.delete_success, null, [genre])
+        else onResponse(res, 'fail', 404, message.genre.not_found, null, null)
     } catch (err) {
-        res.status(500).json({
-            status: 'fail',
-            code: 500,
-            message: err.message,
-            data: null
-        })
+        onCatchError(err, res)
     }
 })
 
