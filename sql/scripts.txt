@@ -104,22 +104,6 @@ create table if not exists "Notify"
 		primary key (endpoint, username)
 );
 
-create table if not exists "Report"
-(
-	endpoint varchar(255) not null,
-	type char not null
-		constraint type_constraint
-			check (type = ANY ('{A,C}'::character(1)[])),
-	num integer default 0 not null,
-	reason text not null,
-	time timestamp default timezone('GMT+7'::text, LOCALTIMESTAMP) not null,
-	status smallint default 0 not null
-		constraint status_constraint
-			check (status = ANY ('{0,1}'::smallint[])),
-	constraint report_pk
-		primary key (endpoint, type)
-);
-
 create table if not exists "Token"
 (
 	token text not null

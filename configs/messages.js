@@ -42,19 +42,6 @@ module.exports = {
         chapter_pk: 'Chapter bị trùng',
         book_fk: 'Sách này không tồn tại'
     },
-    report: {
-        add_success: 'Thêm thành công',
-        update_success: 'Cập nhật thành công',
-        delete_success: 'Xóa thành công',
-        missing_endpoint: 'Thiếu endpoint',
-        missing_type: 'Thiếu loại report',
-        missing_reason: 'Thiếu lí do',
-        missing_status: 'Thiếu status',
-        not_found: 'Không tìm thấy report',
-        report_pk: 'Report này đã tồn tại',
-        type_constraint: 'Loại report chỉ có thể là "A": report account hoặc "C": report comment',
-        status_constraint: 'Trạng thái của report là 0: chưa xử lí hoặc 1: đã xử lí'
-    },
     notify: {
         add_success: 'Thêm thành công',
         update_success: 'Cập nhật thành công',
