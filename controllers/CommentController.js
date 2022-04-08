@@ -47,7 +47,7 @@ db.add = (comment) => {
             num += 1
             params.push(comment.files)
         }
-        query += ') returning id, id_root, endpoint, content, time, files'
+        query += `) returning id, id_root, endpoint, content, to_char(time, 'DD-MM-YYYY hh:mm:ss') as time, files`
 
         conn.query(query, params, (err, res) => {
             if (err) return reject(err)
@@ -79,7 +79,7 @@ db.update = (comment) => {
             params.push(comment.id_root)
         }
 
-        query += ' where id = $' + num + ' returning *'
+        query += ' where id = $' + num + ` returning id, id_root, endpoint, content, to_char(time, 'DD-MM-YYYY hh:mm:ss') as time, files`
         params.push(comment.id)
 
         conn.query(query, params, (err, res) => {
@@ -91,7 +91,7 @@ db.update = (comment) => {
 
 db.delete = (id) => {
     return new Promise((resolve, reject) => {
-        let query = 'delete from "Comment" where id = $1 returning *'
+        let query = `delete from "Comment" where id = $1 returning id, id_root, username, endpoint, content, to_char(time, 'DD-MM-YYYY hh:mm:ss') as time, files`
 
         var params = [id]
 

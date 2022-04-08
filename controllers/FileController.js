@@ -84,6 +84,12 @@ f.upload_multi_with_index = (files, path) => {
     return new Promise((resolve, reject) => {
         var urls = []
         var count = 0
+
+        if (!files || files.length == 0) {
+            resolve(urls)
+            return
+        }
+
         files.forEach((file, index, array) => {
             var blob = firebase.bucket.file(path + index + getFileType(file))
             let uuid = uuidv4()
@@ -97,7 +103,12 @@ f.upload_multi_with_index = (files, path) => {
                 }
             })
 
-            blobWriter.on('error', (ignored) => {})
+            blobWriter.on('error', (ignored) => {
+                count += 1
+                if (count == array.length) {
+                    resolve(urls)
+                }
+            })
 
             blobWriter.on('finish', () => {
                 urls.push(getDonwloadURL(path + index + getFileType(file), uuid))

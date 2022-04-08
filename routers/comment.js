@@ -77,7 +77,7 @@ router.get('/:endpoint', async (req, res, next) => {
         var result = await CommentController.list(endpoint, page)
         result.forEach(e => {
             comments.push({
-                id: e.id,
+                id: Number(e.id),
                 id_root: e.id_root,
                 endpoint: e.endpoint,
                 content: e.content,
@@ -115,7 +115,7 @@ router.get('/detail/:id', async (req, res, next) => {
         result.forEach((e, index, array) => {
             if (index != array.length - 1) {
                 replies.push({
-                    id: e.id,
+                    id: Number(e.id),
                     id_root: e.id_root,
                     endpoint: e.endpoint,
                     content: e.content,
@@ -128,6 +128,7 @@ router.get('/detail/:id', async (req, res, next) => {
                 })
             } else {
                 comment = e
+                comment.id = Number(e.id)
             }
         })
         if (comment) comment.replies = replies
@@ -159,16 +160,16 @@ router.post('/:book_endpoint/:username', auth.verifyUser, upload.any('file'), as
         } else if (!comment.content) {
             onResponse(res, 'fail', 400,  message.comment.missing_content, null, null)
         } else {
-            comment = await CommentController.add(comment)
+            comment = await CommentController.add(comment)            
+            comment.files = await FileController.upload_multi_with_index(req.files, 
+                'comment/' + comment.id + '/')
+            if (comment.id_root === null) comment.id_root = comment.id
+            comment = await CommentController.update(comment)
             var user = await UserController.get(req.params.username)
             comment.user = {
                 username: user.username,
                 avatar: user.avatar
             }
-            comment.files = await FileController.upload_multi_with_index(req.files, 
-                'comment/' + comment.id + '/')
-            if (comment.id_root === null) comment.id_root = comment.id
-            comment = await CommentController.update(comment)
             let tags = comment.content.match(/@[a-zA-Z0-9]+/g)
             if (tags) tags.forEach(async (tag) => {
                 var arr = tag.split('@')
