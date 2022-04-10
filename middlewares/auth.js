@@ -1,35 +1,21 @@
 const jwt = require('jsonwebtoken')
 
 const message = require('../configs/messages')
+const utils = require('../utils/utils')
 
 const auth = {}
 
 auth.verifyUser = (req, res, next) => {
     const authHeader = req.headers['authorization']
-    // if (!authHeader || !authHeader.split(' ')[1]) return res.sendStatus(401)
     const token = authHeader && authHeader.split(' ')[1]
-    if (token == null) return res.status(401).json({
-        status: 'fail',
-        code: 401,
-        message: message.auth.unauthorized,
-        data: null
-    })
+    if (token == null) return utils.onResponse(res, 'fail', 401, message.auth.unauthorized, null, null)
 
     jwt.verify(token, process.env.ACCESSTOKEN, (err, ress) => {
-        if (err) return res.status(400).json({
-            status: 'fail',
-            code: 400,
-            message: message.auth.token_invalid,
-            data: null
-        })
+        if (err) return utils.onResponse(res, 'fail', 400, message.auth.token_invalid, null, null) 
         var user = ress.user
-        if (req.params.username && req.params.username != user.username) 
-            return res.status(403).json({
-                status: 'fail',
-                code: 403,
-                message: message.auth.forbidden,
-                data: null
-            })
+        if (isUser(user) && user.role < 0) 
+            return utils.onResponse(res, 'fail', 403, message.auth.forbidden, null, null) 
+            
         req.user = user
         next()
     })
@@ -37,33 +23,21 @@ auth.verifyUser = (req, res, next) => {
 
 auth.verifyAdmin = (req, res, next) => {
     const authHeader = req.headers['authorization']
-    // if (!authHeader || !authHeader.split(' ')[1]) return res.sendStatus(401)
     const token = authHeader && authHeader.split(' ')[1]
-    if (token == null) return res.status(401).json({
-        status: 'fail',
-        code: 401,
-        message: message.auth.unauthorized,
-        data: null
-    })
+    if (token == null) return utils.onResponse(res, 'fail', 401, message.auth.unauthorized, null, null)
 
     jwt.verify(token, process.env.ACCESSTOKEN, (err, ress) => {
-        if (err) return res.status(400).json({
-            status: 'fail',
-            code: 400,
-            message: message.auth.token_invalid,
-            data: null
-        })
+        if (err) return utils.onResponse(res, 'fail', 400, message.auth.token_invalid, null, null) 
         var user = ress.user
-        if (user.role < 1) 
-            return res.status(403).json({
-                status: 'fail',
-                code: 403,
-                message: message.auth.forbidden,
-                data: null
-            })
+        if (isUser(user) && user.role < 1) 
+            return utils.onResponse(res, 'fail', 403, message.auth.forbidden, null, null) 
         req.user = user
         next()
     })
+}
+
+function isUser(user) {
+    return user.username && user.role
 }
 
 module.exports = auth

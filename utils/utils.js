@@ -13,5 +13,30 @@ module.exports = {
         }catch(e){
             return null
         }
+    },
+    parseQueryParamObjToJson(obj) {
+        try {
+            return JSON.parse(obj)
+        } catch (ignored) {
+            return {}
+        }
+    },
+    onResponse(res, status, code, message, page, data) {
+        if (page) {
+            res.status(code).json({
+                status: status,
+                code: code,
+                message: message,
+                page: Number(page),
+                data: data
+            })
+        } else {
+            res.status(code).json({
+                status: status,
+                code: code,
+                message: message,
+                data: data
+            })
+        }
     }
 }
