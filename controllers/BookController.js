@@ -1,4 +1,5 @@
 const BookModule = require('../modules/BookModule')
+const NotifyModule = require('../modules/NotifyModule')
 const FileModule = require('../modules/FileModule')
 const utils = require('../utils/utils')
 const constants = require('../configs/constants')
@@ -251,7 +252,7 @@ book.finishBook = async (req, res, next) => {
                     username: user.username,
                     content: message.notify.book_finish_notification
                 }
-                NotifyController.add(notify)
+                NotifyModule.add(notify)
             })
             next({data: [book], message: message.book.update_success})
         } else next(new Err(message.book.not_found, 404))
