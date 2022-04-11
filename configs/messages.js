@@ -96,6 +96,7 @@ module.exports = {
         missing_email: 'Thiếu email',
         missing_status: 'Thiếu status',
         missing_role: 'Thiếu role',
+        avatar_invalid: 'Ảnh đại diện không đúng định dạng',
         incorrect_account: 'Username và password không trùng khớp',
         email_exist: 'Email đã được sử dụng',
         email_veified: 'Email đã được xác minh',

@@ -2,6 +2,18 @@ const conn = require('../connection')
 
 const chapter = {}
 
+chapter.get = (book_endpoint, chapter_endpoint) => {
+    return new Promise((resolve, reject) => {
+        let params = [book_endpoint, chapter_endpoint]
+        let query = `select chapter_endpoint, book_endpoint, title, to_char(time, 'DD-MM-YYYY hh:mm:ss') as time from "Chapter" where book_endpoint = $1 and chapter_endpoint = $2`
+
+        conn.query(query, params, (err, res) => {
+            if(err) return reject(err)
+            else return resolve(res.rows[0])
+        })
+    })
+}
+
 chapter.get_detail = (book_endpoint, chapter_endpoint) => {
     return new Promise((resolve, reject) => {
         let query = `select *, to_char(time, 'DD-MM-YYYY hh:mm:ss') as time from "Chapter" where chapter_endpoint = $2 and book_endpoint = $1`

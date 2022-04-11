@@ -2,6 +2,12 @@ const jwt = require('jsonwebtoken')
 
 module.exports = {
     generateAccessToken: (user) => {
+        /**
+             * ... jwt.sign(user, ...
+             * ERROR: Expected \"payload\" to be a plain object.
+             * SOLVE: change oject user to json 
+             * ... jwt.sign({user}, ...
+             */
         return jwt.sign({user}, process.env.ACCESSTOKEN, { expiresIn: '365d'})
     },
     generateRefreshToken: (user) => {

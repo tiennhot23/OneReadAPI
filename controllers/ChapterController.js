@@ -1,7 +1,7 @@
 const ChapterModule = require('../modules/ChapterModule')
 const UserModule = require('../modules/UserModule')
 const HistoryModule = require('../modules/HistoryModule')
-// const NotifyModule = require('../modules/NotifyModule')
+const NotifyModule = require('../modules/NotifyModule')
 const BookModule = require('../modules/BookModule')
 const FileModule = require('../modules/FileModule')
 const message = require('../configs/messages')
@@ -81,10 +81,7 @@ chapter.getDetailChapter = async (req, res, next) => {
 
             next({data: [chapter]})
         } else next(new Err(message.chapter.not_found, 404))
-    } catch (e) {
-        if (e.constraint == 'notify_pk') next({data: [chapter]})
-        else next(new Err(e.message, 500))
-    }
+    } catch (e) {next(new Err(e.message, 500))}
 }
 
 
@@ -94,7 +91,7 @@ chapter.addChapter = async (req, res, next) => {
         book_endpoint: req.params.book_endpoint,
         title: req.body.title
     }
-    
+    var isSendData = false
     try {
         if (!await BookModule.get(chapter.book_endpoint)) return next(new Err(message.book.not_found, 404))
         else if (!chapter.title) return next(new Err(message.chapter.missing_title, 400))
@@ -108,16 +105,18 @@ chapter.addChapter = async (req, res, next) => {
         var followers = await BookModule.get_user_follow(chapter.book_endpoint)
         followers.forEach(async (user) => {
             let notify = {
-                endpoint: `*chapter*${chapter.book_endpoint}*${chapter.chapter_endpoint}`,
+                endpoint: `+chapter+${chapter.book_endpoint}+${chapter.chapter_endpoint}`,
                 username: user.username,
                 content: message.notify.new_chapter_notification
             }
-            NotifyController.add(notify)
+            NotifyModule.add(notify)
         })
+        isSendData = true
         next({data: [chapter], message: message.chapter.add_success})
     } catch (e) {
-        if (e.constraint == 'notify_pk') next({data: [chapter], message: message.chapter.add_success})
-        else next(new Err(e.message, 500))
+        if (e.constraint == 'notify_pk' && !isSendData) 
+            return next({data: [chapter], message: message.chapter.add_success})
+        next(new Err(e.message, 500))
     }
 }
 

@@ -4,12 +4,13 @@ const history = {}
 
 history.get = (history) => {
     return new Promise((resolve, reject) => {
-        let query = `select c.title as chapter_title,b.*
-        from "Chapter" c, (select b.*, book_endpoint, chapter_endpoint, to_char(time, 'DD-MM-YYYY hh:mm:ss') as time
-        from "Book" b,
-        (select * from "History" where book_endpoint = $1 and username = $2 order by time desc) h
-        where b.endpoint = h.book_endpoint) b
-        where c.book_endpoint = b.book_endpoint and c.chapter_endpoint = b.chapter_endpoint`
+        let query = `select * from "History" where book_endpoint = $1 and username = $2`
+        // let query = `select c.title as chapter_title,b.*
+        // from "Chapter" c, (select b.*, book_endpoint, chapter_endpoint, to_char(time, 'DD-MM-YYYY hh:mm:ss') as time
+        // from "Book" b,
+        // (select * from "History" where book_endpoint = $1 and username = $2 order by time desc) h
+        // where b.endpoint = h.book_endpoint) b
+        // where c.book_endpoint = b.book_endpoint and c.chapter_endpoint = b.chapter_endpoint`
 
         var params = [history.book_endpoint, history.username]
         conn.query(query, params, (err, res) => {

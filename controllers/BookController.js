@@ -1,5 +1,6 @@
 const BookModule = require('../modules/BookModule')
 const NotifyModule = require('../modules/NotifyModule')
+const GenreModule = require('../modules/GenreModule')
 const FileModule = require('../modules/FileModule')
 const utils = require('../utils/utils')
 const constants = require('../configs/constants')
@@ -192,11 +193,11 @@ book.addBook = async (req, res) => {
         if (genres) {
             let bookgenre = await BookModule.add_book_genres(book.endpoint, genres)
             bookgenre.forEach(async bg => {
-                book.genres.push(await GenreController.get(bg.genre_endpoint))
+                book.genres.push(await GenreModule.get(bg.genre_endpoint))
             })
         }
 
-        await BookController.add_view(book.endpoint, new Date().toISOString().slice(0, 10))
+        await BookModule.add_view(book.endpoint, new Date().toISOString().slice(0, 10))
         
         next({data: [book], message: message.book.add_success})
     } catch (e) {next(new Err(e.message, 500))}
@@ -229,15 +230,16 @@ book.updateBook = async (req, res, next) => {
             await BookModule.delete_all_genres(req.params.endpoint)
             let bookgenre = await BookModule.add_book_genres(book.endpoint, genres)
             bookgenre.forEach(async bg => {
-                book.genres.push(await GenreController.get(bg.genre_endpoint))
+                book.genres.push(await GenreModule.get(bg.genre_endpoint))
             })
         }
         next({data: [book], message: message.book.update_success})
-    } catch (e) {next(e.message, 500)}
+    } catch (e) {next(new Err(e.message, 500))}
 }
 
 book.finishBook = async (req, res, next) => {
     var book
+    var isSendData = false
     try {
         var book = await BookModule.update_info({
             status: 1,
@@ -254,11 +256,13 @@ book.finishBook = async (req, res, next) => {
                 }
                 NotifyModule.add(notify)
             })
+            isSendData = true
             next({data: [book], message: message.book.update_success})
         } else next(new Err(message.book.not_found, 404))
     } catch (e) {
-        if (e.constraint == 'notify_pk') next({data: [book]})
-        else next(new Err(e.message, 500))
+        if (e.constraint == 'notify_pk' && !isSendData) 
+            return next({data: [book], message: message.book.update_success})
+        next(new Err(e.message, 500))
     }
 }
 
@@ -280,20 +284,16 @@ book.rateBook = async (req, res, next) => {
             
             next({data: [book], message: message.book.update_success})
         } else next(new Err(message.book.not_found, 404))
-    } catch (err) {
-        onCatchError(err, res)
-    }
+    } catch (e) {next(new Err(e.message, 500))}
 }
 
 
 book.deleteBook = async (req, res, next) => {
     try {
-        var book = await BookController.delete(req.params.endpoint)
+        var book = await BookModule.delete(req.params.endpoint)
         if (book) next ({data: [book], message: message.book.delete_success})
         else next(new Err(message.book.not_found, 404))
-    } catch (e) {
-        next(new Err(e.message, 500))
-    }
+    } catch (e) {next(new Err(e.message, 500))}
 }
 
 module.exports = book;
