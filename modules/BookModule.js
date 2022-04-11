@@ -149,7 +149,7 @@ book.get_top_day = () => {
         */
 
         // TOP VIEW DAY FAKE
-        let query = `select b.*, view from (select bv.book_endpoint, sum(bv.view) as view from "BookViews" bv,
+        let query = `select b.* from (select bv.book_endpoint, sum(bv.view) as view from "BookViews" bv,
         (select book_endpoint, max(time) as time from "BookViews"
         group by book_endpoint order by time desc limit 10) b
         where bv.book_endpoint = b.book_endpoint and bv.time = b.time
@@ -175,7 +175,7 @@ book.get_top_month = () => {
         */
 
         //TOP VIEW MONTH FAKE
-        let query = `select b.*, view from (select bv.book_endpoint, sum(bv.view) as view from "BookViews" bv,
+        let query = `select b.* from (select bv.book_endpoint, sum(bv.view) as view from "BookViews" bv,
         (select book_endpoint, max(time) as time from "BookViews"
         group by book_endpoint order by time desc limit 10) b
         where bv.book_endpoint = b.book_endpoint and date_part('month', bv.time) = date_part('month', b.time) and date_part('year', bv.time) = date_part('year', b.time)
@@ -201,7 +201,7 @@ book.get_top_year = () => {
         */
 
         //TOP VIEW YEAR FAKE
-        let query = `select b.*, view from (select book_endpoint, sum(view) as view, max(time) as time from "BookViews"
+        let query = `select b.* from (select book_endpoint, sum(view) as view, max(time) as time from "BookViews"
         group by book_endpoint order by time desc limit 10) as v, "Book" b
         where v.book_endpoint = b.endpoint
         order by view desc`
@@ -215,7 +215,7 @@ book.get_top_year = () => {
 
 book.get_top_follow = () => {
     return new Promise((resolve, reject) => {
-        let query = `select b.*, count from (select book_endpoint, count(username) as count from "BookFollows"
+        let query = `select b.* from (select book_endpoint, count(username) as count from "BookFollows"
         group by book_endpoint limit 10) as v, "Book" b
         where v.book_endpoint = b.endpoint
         order by count desc`
