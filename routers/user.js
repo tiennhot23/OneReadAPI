@@ -3,6 +3,7 @@ const multer = require('multer')
 
 const UserController = require('../controllers/UserController')
 const auth = require('../middlewares/auth')
+const encrypt = require('../middlewares/encrypt')
 const { memoryStorage } = require('multer')
 
 const router = express.Router()

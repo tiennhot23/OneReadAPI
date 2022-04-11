@@ -2,7 +2,7 @@ const express = require('express')
 const multer = require('multer')
 
 const message = require('../configs/messages')
-const FileController = require('../controllers/FileController')
+const FileModule = require('../modules/FileModule')
 
 const router = express.Router()
 const upload = multer({
@@ -19,7 +19,7 @@ router.post('/upload/single', upload.any('file'), async (req, res, next) => {
         })
     }
 
-    const url = await FileController.upload_single(req.files[0], '')
+    const url = await FileModule.upload_single(req.files[0], '')
 
     res.send(url)
 })

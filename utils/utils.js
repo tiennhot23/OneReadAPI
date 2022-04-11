@@ -32,7 +32,7 @@ module.exports = {
             res.status(code).json({
                 status: status,
                 code: code,
-                message: message,
+                message: message || '',
                 page: Number(page),
                 data: data
             })
@@ -40,7 +40,7 @@ module.exports = {
             res.status(code).json({
                 status: status,
                 code: code,
-                message: message,
+                message: message || '',
                 data: data
             })
         }

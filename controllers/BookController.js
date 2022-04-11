@@ -220,9 +220,9 @@ book.updateBook = async (req, res, next) => {
                 'book/' + book.endpoint + '/', 'theme')
         }
 
-        book = await BookModule.update_info(book, endpoint)
-        book.view = (await BookModule.get_view_all(endpoint)).length
-        book.follow = (await BookModule.get_user_follow(endpoint)).length
+        book = await BookModule.update_info(book, req.params.endpoint)
+        book.view = (await BookModule.get_view_all(req.params.endpoint)).length
+        book.follow = (await BookModule.get_user_follow(req.params.endpoint)).length
         book.genres = []
 
         let genres = Array.isArray(req.body.genres) ? req.body.genres : (req.body.genres) ? [req.body.genres] : null

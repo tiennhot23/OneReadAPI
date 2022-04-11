@@ -2,7 +2,7 @@ const express = require('express')
 const multer = require('multer')
 
 const CommentController = require('../controllers/CommentController')
-const message = require('../configs/messages')
+const auth = require('../middlewares/auth')
 const { memoryStorage } = require('multer')
 
 const router = express.Router()

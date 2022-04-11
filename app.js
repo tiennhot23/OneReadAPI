@@ -1,14 +1,14 @@
 const express = require('express')
 const cors = require('cors')
 
-// const conn = require('./connection')
-// const genre = require('./routers/genre')
+
+const genre = require('./routers/genre')
 const book = require('./routers/book')
-// const user = require('./routers/user')
+const user = require('./routers/user')
 // const notify = require('./routers/notify')
-// const comment = require('./routers/comment')
+const comment = require('./routers/comment')
 const chapter = require('./routers/chapter')
-// const upload = require('./routers/upload')
+const upload = require('./routers/upload')
 
 require('dotenv').config()
 
@@ -33,12 +33,12 @@ process.env.TZ = 'Asia/Ho_Chi_Minh'
 
 
 app.use('/book', book)
-// app.use('/genre', genre)
-// app.use('/user', user)
+app.use('/genre', genre)
+app.use('/user', user)
 // app.use('/notify', notify)
-// app.use('/comment', comment)
+app.use('/comment', comment)
 app.use('/chapter', chapter)
-// app.use('/file', upload)
+app.use('/file', upload)
 app.use('/', (req, res, next) => {
     res.json({message: 'ONE'})
 })

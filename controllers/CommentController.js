@@ -2,9 +2,7 @@ const CommentModule = require('../modules/CommentModule')
 const BookModule = require('../modules/BookModule')
 const NotifyModule = require('../modules/NotifyModule')
 const FileModule = require('../modules/FileModule')
-const UserModule = require('../modules/UserModule')
 const message = require('../configs/messages')
-const constants = require('../configs/constants')
 const utils = require('../utils/utils')
 
 const comment = {}
