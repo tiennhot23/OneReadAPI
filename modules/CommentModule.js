@@ -5,7 +5,7 @@ const db = {}
 
 db.get = (id, page) => {
     return new Promise((resolve, reject) => {
-        let query = `select id, a.avatar, c.username, book_endpoint, id_root, content, files, to_char(time, 'DD-MM-YYYY hh:mm:ss') as time from "Comment" c, "Account" a where (id = $1 or id_root = $1) and c.username = a.username order by id desc`
+        let query = `select id, a.avatar, a.username, a.status, a.email, a.role, book_endpoint, id_root, content, files, to_char(time, 'DD-MM-YYYY hh:mm:ss') as time from "Comment" c, "Account" a where (id = $1 or id_root = $1) and c.username = a.username order by id desc`
         query += ' limit ' + constants.limit_element + ' offset ' + (constants.limit_element * (page - 1))
         var params = [id]
         conn.query(query, params, (err, res) => {
@@ -17,7 +17,7 @@ db.get = (id, page) => {
 
 db.get_all = (book_endpoint, page) => {
     return new Promise((resolve, reject) => {
-        let query = `select id, a.avatar, c.username, book_endpoint, id_root, content, files, to_char(time, 'DD-MM-YYYY hh:mm:ss') as time 
+        let query = `select id, a.avatar, a.username, a.status, a.email, a.role, book_endpoint, id_root, content, files, to_char(time, 'DD-MM-YYYY hh:mm:ss') as time 
         from "Comment" c, "Account" a where book_endpoint = $1 and id_root = id and c.username = a.username order by id desc`
         query += ' limit ' + constants.limit_element + ' offset ' + (constants.limit_element * (page - 1))
         let params = [book_endpoint]
