@@ -103,7 +103,7 @@ chapter.addChapter = async (req, res, next) => {
         chapter = await ChapterModule.add(chapter)
         
         var followers = await BookModule.get_user_follow(chapter.book_endpoint)
-        followers.forEach(async (user) => {
+        followers.forEach(user => {
             let notify = {
                 endpoint: `+chapter+${chapter.book_endpoint}+${chapter.chapter_endpoint}`,
                 username: user.username,

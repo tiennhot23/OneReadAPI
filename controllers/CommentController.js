@@ -145,7 +145,7 @@ comment.addComment = async (req, res, next) => {
             role: Number(req.user.role)
         }
         let tags = comment.content.match(/@[a-zA-Z0-9]+/g)
-        if (tags) tags.forEach(async (tag) => {
+        if (tags) tags.forEach(tag => {
             var arr = tag.split('@')
             tag = arr[arr.length - 1]
             if (tag) {

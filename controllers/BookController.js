@@ -139,7 +139,7 @@ book.getlastUpdate = async (req, res, next) => {
 
 book.getRelateBook = async (req, res, next) => {
     try {
-        if ((await BookModule.get(req.params.endpoint)).length == 0) return next(new Err(message.book.not_found, 404))
+        if (!await BookModule.get(req.params.endpoint)) return next(new Err(message.book.not_found, 404))
         next({
             data: await BookModule.get_relate_book(req.params.endpoint)
         })
@@ -148,7 +148,7 @@ book.getRelateBook = async (req, res, next) => {
 
 book.getBookFollower = async (req, res, next) => {
     try {
-        if ((await BookModule.get(req.params.endpoint)).length == 0) return next(new Err(message.book.not_found, 404))
+        if (!await BookModule.get(req.params.endpoint)) return next(new Err(message.book.not_found, 404))
         next({
             data: await BookModule.get_user_follow(req.params.endpoint)
         })
@@ -165,11 +165,11 @@ book.getDetailBook = async (req, res, next) => {
         }, req.params.endpoint)
         next({data: [book]})
     } catch (e) {next(new Err(e.message, 500))}
-}
+}   
 
 
 
-book.addBook = async (req, res) => {
+book.addBook = async (req, res, next) => {
     var book = req.body
     try {
         if (!book.title) return next(new Err(message.book.missing_title, 400))
@@ -192,9 +192,9 @@ book.addBook = async (req, res) => {
         let genres = Array.isArray(req.body.genres) ? req.body.genres : (req.body.genres) ? [req.body.genres] : null
         if (genres) {
             let bookgenre = await BookModule.add_book_genres(book.endpoint, genres)
-            bookgenre.forEach(async bg => {
+            for (bg of bookgenre) {
                 book.genres.push(await GenreModule.get(bg.genre_endpoint))
-            })
+            }
         }
 
         await BookModule.add_view(book.endpoint, new Date().toISOString().slice(0, 10))
@@ -206,8 +206,9 @@ book.addBook = async (req, res) => {
 
 book.updateBook = async (req, res, next) => {
     var book = req.body
+    book.endpoint = req.params.endpoint
     try {
-        if ((await BookModule.get(req.params.endpoint)).length == 0) return next(new Err(message.book.not_found, 404))
+        if (!await BookModule.get(req.params.endpoint)) return next(new Err(message.book.not_found, 404))
 
         if (req.files['thumb']) {
             if (!req.files['thumb'][0]['mimetype'].includes('image')) return next(new Err(message.book.thumb_invalid, 400))
@@ -229,9 +230,9 @@ book.updateBook = async (req, res, next) => {
         if (genres) {
             await BookModule.delete_all_genres(req.params.endpoint)
             let bookgenre = await BookModule.add_book_genres(book.endpoint, genres)
-            bookgenre.forEach(async bg => {
+            for (bg of bookgenre) {
                 book.genres.push(await GenreModule.get(bg.genre_endpoint))
-            })
+            }
         }
         next({data: [book], message: message.book.update_success})
     } catch (e) {next(new Err(e.message, 500))}
@@ -248,7 +249,7 @@ book.finishBook = async (req, res, next) => {
             book = await BookModule.get_detail(req.params.endpoint)
 
             var followers = await BookModule.get_user_follow(book.endpoint)
-            followers.forEach(async (user) => {
+            followers.forEach(user => {
                 let notify = {
                     endpoint: `+book+${book.endpoint}`,
                     username: user.username,
@@ -276,10 +277,12 @@ book.rateBook = async (req, res, next) => {
         if (book) {
             rating = Math.max(rating, 3.5)
             rating = ((book.rating * (book.rate_count - 1)) + rating) / book.rate_count
-            rating = book.rating.toFixed(1)
+            rating = rating.toFixed(1)
+            book.rating = Number(rating)
+            book.rate_count = Math.min(book.rate_count + 1, constants.max_int)
             await BookModule.update_info({
-                rating: rating,
-                rate_count: Math.min(book.rate_count + 1, constants.max_int)
+                rating: book.rating,
+                rate_count: book.rate_count
             }, req.params.endpoint)
             
             next({data: [book], message: message.book.update_success})
