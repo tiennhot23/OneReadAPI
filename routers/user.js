@@ -47,6 +47,9 @@ router.patch('/change-role/:username', auth.verifyAdmin, UserController.updateRo
 
 router.patch('/change-password', auth.verifyUser, encrypt.hash, UserController.updatePassword, UserController.onGetResult)
 
+
+
+
 router.delete('/', auth.verifyUser, UserController.deleteUser, UserController.onGetResult)
 
 router.delete('/history/all', auth.verifyUser, UserController.deleteAllHistoryRead, UserController.onGetResult)

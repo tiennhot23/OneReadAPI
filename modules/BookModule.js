@@ -288,8 +288,10 @@ book.get_detail = (endpoint) => {
         conn.query(query, params, (err, res) => {
             if (err) return reject(err)
             var book = res.rows[0]
-            book.follow = Number(book.follow)
-            book.view = Number(book.view)
+            if (book) {
+                book.follow = Number(book.follow)
+                book.view = Number(book.view)
+            }
             return resolve(book)
         })
     })

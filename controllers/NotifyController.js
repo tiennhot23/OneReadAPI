@@ -1,67 +1,97 @@
-const conn = require('../connection')
+const GenreModule = require('../modules/GenreModule')
+const CommentModule = require('../modules/CommentModule')
+const BookModule = require('../modules/BookModule')
+const NotifyModule = require('../modules/NotifyModule')
+const FileModule = require('../modules/FileModule')
+const UserModule = require('../modules/UserModule')
+const message = require('../configs/messages')
 const constants = require('../configs/constants')
+const utils = require('../utils/utils')
 
-const db = {}
 
-db.get = (endpoint, username) => {
-    return new Promise((resolve, reject) => {
-        let query = `update "Notify" set status = 1 where endpoint = $1 and username = $2 returning *, , to_char(time, 'DD-MM-YYYY hh:mm:ss') as time`
+const notify = {}
 
-        var params = [endpoint, username]
-        conn.query(query, params, (err, res) => {
-            if (err) return reject(err)
-            else return resolve(res.rows[0])
-        })
-    })
+class Err extends Error {
+    constructor(message, code) {
+      super(message);
+      this.message = message;
+      this.code = code;
+    }
 }
 
-db.list = (username, page) => {
-    return new Promise((resolve, reject) => {
-        let query = `select *, to_char(time, 'DD-MM-YYYY hh:mm:ss') as time from "Notify" where username = $1 order by time desc`
-        query += ' limit ' + constants.limit_element + ' offset ' + (constants.limit_element * (page - 1))
-        var params = [username]
-        conn.query(query, params, (err, res) => {
-            if(err) return reject(err)
-            else return resolve(res.rows)
-        })
-    })
+function onCatchError(err, res) {
+    if (err.constraint) {
+        switch (err.constraint) {
+            case 'notify_pk': {
+                onResponse(res, 'fail', 400, message.notify.notify_pk, null, null)
+                break
+            }
+            case 'username_fk': {
+                onResponse(res, 'fail', 400, message.notify.username_fk, null, null)
+                break
+            }
+            case 'status_constraint': {
+                onResponse(res, 'fail', 400, message.notify.status_constraint, null, null)
+                break
+            }
+            default: {
+                onResponse(res, 'fail', 500, err.message, null, null)
+                break
+            }
+        }
+    } else onResponse(res, 'fail', 500, err.message, null, null)
 }
 
-db.add = (notify) => {
-    return new Promise((resolve, reject) => {
-        let query = 'insert into "Notify" (endpoint, username, content) values ($1, $2, $3) returning *'
-
-        var params = [notify.endpoint, notify.username, notify.content]
-
-        conn.query(query, params, (err, res) => {
-            if (err) return reject(err)
-            else return resolve(res.rows[0])
-        })
-    })
+notify.onGetResult = (data, req, res, next) => {
+    if (data instanceof Error) {
+        onCatchError(data, res)
+    } else {
+        utils.onResponse(res, 'success', 200, data.message, data.page, data.data)
+    }
 }
 
-db.delete = (endpoint, username) => {
-    return new Promise((resolve, reject) => {
-        let query = 'delete from "Notify" where endpoint = $1 and username = $2 returning *'
-
-        var params = [endpoint, username]
-
-        conn.query(query, params, (err, res) => {
-            if (err) return reject(err)
-            else return resolve(res.rows[0])
-        })
-    })
+notify.getAllNotification = async (req, res, next) => {
+    var page = req.query.page
+    if (!page) page = 1
+    var user = req.user
+    try {
+        next({data: await NotifyModule.get_all(user.username, page)})
+    } catch(e) {next(new Err(e.message, 500))}
 }
 
-db.deleteRead = () => {
-    return new Promise((resolve, reject) => {
-        let query = 'delete from "Notify" where status = 1 returning *'
-
-        conn.query(query, (err, res) => {
-            if (err) return reject(err)
-            else return resolve(res.rows[0])
-        })
-    })
+notify.readNotification = async (req, res, next) => {
+    try {
+        var notify = await NotifyModule.get(req.params.endpoint, req.user.username)
+        if (notify) next({data: [notify]})
+        else next(new Err(message.notify.not_found, 404))
+    } catch(e) {next(new Err(e.message, 500))}
 }
 
-module.exports = db;
+notify.addNotification =  async (req, res, next) => {
+    var notify = req.body
+    try {
+        if (!notify.endpoint) return next(new Err(message.notify.missing_endpoint, 400))
+        else if (!notify.username) return next(new Err(message.notify.missing_username, 400))
+        else if (!notify.content) return next(new Err(message.notify.missing_content, 400))
+        notify = await NotifyModule.add(notify)
+        next({data: [notify], message: message.notify.add_success})
+    } catch(e) {next(new Err(e.message, 500))}
+}
+
+notify.deleteAllRead =  async (req, res, next) => {
+    try {
+        next({data: await NotifyModule.deleteRead(), message: message.notify.delete_success})
+    } catch(e) {next(new Err(e.message, 500))}
+}
+
+notify.deleteOne = async (req, res, next) => {
+    try {
+        var notify = await NotifyController.delete(req.params.endpoint, req.user.username)
+        if (notify) next({data: [notify], message: message.notify.delete_success})
+        else next(new Err(message.notify.not_found, 404))
+    } catch(e) {next(new Err(e.message, 500))}
+}
+
+
+
+module.exports = notify
