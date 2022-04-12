@@ -11,11 +11,11 @@ const upload = multer({
     storage: memoryStorage()
 })
 
-router.get('/verify-email', auth.verifyUser, UserController.verifyEmail, UserController.onGetResult)
+router.get('/verify-email', UserController.verifyEmail, UserController.onGetResult)
 
 router.get('/info/:username', UserController.get, UserController.onGetResult)
 
-router.get('/book-following/', auth.verifyUser, UserController.getBookFollowing, UserController.onGetResult)
+router.get('/book-following', auth.verifyUser, UserController.getBookFollowing, UserController.onGetResult)
 
 router.get('/comment-history/:username', auth.verifyAdmin, UserController.getCommentHistory, UserController.onGetResult)
 

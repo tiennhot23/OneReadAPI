@@ -92,7 +92,7 @@ user.get_book_following = (username) => {
 user.get_comment_history = (username) => {
     return new Promise((resolve, reject) => {
         let params = [username]
-        let query = `select id, a.avatar, c.username, book_endpoint, id_root, content, files, to_char(time, 'DD-MM-YYYY hh:mm:ss') as time from "Comment" c, "Account" a where c.username = $1 and c.username = a.username order by id desc`
+        let query = `select id, a.avatar, a.username, a.status, a.email, a.role, book_endpoint, id_root, content, files, to_char(time, 'DD-MM-YYYY hh:mm:ss') as time from "Comment" c, "Account" a where c.username = $1 and c.username = a.username order by id desc`
         conn.query(query, params, (err, res) => {
             if (err) return reject(err)
             else return resolve(res.rows)
@@ -154,7 +154,7 @@ user.update = (user) => {
             num += 1
             params.push(user.email)
         }
-        if (user.status) {
+        if (user.status >= -1) {
             if (num > 1) query += ','
             query += ' status = $' + num
             num += 1

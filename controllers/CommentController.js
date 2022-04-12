@@ -8,10 +8,11 @@ const utils = require('../utils/utils')
 const comment = {}
 
 class Err extends Error {
-    constructor(message, code) {
-      super(message);
-      this.message = message;
-      this.code = code;
+    constructor(message, code, constraint) {
+      super(message)
+      this.message = message
+      this.code = code
+      this.constraint = constraint
     }
 }
 
@@ -23,15 +24,15 @@ function onCatchError(err, res) {
                 break
             }
             case 'username_fk': {
-                onResponse(res, 'fail', 400,  message.comment.username_fk, null, null)
+                onResponse(res, 'fail', 404,  message.comment.username_fk, null, null)
                 break
             }
             case 'book_fk': {
-                onResponse(res, 'fail', 400,  message.comment.book_fk, null, null)
+                onResponse(res, 'fail', 404,  message.comment.book_fk, null, null)
                 break
             }
             case 'reply_constraint': {
-                onResponse(res, 'fail', 400,  message.comment.reply_constraint, null, null)
+                onResponse(res, 'fail', 404,  message.comment.reply_constraint, null, null)
                 break
             }
             default: {
@@ -39,7 +40,7 @@ function onCatchError(err, res) {
                 break
             }
         }
-    } else onResponse(res, 'fail', 500, err.message, null, null)
+    } else onResponse(res, 'fail', err.code, err.message, null, null)
 }
 
 comment.onGetResult = (data, req, res, next) => {
@@ -55,7 +56,7 @@ comment.getAllCommentOfBook = async (req, res, next) => {
     try {
         if ((await BookModule.get(req.params.book_endpoint)).length == 0) return next(new Err(message.book.not_found, 404))
         next({data: await ChapterModule.get_all(req.params.book_endpoint)})
-    } catch (e) {next(new Err(e.message, 500))}
+    } catch (e) {next(new Err(e.message, 500,  e.constraint))}
 
 
     var page = req.query.page
@@ -82,7 +83,7 @@ comment.getAllCommentOfBook = async (req, res, next) => {
             })
         })
         next({data: comments, page: page})
-    } catch (e) {next(new Err(e.message, 500))}
+    } catch (e) {next(new Err(e.message, 500,  e.constraint))}
 }
 
 comment.getDetailComment = async (req, res, next) => {
@@ -117,7 +118,7 @@ comment.getDetailComment = async (req, res, next) => {
         if (comment) comment.replies = replies
         if (comment) next({data: [comment], page: page})
         else next(new Err(message.comment.not_found, 404))
-    } catch (e) {next(new Err(e.message, 500))}
+    } catch (e) {next(new Err(e.message, 500,  e.constraint))}
 }
 
 comment.addComment = async (req, res, next) => {
@@ -162,7 +163,7 @@ comment.addComment = async (req, res, next) => {
     } catch (e) {
         if (e.constraint == 'notify_pk' && !isSendData) 
             return next({data: [comment], message: message.comment.add_success})
-        next(new Err(e.message, 500))
+        next(new Err(e.message, 500,  e.constraint))
     }
 }
 
@@ -171,7 +172,7 @@ comment.deleteComment = async (req, res, next) => {
         var comment = await CommentModule.delete(req.params.id)
         if (comment) next({data: [comment], message: message.comment.delete_success})
         else next(new Err(message.comment.not_found, 404))
-    } catch (e) {next(new Err(e.message, 500))}
+    } catch (e) {next(new Err(e.message, 500,  e.constraint))}
 }
 
 module.exports = comment

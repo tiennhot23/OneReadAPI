@@ -11,10 +11,11 @@ const utils = require('../utils/utils')
 const chapter = {}
 
 class Err extends Error {
-    constructor(message, code) {
-      super(message);
-      this.message = message;
-      this.code = code;
+    constructor(message, code, constraint) {
+      super(message)
+      this.message = message
+      this.code = code
+      this.constraint = constraint
     }
 }
 
@@ -26,7 +27,7 @@ function onCatchError(err, res) {
                 break
             }
             case 'book_fk': {
-                utils.onResponse(res, 'fail', 400, message.chapter.book_fk, null, null)
+                utils.onResponse(res, 'fail', 404, message.chapter.book_fk, null, null)
                 break
             }
             default: {
@@ -51,7 +52,7 @@ chapter.getAllChapter = async (req, res, next) => {
     try {
         if ((await BookModule.get(req.params.book_endpoint)).length == 0) return next(new Err(message.book.not_found, 404))
         next({data: await ChapterModule.get_all(req.params.book_endpoint)})
-    } catch (e) {next(new Err(e.message, 500))}
+    } catch (e) {next(new Err(e.message, 500,  e.constraint))}
 }
 
 chapter.getDetailChapter = async (req, res, next) => {
@@ -81,7 +82,7 @@ chapter.getDetailChapter = async (req, res, next) => {
 
             next({data: [chapter]})
         } else next(new Err(message.chapter.not_found, 404))
-    } catch (e) {next(new Err(e.message, 500))}
+    } catch (e) {next(new Err(e.message, 500,  e.constraint))}
 }
 
 
@@ -116,7 +117,7 @@ chapter.addChapter = async (req, res, next) => {
     } catch (e) {
         if (e.constraint == 'notify_pk' && !isSendData) 
             return next({data: [chapter], message: message.chapter.add_success})
-        next(new Err(e.message, 500))
+        next(new Err(e.message, 500,  e.constraint))
     }
 }
 
@@ -126,7 +127,7 @@ chapter.deleteChapter = async (req, res, next) => {
         if (chapter) next ({data: [chapter], message: message.chapter.delete_success})
         else next(new Err(message.chapter.not_found, 404))
     } catch (e) {
-        next(new Err(e.message, 500))
+        next(new Err(e.message, 500,  e.constraint))
     }
 }
 

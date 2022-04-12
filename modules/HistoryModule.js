@@ -4,7 +4,7 @@ const history = {}
 
 history.get = (history) => {
     return new Promise((resolve, reject) => {
-        let query = `select * from "History" where book_endpoint = $1 and username = $2`
+        let query = `select *, to_char(time, 'DD-MM-YYYY hh:mm:ss') as time from "History" where book_endpoint = $1 and username = $2`
         // let query = `select c.title as chapter_title,b.*
         // from "Chapter" c, (select b.*, book_endpoint, chapter_endpoint, to_char(time, 'DD-MM-YYYY hh:mm:ss') as time
         // from "Book" b,
@@ -22,7 +22,7 @@ history.get = (history) => {
 
 history.get_all = (username) => {
     return new Promise((resolve, reject) => {
-        let query = `select c.title as chapter_title,b.*
+        let query = `select c.title as chapter_title, to_char(c.time, 'DD-MM-YYYY hh:mm:ss') as chapter_time, b.*
         from "Chapter" c, (select b.*, book_endpoint, chapter_endpoint, to_char(time, 'DD-MM-YYYY hh:mm:ss') as time
         from "Book" b,
         (select * from "History" where username = $1 order by time desc) h

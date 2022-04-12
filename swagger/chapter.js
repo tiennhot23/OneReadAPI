@@ -23,7 +23,7 @@
  *                      schema:
  *                          $ref: '#/components/response/ChapterResponse'
  *          400: 
- *              description: Bad Request - thiếu các tham số bắt buộc book_endpoint
+ *              description: Bad Request - Thiếu các tham số đầu vào bắt buộc, hoặc dữ liệu không đúng với ràng buộc
  *          500:
  *              description: Lỗi thực thi request trên server
  */
@@ -62,7 +62,7 @@
  *                      schema:
  *                          $ref: '#/components/response/DetailChapterResponse'
  *          400: 
- *              description: Bad Request - Thiếu các tham số bắt buộc book_endpoint, chapter_endpoint
+ *              description: Bad Request - Thiếu các tham số đầu vào bắt buộc, hoặc dữ liệu không đúng với ràng buộc
  *          500:
  *              description: Lỗi thực thi request trên server
  */
@@ -125,7 +125,7 @@
  *                      schema:
  *                          $ref: '#/components/response/ChapterResponse'
  *          400: 
- *              description: Bad Request - Thiếu các tham số bắt buộc book_endpoint, title
+ *              description: Bad Request - Thiếu các tham số đầu vào bắt buộc, hoặc dữ liệu không đúng với ràng buộc
  *          401: 
  *              description: Unauthorized - Không thể xác thực yêu cầu
  *          403: 
@@ -172,7 +172,7 @@
  *                      schema:
  *                          $ref: '#/components/response/DetailChapterResponse'
  *          400: 
- *              description: Bad Request - Thiếu các tham số bắt buộc book_endpoint, chapter_endpoint
+ *              description: Bad Request - Thiếu các tham số đầu vào bắt buộc, hoặc dữ liệu không đúng với ràng buộc
  *          401: 
  *              description: Unauthorized - Không thể xác thực yêu cầu
  *          403: 

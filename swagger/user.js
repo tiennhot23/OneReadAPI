@@ -1,27 +1,19 @@
 
 
-/**
+/** Xác thực token và cập nhật trang thái tài khoản thành đã xác thực email
  * @swagger
- * /user/verify-email/{username}:
+ * /user/verify-email:
  *  get:
  *      summary: Xác thực token và cập nhật trang thái tài khoản thành đã xác thực email
  *      description: Cập nhật status của user = 1
  *      tags: [User]
  *      parameters:
- *          - in: path
- *            name: username
- *            required: true
- *            schema:
- *              type: string
- *            description: username của user
  *          - in: query
  *            name: token
  *            required: true
  *            schema: 
  *              type: string
  *            description: token dùng để xác thực email, nhân được trong mail sau khi người dùng thực hiện yêu cầu xác minh email
- *      security:
- *          - bearerAuth: []
  *      responses:
  *          200:
  *              description: Request thành công
@@ -30,11 +22,7 @@
  *                      schema:
  *                          $ref: '#/components/response/MessageResponse'
  *          400: 
- *              description: Bad Request - tham số token bị thiếu hoặc không khả dụng
- *          401: 
- *              description: Unauthorized - Không thể xác thực yêu cầu
- *          403: 
- *              description: Forbidden - Tài khoản không đủ quyền để thực thi yêu cầu
+ *              description: Bad Request - Thiếu các tham số đầu vào bắt buộc, hoặc dữ liệu không đúng với ràng buộc
  *          404: 
  *              description: Not Found - Không thể tìm thấy user được yêu cầu
  *          500:
@@ -46,7 +34,7 @@
 
 
 
-/**
+/** Lấy thông tin gồm username, avatar, status, email của user
  * @swagger
  * /user/info/{username}:
  *  get:
@@ -66,8 +54,32 @@
  *                  application/json:
  *                      schema:
  *                          $ref: '#/components/response/UserResponse'
- *          400: 
- *              description: Bad Request - Thiếu tham số username
+ *          404: 
+ *              description: Not Found - Không thể tìm thấy user được yêu cầu
+ *          500:
+ *              description: Lỗi thực thi request trên server
+ */
+
+
+
+
+
+
+/** Lấy danh sách các sách mà user đang follow
+ * @swagger
+ * /user/book-following:
+ *  get:
+ *      summary: Lấy danh sách các sách mà user đang follow
+ *      tags: [User]
+ *      security:
+ *          - bearerAuth: []
+ *      responses:
+ *          200:
+ *              description: Request thành công
+ *              content:
+ *                  application/json:
+ *                      schema:
+ *                          $ref: '#/components/response/BookResponse'
  *          401: 
  *              description: Unauthorized - Không thể xác thực yêu cầu
  *          403: 
@@ -82,44 +94,7 @@
 
 
 
-
-/**
- * @swagger
- * /user/book-following/{username}:
- *  get:
- *      summary: Lấy danh sách các sách mà user đang follow
- *      tags: [User]
- *      parameters:
- *          - in: path
- *            name: username
- *            required: true
- *            schema:
- *              type: string
- *            description: username của user
- *      security:
- *          - bearerAuth: []
- *      responses:
- *          200:
- *              description: Request thành công
- *              content:
- *                  application/json:
- *                      schema:
- *                          $ref: '#/components/response/BookResponse'
- *          400: 
- *              description: Bad Request - Thiếu tham số username
- *          401: 
- *              description: Unauthorized - Không thể xác thực yêu cầu
- *          403: 
- *              description: Forbidden - Tài khoản không đủ quyền để thực thi yêu cầu
- *          500:
- *              description: Lỗi thực thi request trên server
- */
-
-
-
-
-
-/**
+/** Lịch sử comment của user
  * @swagger
  * /user/comment-history/{username}:
  *  get:
@@ -141,12 +116,12 @@
  *                  application/json:
  *                      schema:
  *                          $ref: '#/components/response/CommentResponse'
- *          400: 
- *              description: Bad Request - Thiếu tham số username
  *          401: 
  *              description: Unauthorized - Không thể xác thực yêu cầu
  *          403: 
  *              description: Forbidden - Tài khoản không đủ quyền để thực thi yêu cầu
+ *          404: 
+ *              description: Not Found - Không tìm thấy user thực hiện yêu cầu
  *          500:
  *              description: Lỗi thực thi request trên server
  */
@@ -156,19 +131,12 @@
 
 
 
-/**
+/** Lịch sủ các sách đã xem của user
  * @swagger
- * /user/history/{username}:
+ * /user/history:
  *  get:
  *      summary: Lịch sủ các sách đã xem của user
  *      tags: [User]
- *      parameters:
- *          - in: path
- *            name: username
- *            required: true
- *            schema:
- *              type: string
- *            description: username của user
  *      security:
  *          - bearerAuth: []
  *      responses:
@@ -178,12 +146,12 @@
  *                  application/json:
  *                      schema:
  *                          $ref: '#/components/response/HistoryReadResponse'
- *          400: 
- *              description: Bad Request - Thiếu tham số username
  *          401: 
  *              description: Unauthorized - Không thể xác thực yêu cầu
  *          403: 
  *              description: Forbidden - Tài khoản không đủ quyền để thực thi yêu cầu
+ *          404: 
+ *              description: Not Found - Không tìm thấy user thực hiện yêu cầu
  *          500:
  *              description: Lỗi thực thi request trên server
  */
@@ -194,19 +162,13 @@
 
 
 
-/**
+/**  Lịch sử xem của 1 sách, chapter đọc gần đây nhất
  * @swagger
- * /user/history/{book_endpoint}{username}:
+ * /user/history/{book_endpoint}:
  *  get:
  *      summary: Lịch sử xem của 1 sách, chapter đọc gần đây nhất
  *      tags: [User]
  *      parameters:
- *          - in: path
- *            name: username
- *            required: true
- *            schema:
- *              type: string
- *            description: username của user
  *          - in: path
  *            name: book_endpoint
  *            required: true
@@ -222,12 +184,12 @@
  *                  application/json:
  *                      schema:
  *                          $ref: '#/components/response/HistoryReadResponse'
- *          400: 
- *              description: Bad Request - Thiếu tham số username
  *          401: 
  *              description: Unauthorized - Không thể xác thực yêu cầu
  *          403: 
  *              description: Forbidden - Tài khoản không đủ quyền để thực thi yêu cầu
+ *          404: 
+ *              description: Not Found - Không tìm thấy user hoặc sách
  *          500:
  *              description: Lỗi thực thi request trên server
  */
@@ -238,12 +200,22 @@
 
 
 
-/**
+/** Đăng nhập
  * @swagger
  * /user/login:
  *  post:
  *      summary: Đăng nhập
  *      tags: [User]
+ *      requestBody:
+ *          content:
+ *              application/json:
+ *                  schema:
+ *                      type: object
+ *                      properties:
+ *                          username: 
+ *                              type: string
+ *                          password:
+ *                              type: string
  *      responses:
  *          200:
  *              description: Trả về một jsonobject gồm accessToken và dữ liệu người dùng
@@ -252,7 +224,7 @@
  *                      schema:
  *                          $ref: '#/components/response/LoginResponse'
  *          400: 
- *              description: Bad Request - Thiếu các tham số bắt buộc username, password
+ *              description: Bad Request - Thiếu các tham số đầu vào bắt buộc, hoặc dữ liệu không đúng với ràng buộc
  *          500:
  *              description: Lỗi thực thi request trên server
  */
@@ -263,7 +235,7 @@
 
 
 
-/**
+/** Đăng kí tài khoản
  * @swagger
  * /user/register:
  *  post:
@@ -289,7 +261,7 @@
  *                      schema:
  *                          $ref: '#/components/response/MessageResponse'
  *          400: 
- *              description: Bad Request - Thiếu các tham số bắt buộc như username, password, email
+ *              description: Bad Request - Thiếu các tham số đầu vào bắt buộc, hoặc dữ liệu không đúng với ràng buộc
  *          500:
  *              description: Lỗi thực thi request trên server
  */
@@ -300,19 +272,12 @@
 
 
 
-/**
+/** Gửi mail chứa link xác thực tới email của user
  * @swagger
- * /user/verify-email/{username}:
+ * /user/verify-email:
  *  post:
  *      summary: Gửi mail chứa link xác thực tới email của user
  *      tags: [User]
- *      parameters:
- *          - in: path
- *            name: username
- *            required: true
- *            schema:
- *              type: string
- *            description: username của user
  *      security:
  *          - bearerAuth: []
  *      responses:
@@ -323,7 +288,7 @@
  *                      schema:
  *                          $ref: '#/components/response/MessageResponse'
  *          400: 
- *              description: Bad Request - Thiếu tham số username
+ *              description: Bad Request - Thiếu các tham số đầu vào bắt buộc, hoặc dữ liệu không đúng với ràng buộc
  *          401: 
  *              description: Unauthorized - Không thể xác thực yêu cầu
  *          403: 
@@ -338,19 +303,13 @@
 
 
 
-/**
+/** Follow sách
  * @swagger
- * /user/follow-book/{book_endpoint}/{username}:
+ * /user/follow-book/{book_endpoint}:
  *  post:
  *      summary: Follow sách
  *      tags: [User]
  *      parameters:
- *          - in: path
- *            name: username
- *            required: true
- *            schema:
- *              type: string
- *            description: username của user
  *          - in: path
  *            name: book_endpoint
  *            required: true
@@ -361,17 +320,19 @@
  *          - bearerAuth: []
  *      responses:
  *          200:
- *              description: Trả về một message thông báo đã gửi link vào email của user
+ *              description: Trả về một message thông báo đã follow sách
  *              content:
  *                  application/json:
  *                      schema:
  *                          $ref: '#/components/response/MessageResponse'
  *          400: 
- *              description: Bad Request - Thiếu các tham số bắt buộc như username, book_endpoint
+ *              description: Bad Request - Thiếu các tham số đầu vào bắt buộc, hoặc dữ liệu không đúng với ràng buộc
  *          401: 
  *              description: Unauthorized - Không thể xác thực yêu cầu
  *          403: 
  *              description: Forbidden - Tài khoản không đủ quyền để thực thi yêu cầu
+ *          404: 
+ *              description: Not Found - Không tìm thấy sách
  *          500:
  *              description: Lỗi thực thi request trên server
  */
@@ -382,19 +343,13 @@
 
 
 
-/**
+/** Unfollow sách
  * @swagger
- * /user/unfollow-book/{book_endpoint}/{username}:
+ * /user/unfollow-book/{book_endpoint}:
  *  post:
  *      summary: Unfollow sách
  *      tags: [User]
  *      parameters:
- *          - in: path
- *            name: username
- *            required: true
- *            schema:
- *              type: string
- *            description: username của user
  *          - in: path
  *            name: book_endpoint
  *            required: true
@@ -411,11 +366,13 @@
  *                      schema:
  *                          $ref: '#/components/response/MessageResponse'
  *          400: 
- *              description: Bad Request - Thiếu các tham số bắt buộc như username, book_endpoint
+ *              description: Bad Request - Thiếu các tham số đầu vào bắt buộc, hoặc dữ liệu không đúng với ràng buộc
  *          401: 
  *              description: Unauthorized - Không thể xác thực yêu cầu
  *          403: 
  *              description: Forbidden - Tài khoản không đủ quyền để thực thi yêu cầu
+ *          404: 
+ *              description: Not Found - Không tìm thấy sách
  *          500:
  *              description: Lỗi thực thi request trên server
  */
@@ -425,7 +382,7 @@
 
 
 
-/**
+/** Ban user và tự động thông báo tới user bị ban
  * @swagger
  * /user/ban/{username}:
  *  post:
@@ -448,11 +405,13 @@
  *                      schema:
  *                          $ref: '#/components/response/MessageResponse'
  *          400: 
- *              description: Bad Request - Thiếu các tham số bắt buộc như username, book_endpoint
+ *              description: Bad Request - Thiếu các tham số đầu vào bắt buộc, hoặc dữ liệu không đúng với ràng buộc
  *          401: 
  *              description: Unauthorized - Không thể xác thực yêu cầu
  *          403: 
  *              description: Forbidden - Tài khoản không đủ quyền để thực thi yêu cầu
+ *          404: 
+ *              description: Not Found - Không tìm thấy user
  *          500:
  *              description: Lỗi thực thi request trên server
  */
@@ -462,7 +421,7 @@
 
 
 
-/**
+/**  Unban user và tự động thông báo tới user bị ban
  * @swagger
  * /user/unban/{username}:
  *  post:
@@ -485,11 +444,13 @@
  *                      schema:
  *                          $ref: '#/components/response/MessageResponse'
  *          400: 
- *              description: Bad Request - Thiếu các tham số bắt buộc như username, book_endpoint
+ *              description: Bad Request - Thiếu các tham số đầu vào bắt buộc, hoặc dữ liệu không đúng với ràng buộc
  *          401: 
  *              description: Unauthorized - Không thể xác thực yêu cầu
  *          403: 
  *              description: Forbidden - Tài khoản không đủ quyền để thực thi yêu cầu
+ *          404: 
+ *              description: Not Found - Không tìm thấy user
  *          500:
  *              description: Lỗi thực thi request trên server
  */
@@ -501,19 +462,12 @@
 
 
 
-/**
+/** Cập nhật thông tin user gồm email hoặc avatar
  * @swagger
- * /user/{username}:
+ * /user:
  *  patch:
  *      summary: Cập nhật thông tin user gồm email hoặc avatar
  *      tags: [User]
- *      parameters:
- *          - in: path
- *            name: username
- *            required: true
- *            schema:
- *              type: string
- *            description: username của user
  *      security:
  *          - bearerAuth: []
  *      requestBody:
@@ -540,11 +494,13 @@
  *                      schema:
  *                          $ref: '#/components/response/UserResponse'
  *          400: 
- *              description: Bad Request - Thiếu các tham số bắt buộc như username
+ *              description: Bad Request - Thiếu các tham số đầu vào bắt buộc, hoặc dữ liệu không đúng với ràng buộc
  *          401: 
  *              description: Unauthorized - Không thể xác thực yêu cầu
  *          403: 
  *              description: Forbidden - Tài khoản không đủ quyền để thực thi yêu cầu
+ *          404: 
+ *              description: Not Found - Không tìm thấy user
  *          500:
  *              description: Lỗi thực thi request trên server
  */
@@ -555,9 +511,9 @@
 
 
 
-/**
+/** Cập nhật role của tài khoản
  * @swagger
- * /change-role/{username}:
+ * /user/change-role/{username}:
  *  patch:
  *      summary: Cập nhật role của tài khoản
  *      tags: [User]
@@ -572,12 +528,14 @@
  *          - bearerAuth: []
  *      requestBody:
  *          content:
- *              application/json:
+ *              application/x-www-form-urlencoded:
  *                  schema:
  *                      type: object
  *                      properties:
  *                          role:
  *                              type: integer
+ *                              enum: [0, 1]
+ *                              description: Quyền của tài khoản (0 - quyền user, 1 - quyền admin)
  *      responses:
  *          200:
  *              description: Trả về một message thông báo đã cập nhật role của user
@@ -586,11 +544,13 @@
  *                      schema:
  *                          $ref: '#/components/response/MessageResponse'
  *          400: 
- *              description: Bad Request - Thiếu các tham số bắt buộc như username, role
+ *              description: Bad Request - Thiếu các tham số đầu vào bắt buộc, hoặc dữ liệu không đúng với ràng buộc
  *          401: 
  *              description: Unauthorized - Không thể xác thực yêu cầu
  *          403: 
  *              description: Forbidden - Tài khoản không đủ quyền để thực thi yêu cầu
+ *          404: 
+ *              description: Not Found - Không tìm thấy user
  *          500:
  *              description: Lỗi thực thi request trên server
  */
@@ -601,24 +561,17 @@
 
 
 
-/**
+/** Thay đổi password
  * @swagger
- * /change-password/{username}:
+ * /user/change-password:
  *  patch:
  *      summary: Thay đổi password
  *      tags: [User]
- *      parameters:
- *          - in: path
- *            name: username
- *            required: true
- *            schema:
- *              type: string
- *            description: username của user
  *      security:
  *          - bearerAuth: []
  *      requestBody:
  *          content:
- *              application/json:
+ *              application/x-www-form-urlencoded:
  *                  schema:
  *                      type: object
  *                      properties:
@@ -632,11 +585,13 @@
  *                      schema:
  *                          $ref: '#/components/response/MessageResponse'
  *          400: 
- *              description: Bad Request - Thiếu các tham số bắt buộc như username, role
+ *              description: Bad Request - Thiếu các tham số đầu vào bắt buộc, hoặc dữ liệu không đúng với ràng buộc
  *          401: 
  *              description: Unauthorized - Không thể xác thực yêu cầu
  *          403: 
  *              description: Forbidden - Tài khoản không đủ quyền để thực thi yêu cầu
+ *          404: 
+ *              description: Not Found - Không tìm thấy user
  *          500:
  *              description: Lỗi thực thi request trên server
  */
@@ -648,19 +603,12 @@
 
 
 
-/**
+/** Xóa user cùng toàn bộ dữ liệu liên quan 
  * @swagger
- * /{username}:
+ * /user/:
  *  delete:
  *      summary: Xóa user cùng toàn bộ dữ liệu liên quan 
  *      tags: [User]
- *      parameters:
- *          - in: path
- *            name: username
- *            required: true
- *            schema:
- *              type: string
- *            description: username của user
  *      security:
  *          - bearerAuth: []
  *      responses:
@@ -671,11 +619,13 @@
  *                      schema:
  *                          $ref: '#/components/response/MessageResponse'
  *          400: 
- *              description: Bad Request - Thiếu các tham số bắt buộc như username
+ *              description: Bad Request - Thiếu các tham số đầu vào bắt buộc, hoặc dữ liệu không đúng với ràng buộc
  *          401: 
  *              description: Unauthorized - Không thể xác thực yêu cầu
  *          403: 
  *              description: Forbidden - Tài khoản không đủ quyền để thực thi yêu cầu
+ *          404: 
+ *              description: Not Found - Không tìm thấy user
  *          500:
  *              description: Lỗi thực thi request trên server
  */
@@ -689,17 +639,10 @@
 
 /**
  * @swagger
- * /history/all/{username}:
+ * /user/history/all/:
  *  delete:
  *      summary: Xóa toàn bộ lịch sử xem của user
  *      tags: [User]
- *      parameters:
- *          - in: path
- *            name: username
- *            required: true
- *            schema:
- *              type: string
- *            description: username của user
  *      security:
  *          - bearerAuth: []
  *      responses:
@@ -710,11 +653,13 @@
  *                      schema:
  *                          $ref: '#/components/response/MessageResponse'
  *          400: 
- *              description: Bad Request - Thiếu các tham số bắt buộc như username
+ *              description: Bad Request - Thiếu các tham số đầu vào bắt buộc, hoặc dữ liệu không đúng với ràng buộc
  *          401: 
  *              description: Unauthorized - Không thể xác thực yêu cầu
  *          403: 
  *              description: Forbidden - Tài khoản không đủ quyền để thực thi yêu cầu
+ *          404: 
+ *              description: Not Found - Không tìm thấy user
  *          500:
  *              description: Lỗi thực thi request trên server
  */
@@ -727,17 +672,11 @@
 
 /**
  * @swagger
- * /history/single/{book_endpoint}/{username}:
+ * /user/history/single/{book_endpoint}:
  *  delete:
  *      summary: Xóa lịch sử xem một sách của user
  *      tags: [User]
  *      parameters:
- *          - in: path
- *            name: username
- *            required: true
- *            schema:
- *              type: string
- *            description: username của user
  *          - in: path
  *            name: book_endpoint
  *            required: true
@@ -754,11 +693,13 @@
  *                      schema:
  *                          $ref: '#/components/response/MessageResponse'
  *          400: 
- *              description: Bad Request - Thiếu các tham số bắt buộc như username, book_endpoint
+ *              description: Bad Request - Thiếu các tham số đầu vào bắt buộc, hoặc dữ liệu không đúng với ràng buộc
  *          401: 
  *              description: Unauthorized - Không thể xác thực yêu cầu
  *          403: 
  *              description: Forbidden - Tài khoản không đủ quyền để thực thi yêu cầu
+ *          404: 
+ *              description: Not Found - Không tìm thấy user hoặc sách
  *          500:
  *              description: Lỗi thực thi request trên server
  */

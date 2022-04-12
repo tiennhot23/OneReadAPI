@@ -8,10 +8,11 @@ const message = require('../configs/messages')
 
 const book = {}
 class Err extends Error {
-    constructor(message, code) {
-      super(message);
-      this.message = message;
-      this.code = code;
+    constructor(message, code, constraint) {
+      super(message)
+      this.message = message
+      this.code = code
+      this.constraint = constraint
     }
 }
 
@@ -69,7 +70,7 @@ book.getAllBook = async (req, res, next) => {
                 page: page
             })
         }
-    } catch (e) {next(new Err(e.message, 500))}
+    } catch (e) {next(new Err(e.message, 500,  e.constraint))}
 }
 
 book.getSuggestBook = async (req, res, next) => {
@@ -78,7 +79,7 @@ book.getSuggestBook = async (req, res, next) => {
         next({
             data: await BookModule.get_suggest_book(user.username)
         })
-    } catch (e) {next(new Err(e.message, 500))}
+    } catch (e) {next(new Err(e.message, 500,  e.constraint))}
 }
 
 book.getTopSearch = async (req, res, next) => {
@@ -86,7 +87,7 @@ book.getTopSearch = async (req, res, next) => {
         next({
             data: await BookModule.get_top_search()
         })
-    } catch (e) {next(new Err(e.message, 500))}
+    } catch (e) {next(new Err(e.message, 500,  e.constraint))}
 }
 
 book.getTopRating = async (req, res, next) => {
@@ -94,7 +95,7 @@ book.getTopRating = async (req, res, next) => {
         next({
             data: await BookModule.get_top_rating()
         })
-    } catch (e) {next(new Err(e.message, 500))}
+    } catch (e) {next(new Err(e.message, 500,  e.constraint))}
 }
 
 book.getTopDay = async (req, res, next) => {
@@ -102,7 +103,7 @@ book.getTopDay = async (req, res, next) => {
         next({
             data: await BookModule.get_top_day()
         })
-    } catch (e) {next(new Err(e.message, 500))}
+    } catch (e) {next(new Err(e.message, 500,  e.constraint))}
 }
 
 book.getTopMonth = async (req, res, next) => {
@@ -110,7 +111,7 @@ book.getTopMonth = async (req, res, next) => {
         next({
             data: await BookModule.get_top_month()
         })
-    } catch (e) {next(new Err(e.message, 500))}
+    } catch (e) {next(new Err(e.message, 500,  e.constraint))}
 }
 
 book.getTopYear = async (req, res, next) => {
@@ -118,7 +119,7 @@ book.getTopYear = async (req, res, next) => {
         next({
             data: await BookModule.get_top_year()
         })
-    } catch (e) {next(new Err(e.message, 500))}
+    } catch (e) {next(new Err(e.message, 500,  e.constraint))}
 }
 
 book.getTopFollow = async (req, res, next) => {
@@ -126,7 +127,7 @@ book.getTopFollow = async (req, res, next) => {
         next({
             data: await BookModule.get_top_follow()
         })
-    } catch (e) {next(new Err(e.message, 500))}
+    } catch (e) {next(new Err(e.message, 500,  e.constraint))}
 }
 
 book.getlastUpdate = async (req, res, next) => {
@@ -134,7 +135,7 @@ book.getlastUpdate = async (req, res, next) => {
         next({
             data: await BookModule.get_last_update()
         })
-    } catch (e) {next(new Err(e.message, 500))}
+    } catch (e) {next(new Err(e.message, 500,  e.constraint))}
 }
 
 book.getRelateBook = async (req, res, next) => {
@@ -143,7 +144,7 @@ book.getRelateBook = async (req, res, next) => {
         next({
             data: await BookModule.get_relate_book(req.params.endpoint)
         })
-    } catch (e) {next(new Err(e.message, 500))}
+    } catch (e) {next(new Err(e.message, 500,  e.constraint))}
 }
 
 book.getBookFollower = async (req, res, next) => {
@@ -152,7 +153,7 @@ book.getBookFollower = async (req, res, next) => {
         next({
             data: await BookModule.get_user_follow(req.params.endpoint)
         })
-    } catch (e) {next(new Err(e.message, 500))}
+    } catch (e) {next(new Err(e.message, 500,  e.constraint))}
 }
 
 book.getDetailBook = async (req, res, next) => {
@@ -164,7 +165,7 @@ book.getDetailBook = async (req, res, next) => {
             search_number: Math.min(book.search_number + 1, constants.max_int)
         }, req.params.endpoint)
         next({data: [book]})
-    } catch (e) {next(new Err(e.message, 500))}
+    } catch (e) {next(new Err(e.message, 500,  e.constraint))}
 }   
 
 
@@ -200,7 +201,7 @@ book.addBook = async (req, res, next) => {
         await BookModule.add_view(book.endpoint, new Date().toISOString().slice(0, 10))
         
         next({data: [book], message: message.book.add_success})
-    } catch (e) {next(new Err(e.message, 500))}
+    } catch (e) {next(new Err(e.message, 500,  e.constraint))}
 }
 
 
@@ -235,7 +236,7 @@ book.updateBook = async (req, res, next) => {
             }
         }
         next({data: [book], message: message.book.update_success})
-    } catch (e) {next(new Err(e.message, 500))}
+    } catch (e) {next(new Err(e.message, 500,  e.constraint))}
 }
 
 book.finishBook = async (req, res, next) => {
@@ -263,7 +264,7 @@ book.finishBook = async (req, res, next) => {
     } catch (e) {
         if (e.constraint == 'notify_pk' && !isSendData) 
             return next({data: [book], message: message.book.update_success})
-        next(new Err(e.message, 500))
+        next(new Err(e.message, 500,  e.constraint))
     }
 }
 
@@ -287,7 +288,7 @@ book.rateBook = async (req, res, next) => {
             
             next({data: [book], message: message.book.update_success})
         } else next(new Err(message.book.not_found, 404))
-    } catch (e) {next(new Err(e.message, 500))}
+    } catch (e) {next(new Err(e.message, 500,  e.constraint))}
 }
 
 
@@ -296,7 +297,7 @@ book.deleteBook = async (req, res, next) => {
         var book = await BookModule.delete(req.params.endpoint)
         if (book) next ({data: [book], message: message.book.delete_success})
         else next(new Err(message.book.not_found, 404))
-    } catch (e) {next(new Err(e.message, 500))}
+    } catch (e) {next(new Err(e.message, 500,  e.constraint))}
 }
 
 module.exports = book;

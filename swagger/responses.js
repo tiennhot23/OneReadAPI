@@ -172,6 +172,12 @@
  *                                      type: string
  *                                  avatar:
  *                                      type: string
+ *                                  status:
+ *                                      type: integer
+ *                                  email:
+ *                                      type: string
+ *                                  role: 
+ *                                      type: integer
  */
 
 
@@ -236,13 +242,25 @@
  *                                                  type: string
  *                                              avatar:
  *                                                  type: string
+ *                                              status:
+ *                                                  type: integer
+ *                                              email:
+ *                                                  type: string
+ *                                              role: 
+ *                                                  type: integer
  *                          user:
  *                              type: object
  *                              properties:
  *                                  username: 
  *                                      type: string
  *                                  avatar:
- *                                      type: string    
+ *                                      type: string 
+ *                                  status:
+ *                                      type: integer
+ *                                  email:
+ *                                      type: string
+ *                                  role: 
+ *                                      type: integer   
  */
 
 
@@ -289,12 +307,18 @@
  *                                      type: integer
  *                                  status:
  *                                      type: integer
+ *                                  search_number:
+ *                                      type: integer
  *                          chapter:
  *                              type: object
  *                              properties:
  *                                  chapter_endpoint:
  *                                      type: string
+ *                                  book_endpoint:
+ *                                      type: string
  *                                  title:
+ *                                      type: string
+ *                                  time:
  *                                      type: string
  *                          time:
  *                              type: string
@@ -404,8 +428,6 @@
  *                                          type: string
  *                                      role:
  *                                          type: integer
- *                              time:
- *                                  type: string
  */
 
 

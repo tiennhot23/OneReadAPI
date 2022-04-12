@@ -5,10 +5,11 @@ const utils = require('../utils/utils')
 const genre = {}
 
 class Err extends Error {
-    constructor(message, code) {
-      super(message);
-      this.message = message;
-      this.code = code;
+    constructor(message, code, constraint) {
+      super(message)
+      this.message = message
+      this.code = code
+      this.constraint = constraint
     }
 }
 
@@ -24,7 +25,7 @@ function onCatchError(err, res) {
                 break
             }
         }
-    } else onResponse(res, 'fail', 500, err.message, null, null)
+    } else onResponse(res, 'fail', err.code, err.message, null, null)
 }
 
 genre.onGetResult = (data, req, res, next) => {
@@ -38,7 +39,7 @@ genre.onGetResult = (data, req, res, next) => {
 genre.getAllGenre = async (req, res, next) => {
     try {
         next({data: await GenreModule.get_all()})
-    } catch(e) {next(new Err(e.message, 500))}
+    } catch(e) {next(new Err(e.message, 500,  e.constraint))}
 }
 
 genre.addGenre = async (req, res, next) => {
@@ -50,7 +51,7 @@ genre.addGenre = async (req, res, next) => {
     try {
         if (!genre.title) return next(new Err(message.genre.missing_title, 400))
         next({data: await GenreModule.add(genre)})
-    } catch (e) {next(new Err(e.message, 500))}
+    } catch (e) {next(new Err(e.message, 500,  e.constraint))}
 }
 
 genre.updateGenre = async (req, res, next) => {
@@ -59,7 +60,7 @@ genre.updateGenre = async (req, res, next) => {
         genre = await GenreModule.update(genre, req.params.endpoint)
         if (genre) next({data: [genre], message: message.genre.update_success})
         else next(new Err(message.genre.not_found, 404))
-    } catch (e) {next(new Err(e.message, 500))}
+    } catch (e) {next(new Err(e.message, 500,  e.constraint))}
 }
 
 genre.deleteGenre = async (req, res, next) => {
@@ -67,7 +68,7 @@ genre.deleteGenre = async (req, res, next) => {
         var genre = await GenreModule.delete(req.params.endpoint)
         if (genre) next({data: [genre], message: message.genre.delete_success})
         else next(new Err(message.genre.not_found, 404))
-    } catch (e) {next(new Err(e.message, 500))}
+    } catch (e) {next(new Err(e.message, 500,  e.constraint))}
 }
 
 module.exports = genre

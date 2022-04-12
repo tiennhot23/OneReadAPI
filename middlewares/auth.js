@@ -12,7 +12,7 @@ auth.verifyUser = (req, res, next) => {
     if (token == null) return utils.onResponse(res, 'fail', 401, message.auth.unauthorized, null, null)
 
     jwt.verify(token, process.env.ACCESSTOKEN, async (err, ress) => {
-        if (err) return utils.onResponse(res, 'fail', 400, message.auth.token_invalid, null, null) 
+        if (err) return utils.onResponse(res, 'fail', 401, message.auth.token_invalid, null, null) 
         var user = ress.user
         if (!(user.username && await UserModule.get(user.username))) return utils.onResponse(res, 'fail', 404, message.user.not_found, null, null) 
         if (user.role && user.role < 0) 
@@ -29,7 +29,7 @@ auth.verifyAdmin = (req, res, next) => {
     if (token == null) return utils.onResponse(res, 'fail', 401, message.auth.unauthorized, null, null)
 
     jwt.verify(token, process.env.ACCESSTOKEN, async (err, ress) => {
-        if (err) return utils.onResponse(res, 'fail', 400, message.auth.token_invalid, null, null) 
+        if (err) return utils.onResponse(res, 'fail', 401, message.auth.token_invalid, null, null) 
         var user = ress.user
         if (!(user.username && await UserModule.get(user.username))) return utils.onResponse(res, 'fail', 404, message.user.not_found, null, null) 
         if (user.role && user.role < 1) 

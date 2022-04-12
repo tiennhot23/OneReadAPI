@@ -65,7 +65,7 @@
  *                      schema:
  *                          $ref: '#/components/response/BookResponse'
  *          400: 
- *              description: Access token không khả dụng
+ *              description: Bad Request - Thiếu các tham số đầu vào bắt buộc, hoặc dữ liệu không đúng với ràng buộc
  *              content:
  *                  application/json:
  *                      schema:
@@ -425,7 +425,7 @@
  *                      schema:
  *                          $ref: '#/components/response/DetailBookResponse'
  *          400:
- *              description: Bad Request - yêu cầu thiếu dữ liệu, dữ liệu không đúng định dạng hoặc access token không khả dụng
+ *              description: Bad Request - Thiếu các tham số đầu vào bắt buộc, hoặc dữ liệu không đúng với ràng buộc
  *              content:
  *                  application/json:
  *                      schema:
@@ -513,7 +513,7 @@
  *                      schema:
  *                          $ref: '#/components/response/DetailBookResponse'
  *          400:
- *              description: Bad Request - yêu cầu thiếu dữ liệu, dữ liệu không đúng định dạng hoặc access token không khả dụng
+ *              description: Bad Request - Thiếu các tham số đầu vào bắt buộc, hoặc dữ liệu không đúng với ràng buộc
  *              content:
  *                  application/json:
  *                      schema:
@@ -569,7 +569,7 @@
  *                      schema:
  *                          $ref: '#/components/response/DetailBookResponse'
  *          400:
- *              description: Bad Request - access token không khả dụng
+ *              description: Bad Request - Thiếu các tham số đầu vào bắt buộc, hoặc dữ liệu không đúng với ràng buộc
  *              content:
  *                  application/json:
  *                      schema:
@@ -619,15 +619,14 @@
  *            description: endpoint của sách
  *      requestBody:
  *          content:
- *              application/json:
+ *              application/x-www-form-urlencoded:
  *                  schema:
  *                      type: object
  *                      properties:
  *                          rating:
- *                              type: integer
- *                              description: Điểm đánh giá của user
- *                              minimum: 0
- *                              maximum: 5
+ *                              type: number
+ *                              format: float
+ *                              description: Điểm đánh giá của user (0 <= rating <= 5)
  *      responses:
  *          200:
  *              description: Request thành công
@@ -636,7 +635,7 @@
  *                      schema:
  *                          $ref: '#/components/response/DetailBookResponse'
  *          400:
- *              description: Bad Request - yêu cầu thiếu rating hoặc access token không khả dụng
+ *              description: Bad Request - Thiếu các tham số đầu vào bắt buộc, hoặc dữ liệu không đúng với ràng buộc
  *              content:
  *                  application/json:
  *                      schema:

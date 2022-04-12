@@ -21,7 +21,7 @@
  *                      schema:
  *                          $ref: '#/components/response/CommentResponse'
  *          400: 
- *              description: Bad Request - thiếu các tham số bắt buộc book_endpoint
+ *              description: Bad Request - Thiếu các tham số đầu vào bắt buộc, hoặc dữ liệu không đúng với ràng buộc
  *          500:
  *              description: Lỗi thực thi request trên server
  */
