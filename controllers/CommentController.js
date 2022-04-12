@@ -54,7 +54,7 @@ comment.onGetResult = (data, req, res, next) => {
 
 comment.getAllCommentOfBook = async (req, res, next) => {
     try {
-        if ((await BookModule.get(req.params.book_endpoint)).length == 0) return next(new Err(message.book.not_found, 404))
+        if (!!await BookModule.get(req.params.book_endpoint)) return next(new Err(message.book.not_found, 404))
         next({data: await ChapterModule.get_all(req.params.book_endpoint)})
     } catch (e) {next(new Err(e.message, 500,  e.constraint))}
 

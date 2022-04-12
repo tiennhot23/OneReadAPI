@@ -15,7 +15,10 @@ router.get('/all/:book_endpoint', ChapterController.getAllChapter, ChapterContro
 
 router.get('/detail/:book_endpoint/:chapter_endpoint', ChapterController.getDetailChapter, ChapterController.onGetResult)
 
-router.post('/:book_endpoint', upload.any(), auth.verifyAdmin, slugify.get_endpoint, ChapterController.addChapter, ChapterController.onGetResult)
+
+router.post('/comic/:book_endpoint', upload.any(), auth.verifyAdmin, slugify.get_endpoint, ChapterController.addComicChapter, ChapterController.onGetResult)
+
+router.post('/novel/:book_endpoint', auth.verifyAdmin, slugify.get_endpoint, ChapterController.addNovelChapter, ChapterController.onGetResult)
 
 
 router.delete('/:book_endpoint/:chapter_endpoint', auth.verifyAdmin, ChapterController.deleteChapter, ChapterController.onGetResult)

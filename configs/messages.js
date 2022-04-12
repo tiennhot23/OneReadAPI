@@ -17,6 +17,8 @@ module.exports = {
         not_found: 'Sách này không tồn tại',
         exist: 'Sách này đã tồn tại',
         book_pk: 'Tên sách bị trùng',
+        only_comic_allowed: 'Chỉ cho phép sách thể loại comic',
+        only_novel_allowed: 'Chỉ cho phép sách thể loại Novel hoặc Literature',
         rating_constraint: 'Rating giới hạn từ 0 đến 5',
         type_constraint: 'Sách chỉ gồm các loại "Comic", "Novel" hoặc "Literature"',
         status_constraint: 'Tình trạng của sách: -1 - đã xoá, 0 - đang tiến hành, 1 - đã hoàn thành'
