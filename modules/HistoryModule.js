@@ -1,15 +1,16 @@
 const conn = require('../connection')
 
-const db = {}
+const history = {}
 
-db.get = (history) => {
+history.get = (history) => {
     return new Promise((resolve, reject) => {
-        let query = `select c.title as chapter_title,b.*
-        from "Chapter" c, (select b.*, book_endpoint, chapter_endpoint, to_char(time, 'DD-MM-YYYY hh:mm:ss') as time
-        from "Book" b,
-        (select * from "History" where book_endpoint = $1 and username = $2 order by time desc) h
-        where b.endpoint = h.book_endpoint) b
-        where c.book_endpoint = b.book_endpoint and c.chapter_endpoint = b.chapter_endpoint`
+        let query = `select *, to_char(time, 'DD-MM-YYYY hh:mm:ss') as time from "History" where book_endpoint = $1 and username = $2`
+        // let query = `select c.title as chapter_title,b.*
+        // from "Chapter" c, (select b.*, book_endpoint, chapter_endpoint, to_char(time, 'DD-MM-YYYY hh:mm:ss') as time
+        // from "Book" b,
+        // (select * from "History" where book_endpoint = $1 and username = $2 order by time desc) h
+        // where b.endpoint = h.book_endpoint) b
+        // where c.book_endpoint = b.book_endpoint and c.chapter_endpoint = b.chapter_endpoint`
 
         var params = [history.book_endpoint, history.username]
         conn.query(query, params, (err, res) => {
@@ -19,9 +20,9 @@ db.get = (history) => {
     })
 }
 
-db.list = (username) => {
+history.get_all = (username) => {
     return new Promise((resolve, reject) => {
-        let query = `select c.title as chapter_title,b.*
+        let query = `select c.title as chapter_title, to_char(c.time, 'DD-MM-YYYY hh:mm:ss') as chapter_time, b.*
         from "Chapter" c, (select b.*, book_endpoint, chapter_endpoint, to_char(time, 'DD-MM-YYYY hh:mm:ss') as time
         from "Book" b,
         (select * from "History" where username = $1 order by time desc) h
@@ -36,7 +37,7 @@ db.list = (username) => {
     })
 }
 
-db.add = (history) => {
+history.add = (history) => {
     return new Promise((resolve, reject) => {
         let query = `insert into "History" (book_endpoint, username, chapter_endpoint) 
         values ($1, $2, $3) returning *`
@@ -49,7 +50,7 @@ db.add = (history) => {
     })
 }
 
-db.update = (history, time) => {
+history.update = (history, time) => {
     return new Promise((resolve, reject) => {
         let query = `update "History" set chapter_endpoint = $3, time = $4 where book_endpoint = $1
         and username = $2 returning *`
@@ -62,7 +63,7 @@ db.update = (history, time) => {
     })
 }
 
-db.delete = (history) => {
+history.delete = (history) => {
     return new Promise((resolve, reject) => {
         let query = `delete from "History" where book_endpoint = $1 and username = $2 returning *`
 
@@ -74,7 +75,7 @@ db.delete = (history) => {
     })
 }
 
-db.delete_all = (history) => {
+history.delete_all = (history) => {
     return new Promise((resolve, reject) => {
         let query = `delete from "History" where username = $1 returning *`
 
@@ -86,4 +87,4 @@ db.delete_all = (history) => {
     })
 }
 
-module.exports = db;
+module.exports = history;

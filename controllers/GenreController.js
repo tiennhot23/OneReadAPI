@@ -1,97 +1,74 @@
-const conn = require('../connection')
+const GenreModule = require('../modules/GenreModule')
+const message = require('../configs/messages')
+const utils = require('../utils/utils')
 
-const db = {}
+const genre = {}
 
-db.get = (endpoint) => {
-    return new Promise((resolve, reject) => {
-        let query = 'select * from "Genre" where endpoint = $1 limit 1'
-
-        var params = [endpoint]
-        conn.query(query, params, (err, res) => {
-            if (err) return reject(err)
-            else return resolve(res.rows[0])
-        })
-    })
+class Err extends Error {
+    constructor(message, code, constraint) {
+      super(message)
+      this.message = message
+      this.code = code
+      this.constraint = constraint
+    }
 }
 
-db.list = () => {
-    return new Promise((resolve, reject) => {
-        let query = 'select * from "Genre"'
-
-        conn.query(query, (err, res) => {
-            if(err) return reject(err)
-            else return resolve(res.rows)
-        })
-    })
-}
-
-db.add = (genre) => {
-    return new Promise((resolve, reject) => {
-        let query = 'insert into "Genre" (endpoint, title' 
-        + (genre.description?', description':'') 
-        + ') values ($1, $2' 
-        + (genre.description?', $3':'')
-        + ') returning *'
-
-        var params = [genre.endpoint, genre.title]
-        if (genre.description) {
-            params.push(genre.description)
+function onCatchError(err, res) {
+    if (err.constraint) {
+        switch (err.constraint) {
+            case 'genre_pk': {
+                utils.onResponse(res, 'fail', 400, message.genre.genre_pk, null, null)
+                break
+            }
+            default: {
+                utils.onResponse(res, 'fail', 500, err.message, null, null)
+                break
+            }
         }
-
-        conn.query(query, params, (err, res) => {
-            if (err) return reject(err)
-            else return resolve(res.rows[0])
-        })
-    })
+    } else utils.onResponse(res, 'fail', err.code, err.message, null, null)
 }
 
-db.update = (genre, endpoint) => {
-    return new Promise((resolve, reject) => {
-        let num = 1
-        let params = []
-        let query = 'update "Genre" set '
-        if (genre.endpoint) {
-            if (num > 1) query += ','
-            query += ' endpoint = $' + num
-            num += 1
-            params.push(genre.endpoint)
-        }
-        if (genre.title) {
-            if (num > 1) query += ','
-            query += ' title = $' + num
-            num += 1
-            params.push(genre.title)
-        }
-        if (genre.description) {
-            if (num > 1) query += ','
-            query += ' description = $' + num
-            num += 1
-            params.push(genre.description)
-        }
-
-        query += ' where endpoint = $' + num + ' returning *'
-        params.push(endpoint)
-
-        if (num == 1) query = 'select * from "Genre" where endpoint = $1 limit 1'
-
-        conn.query(query, params, (err, res) => {
-            if (err) return reject(err)
-            else return resolve(res.rows[0])
-        })
-    })
+genre.onGetResult = (data, req, res, next) => {
+    if (data instanceof Error) {
+        onCatchError(data, res)
+    } else {
+        utils.onResponse(res, 'success', 200, data.message, data.page, data.data)
+    }
 }
 
-db.delete = (endpoint) => {
-    return new Promise((resolve, reject) => {
-        let query = 'delete from "Genre" where endpoint = $1 returning *'
-
-        var params = [endpoint]
-
-        conn.query(query, params, (err, res) => {
-            if (err) return reject(err)
-            else return resolve(res.rows[0])
-        })
-    })
+genre.getAllGenre = async (req, res, next) => {
+    try {
+        next({data: await GenreModule.get_all()})
+    } catch(e) {next(new Err(e.message, 500,  e.constraint))}
 }
 
-module.exports = db;
+genre.addGenre = async (req, res, next) => {
+    var genre = {
+        endpoint: req.body.endpoint,
+        title: req.body.title,
+        description: req.body.description
+    }
+    try {
+        if (!genre.title) return next(new Err(message.genre.missing_title, 400))
+        next({data: await GenreModule.add(genre)})
+    } catch (e) {next(new Err(e.message, 500,  e.constraint))}
+}
+
+genre.updateGenre = async (req, res, next) => {
+    var genre = req.body
+    try {
+        genre = await GenreModule.update(genre, req.params.endpoint)
+        if (genre) next({data: [genre], message: message.genre.update_success})
+        else next(new Err(message.genre.not_found, 404))
+    } catch (e) {next(new Err(e.message, 500,  e.constraint))}
+}
+
+genre.deleteGenre = async (req, res, next) => {
+    try {
+        var genre = await GenreModule.delete(req.params.endpoint)
+        if (genre) next({data: [genre], message: message.genre.delete_success})
+        else next(new Err(message.genre.not_found, 404))
+    } catch (e) {next(new Err(e.message, 500,  e.constraint))}
+}
+
+module.exports = genre
