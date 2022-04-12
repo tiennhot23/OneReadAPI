@@ -21,7 +21,8 @@ const options = {
             description: 'A simple api for reader'
         },
         servers: [
-            {url: 'http://localhost:3000'}
+            {url: 'http://localhost:3000'},
+            {url: 'https://one-read-v2.herokuapp.com'}
         ]
     },
     apis: ['./swagger/*.js']
