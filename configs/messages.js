@@ -75,7 +75,7 @@ module.exports = {
         not_found: 'Không tìm thấy comment',
         comment_pk: 'Thông báo này đã tồn tại',
         username_fk: 'User này không tồn tại',
-        book_fk: 'Sách nà không tồn tại',
+        book_fk: 'Sách này không tồn tại',
         reply_constraint: 'Comment gốc không tồn tại',
     },
     file:{

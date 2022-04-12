@@ -1,5 +1,6 @@
 const CommentModule = require('../modules/CommentModule')
 const BookModule = require('../modules/BookModule')
+const ChapterModule = require('../modules/ChapterModule')
 const NotifyModule = require('../modules/NotifyModule')
 const FileModule = require('../modules/FileModule')
 const message = require('../configs/messages')
@@ -20,27 +21,27 @@ function onCatchError(err, res) {
     if (err.constraint) {
         switch (err.constraint) {
             case 'comment_pk': {
-                onResponse(res, 'fail', 400,  message.comment.comment_pk, null, null)
+                utils.onResponse(res, 'fail', 400,  message.comment.comment_pk, null, null)
                 break
             }
             case 'username_fk': {
-                onResponse(res, 'fail', 404,  message.comment.username_fk, null, null)
+                utils.onResponse(res, 'fail', 404,  message.comment.username_fk, null, null)
                 break
             }
             case 'book_fk': {
-                onResponse(res, 'fail', 404,  message.comment.book_fk, null, null)
+                utils.onResponse(res, 'fail', 404,  message.comment.book_fk, null, null)
                 break
             }
             case 'reply_constraint': {
-                onResponse(res, 'fail', 404,  message.comment.reply_constraint, null, null)
+                utils.onResponse(res, 'fail', 404,  message.comment.reply_constraint, null, null)
                 break
             }
             default: {
-                onResponse(res, 'fail', 500, err.message, null, null)
+                utils.onResponse(res, 'fail', 500, err.message, null, null)
                 break
             }
         }
-    } else onResponse(res, 'fail', err.code, err.message, null, null)
+    } else utils.onResponse(res, 'fail', err.code, err.message, null, null)
 }
 
 comment.onGetResult = (data, req, res, next) => {
@@ -53,12 +54,6 @@ comment.onGetResult = (data, req, res, next) => {
 
 
 comment.getAllCommentOfBook = async (req, res, next) => {
-    try {
-        if (!!await BookModule.get(req.params.book_endpoint)) return next(new Err(message.book.not_found, 404))
-        next({data: await ChapterModule.get_all(req.params.book_endpoint)})
-    } catch (e) {next(new Err(e.message, 500,  e.constraint))}
-
-
     var page = req.query.page
     if (!page) page = 1
     var comments = []
@@ -111,8 +106,21 @@ comment.getDetailComment = async (req, res, next) => {
                     }
                 })
             } else {
-                comment = e
-                comment.id = Number(e.id)
+                comment = {
+                    id: Number(e.id),
+                    id_root: Number(e.id_root),
+                    book_endpoint: e.book_endpoint,
+                    content: e.content,
+                    files: e.files,
+                    time: e.time,
+                    user: {
+                        username: e.username,
+                        avatar: e.avatar,
+                        status: Number(e.status),
+                        email: e.email,
+                        role: Number(e.role)
+                    }
+                }
             }
         })
         if (comment) comment.replies = replies
@@ -170,7 +178,19 @@ comment.addComment = async (req, res, next) => {
 comment.deleteComment = async (req, res, next) => {
     try {
         var comment = await CommentModule.delete(req.params.id)
-        if (comment) next({data: [comment], message: message.comment.delete_success})
+        
+        if (comment) {
+            comment.id = Number(comment.id)
+            comment.id_root = Number(comment.id_root)
+            comment.user = {
+                username: req.user.username,
+                avatar: req.user.avatar,
+                status: Number(req.user.status),
+                email: req.user.email,
+                role: Number(req.user.role)
+            }
+            next({data: [comment], message: message.comment.delete_success})
+        } 
         else next(new Err(message.comment.not_found, 404))
     } catch (e) {next(new Err(e.message, 500,  e.constraint))}
 }

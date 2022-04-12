@@ -231,7 +231,8 @@
  *                                          type: string
  *                                      files:
  *                                          type: array
- *                                          items: string
+ *                                          items: 
+ *                                              type: string
  *                                      time:
  *                                          type: string
  *                                          format: dd-MM-yyyy hh:mm:ss
