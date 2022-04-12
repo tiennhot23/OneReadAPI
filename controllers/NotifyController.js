@@ -24,23 +24,23 @@ function onCatchError(err, res) {
     if (err.constraint) {
         switch (err.constraint) {
             case 'notify_pk': {
-                onResponse(res, 'fail', 400, message.notify.notify_pk, null, null)
+                utils.onResponse(res, 'fail', 400, message.notify.notify_pk, null, null)
                 break
             }
             case 'username_fk': {
-                onResponse(res, 'fail', 404, message.notify.username_fk, null, null)
+                utils.onResponse(res, 'fail', 404, message.notify.username_fk, null, null)
                 break
             }
             case 'status_constraint': {
-                onResponse(res, 'fail', 400, message.notify.status_constraint, null, null)
+                utils.onResponse(res, 'fail', 400, message.notify.status_constraint, null, null)
                 break
             }
             default: {
-                onResponse(res, 'fail', 500, err.message, null, null)
+                utils.onResponse(res, 'fail', 500, err.message, null, null)
                 break
             }
         }
-    } else onResponse(res, 'fail', err.code, err.message, null, null)
+    } else utils.onResponse(res, 'fail', err.code, err.message, null, null)
 }
 
 notify.onGetResult = (data, req, res, next) => {
@@ -87,7 +87,7 @@ notify.deleteAllRead =  async (req, res, next) => {
 
 notify.deleteOne = async (req, res, next) => {
     try {
-        var notify = await NotifyController.delete(req.params.endpoint, req.user.username)
+        var notify = await NotifyModule.delete(req.params.endpoint, req.user.username)
         if (notify) next({data: [notify], message: message.notify.delete_success})
         else next(new Err(message.notify.not_found, 404))
     } catch(e) {next(new Err(e.message, 500,  e.constraint))}

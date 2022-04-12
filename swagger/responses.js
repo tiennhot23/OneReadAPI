@@ -436,6 +436,69 @@
  * @swagger
  * components:
  *  response:
+ *      GenreResponse:
+ *          type: object
+ *          properties:
+ *              status:
+ *                  type: string
+ *                  default: success
+ *              code:
+ *                  type: integer
+ *                  default: 200
+ *              message:
+ *                  type: string
+ *              data:
+ *                  type: array
+ *                  items:
+ *                      type: object
+ *                      properties:
+ *                              endpoint:
+ *                                  type: string
+ *                              title:
+ *                                  type: string
+ *                              description:
+ *                                  type: string
+ */
+
+
+
+/**  
+ * @swagger
+ * components:
+ *  response:
+ *      NotifyResponse:
+ *          type: object
+ *          properties:
+ *              status:
+ *                  type: string
+ *                  default: success
+ *              code:
+ *                  type: integer
+ *                  default: 200
+ *              message:
+ *                  type: string
+ *              data:
+ *                  type: array
+ *                  items:
+ *                      type: object
+ *                      properties:
+ *                              endpoint:
+ *                                  type: string
+ *                              username:
+ *                                  type: string
+ *                              content:
+ *                                  type: string
+ *                              status:
+ *                                  type: integer
+ *                              time:
+ *                                  type: string
+ */
+
+
+/**  
+ * @swagger
+ * components:
+ *  response:
  *      MessageResponse:
  *          type: object
  *          properties:

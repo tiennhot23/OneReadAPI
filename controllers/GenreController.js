@@ -17,15 +17,15 @@ function onCatchError(err, res) {
     if (err.constraint) {
         switch (err.constraint) {
             case 'genre_pk': {
-                onResponse(res, 'fail', 400, message.genre.genre_pk, null, null)
+                utils.onResponse(res, 'fail', 400, message.genre.genre_pk, null, null)
                 break
             }
             default: {
-                onResponse(res, 'fail', 500, err.message, null, null)
+                utils.onResponse(res, 'fail', 500, err.message, null, null)
                 break
             }
         }
-    } else onResponse(res, 'fail', err.code, err.message, null, null)
+    } else utils.onResponse(res, 'fail', err.code, err.message, null, null)
 }
 
 genre.onGetResult = (data, req, res, next) => {

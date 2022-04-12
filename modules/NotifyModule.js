@@ -5,7 +5,7 @@ const notify = {}
 
 notify.get = (endpoint, username) => {
     return new Promise((resolve, reject) => {
-        let query = `update "Notify" set status = 1 where endpoint = $1 and username = $2 returning *, , to_char(time, 'DD-MM-YYYY hh:mm:ss') as time`
+        let query = `update "Notify" set status = 1 where endpoint = $1 and username = $2 returning *, to_char(time, 'DD-MM-YYYY hh:mm:ss') as time`
 
         var params = [endpoint, username]
         conn.query(query, params, (err, res) => {
@@ -17,7 +17,7 @@ notify.get = (endpoint, username) => {
 
 notify.get_all = (username, page) => {
     return new Promise((resolve, reject) => {
-        let query = `select *, to_char(time, 'DD-MM-YYYY hh:mm:ss') as time from "Notify" where username = $1 order by time desc`
+        let query = `select *, to_char(time, 'DD-MM-YYYY hh:mm:ss') as time from "Notify" where username = $1`
         query += ' limit ' + constants.limit_element + ' offset ' + (constants.limit_element * (page - 1))
         var params = [username]
         conn.query(query, params, (err, res) => {

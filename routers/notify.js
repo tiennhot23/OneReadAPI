@@ -8,8 +8,6 @@ router.get('/all', auth.verifyUser, NotifyController.getAllNotification, NotifyC
 
 router.get('/:endpoint', auth.verifyUser, NotifyController.readNotification, NotifyController.onGetResult)
 
-router.post('/', auth.verifyAdmin, NotifyController.addNotification, NotifyController.onGetResult)
-
 router.delete('/all-read', auth.verifyUser, NotifyController.deleteAllRead, NotifyController.onGetResult)
 
 router.delete('/:endpoint', auth.verifyUser, NotifyController.deleteOne, NotifyController.onGetResult)
