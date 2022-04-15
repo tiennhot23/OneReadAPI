@@ -164,14 +164,15 @@ user.getRecentReadChapter = async (req, res, next) => {
     var user = req.user
     var books = []
     try {
-        if (!await BookModule.get(req.params.book_endpoint)) return next(new Err(message.book.not_found, 404))
+        var book = await BookModule.get(req.params.book_endpoint)
+        if (!book) return next(new Err(message.book.not_found, 404))
         var result = await HistoryModule.get({
             book_endpoint: req.params.book_endpoint,
             username: user.username
         })
         if (result.length > 0) {
             var chapter = await ChapterModule.get(result[0].book_endpoint, result[0].chapter_endpoint)
-            books.push({chapter, time: result[0].time})
+            books.push({book, chapter, time: result[0].time})
         }
         next({data: books})
     } catch (e) {next(new Err(e.message, 500,  e.constraint))}
