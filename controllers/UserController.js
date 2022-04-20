@@ -1,8 +1,12 @@
+const { v4: uuidv4 } = require('uuid')
+const { validate: uuidValidate} = require('uuid')
+
 const BookModule = require('../modules/BookModule')
 const UserModule = require('../modules/UserModule')
 const HistoryModule = require('../modules/HistoryModule')
 const ChapterModule = require('../modules/ChapterModule')
 const NotifyModule = require('../modules/NotifyModule')
+const TokenModule = require('../modules/TokenModule')
 const FileModule = require('../modules/FileModule')
 const utils = require('../utils/utils')
 const constants = require('../configs/constants')
@@ -74,17 +78,14 @@ user.onGetResult = (data, req, res, next) => {
 user.verifyEmail = async (req, res, next) => {
     // var user = req.user
     try {
-        if (!req.query.token) return next(new Err(message.auth.token_invalid, 400))
-        var data = await UserModule.get_data_from_token(req.query.token)
-        var user = await UserModule.verify_email(data.username)
-        if (user) next({message: message.user.email_veified})
-        else next (new Err(message.user.not_found, 404))
+        if (!req.query.token || !uuidValidate(req.query.token)) return next(new Err(message.auth.token_invalid, 400))
+        var data = await TokenModule.delete(req.query.token)
+        if (data) {
+            var user = await UserModule.verify_email(data.username)
+            if (user) next({message: message.user.email_veified})
+            else next (new Err(message.user.not_found, 404))
+        } else next (new Err(message.auth.token_invalid, 400))
         
-        // if (data.username && data.email &&
-        //     user.username == data.username && user.email == data.email) {
-        //     user = await UserModule.verify_email(data.username)
-        //     next({message: message.user.email_veified})
-        // } else next (new Err(message.user.not_found, 404))
     } catch (e) {next(new Err(e.message, 500,  e.constraint))}
 }
 
@@ -215,8 +216,9 @@ user.sendMailVerify = async (req, res, next) => {
     try {
         if (!user.username) return next(new Err(message.user.missing_username, 400))
         
-        const authHeader = req.headers['authorization']
-        const token = authHeader && authHeader.split(' ')[1]
+
+        const token = uuidv4()
+        await TokenModule.add({token: token, username: user.username})
         mail.sendVerification(user.email, 'http://localhost:3000/user/verify-email?token=' + token)
         next({message: message.auth.verify_email})
     } catch (e) {next(new Err(e.message, 500,  e.constraint))}

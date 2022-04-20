@@ -45,7 +45,7 @@ user.get = (username) => {
 
 user.verify_email = (username) => {
     return new Promise((resolve, reject) => {
-        let query = 'update "Account" set status = 1 where username = $1'
+        let query = 'update "Account" set status = 1 where username = $1 returning *'
         let params= [username]
 
         conn.query(query, params, (err, res) => {
