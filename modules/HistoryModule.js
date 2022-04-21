@@ -15,7 +15,7 @@ history.get = (history) => {
         var params = [history.book_endpoint, history.username]
         conn.query(query, params, (err, res) => {
             if (err) return reject(err)
-            else return resolve(res.rows)
+            else return resolve(res.rows[0])
         })
     })
 }
