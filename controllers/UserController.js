@@ -171,9 +171,9 @@ user.getRecentReadChapter = async (req, res, next) => {
             book_endpoint: req.params.book_endpoint,
             username: user.username
         })
-        if (result.length > 0) {
-            var chapter = await ChapterModule.get(result[0].book_endpoint, result[0].chapter_endpoint)
-            books.push({book, chapter, time: result[0].time})
+        if (result) {
+            var chapter = await ChapterModule.get(result.book_endpoint, result.chapter_endpoint)
+            books.push({book, chapter, time: result.time})
         }
         next({data: books})
     } catch (e) {next(new Err(e.message, 500,  e.constraint))}
