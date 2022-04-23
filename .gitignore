@@ -1,3 +1,6 @@
 node_modules
 .env
 request
+firebaseServiceKey.json
+sql
+connection.js
