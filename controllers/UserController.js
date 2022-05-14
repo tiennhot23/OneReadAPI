@@ -1,5 +1,5 @@
 const { v4: uuidv4 } = require('uuid')
-const { validate: uuidValidate} = require('uuid')
+const { validate: uuidValidate } = require('uuid')
 
 const BookModule = require('../modules/BookModule')
 const UserModule = require('../modules/UserModule')
@@ -19,10 +19,10 @@ const user = {}
 
 class Err extends Error {
     constructor(message, code, constraint) {
-      super(message)
-      this.message = message
-      this.code = code
-      this.constraint = constraint
+        super(message)
+        this.message = message
+        this.code = code
+        this.constraint = constraint
     }
 }
 
@@ -82,26 +82,26 @@ user.verifyEmail = async (req, res, next) => {
         var data = await TokenModule.delete(req.query.token)
         if (data) {
             var user = await UserModule.verify_email(data.username)
-            if (user) next({message: message.user.email_veified})
-            else next (new Err(message.user.not_found, 404))
-        } else next (new Err(message.auth.token_invalid, 400))
-        
-    } catch (e) {next(new Err(e.message, 500,  e.constraint))}
+            if (user) next({ message: message.user.email_veified })
+            else next(new Err(message.user.not_found, 404))
+        } else next(new Err(message.auth.token_invalid, 400))
+
+    } catch (e) { next(new Err(e.message, 500, e.constraint)) }
 }
 
 user.get = async (req, res, next) => {
     try {
         var user = await UserModule.get(req.params.username)
-        if (user) next({data: [user]})
+        if (user) next({ data: [user] })
         else next(new Err(message.user.not_found, 404))
-    } catch (e) {next(new Err(e.message, 500,  e.constraint))}
+    } catch (e) { next(new Err(e.message, 500, e.constraint)) }
 }
 
 user.getBookFollowing = async (req, res, next) => {
     var user = req.user
     try {
-        next({data: await UserModule.get_book_following(user.username)})
-    } catch (e) {next(new Err(e.message, 500,  e.constraint))}
+        next({ data: await UserModule.get_book_following(user.username) })
+    } catch (e) { next(new Err(e.message, 500, e.constraint)) }
 }
 
 user.getCommentHistory = async (req, res, next) => {
@@ -126,8 +126,8 @@ user.getCommentHistory = async (req, res, next) => {
                 }
             })
         })
-        next({data: comments})
-    } catch (e) {next(new Err(e.message, 500,  e.constraint))}
+        next({ data: comments })
+    } catch (e) { next(new Err(e.message, 500, e.constraint)) }
 }
 
 user.getAllHistoryRead = async (req, res, next) => {
@@ -135,7 +135,7 @@ user.getAllHistoryRead = async (req, res, next) => {
     var books = []
     try {
         var result = await HistoryModule.get_all(user.username)
-        result.forEach( e => {
+        result.forEach(e => {
             var book = {
                 endpoint: e.endpoint,
                 title: e.title,
@@ -155,10 +155,10 @@ user.getAllHistoryRead = async (req, res, next) => {
                 title: e.chapter_title,
                 time: e.chapter_time
             }
-            books.push({book, chapter, time: e.time})
+            books.push({ book, chapter, time: e.time })
         })
-        next({data: books})
-    } catch (e) {next(new Err(e.message, 500,  e.constraint))}
+        next({ data: books })
+    } catch (e) { next(new Err(e.message, 500, e.constraint)) }
 }
 
 user.getRecentReadChapter = async (req, res, next) => {
@@ -173,10 +173,10 @@ user.getRecentReadChapter = async (req, res, next) => {
         })
         if (result) {
             var chapter = await ChapterModule.get(result.book_endpoint, result.chapter_endpoint)
-            books.push({book, chapter, time: result.time})
+            books.push({ book, chapter, time: result.time })
         }
-        next({data: books})
-    } catch (e) {next(new Err(e.message, 500,  e.constraint))}
+        next({ data: books })
+    } catch (e) { next(new Err(e.message, 500, e.constraint)) }
 }
 
 
@@ -190,12 +190,14 @@ user.login = async (req, res, next) => {
         if (user) {
             user.password = ''
             var accessToken = utils.generateAccessToken(user)
-            next({data: [{
-                accessToken: accessToken,
-                user: user
-            }], message: message.user.login_success})
+            next({
+                data: [{
+                    accessToken: accessToken,
+                    user: user
+                }], message: message.user.login_success
+            })
         } else next(new Err(message.user.incorrect_account, 404))
-    } catch (e) {next(new Err(e.message, 500,  e.constraint))}
+    } catch (e) { next(new Err(e.message, 500, e.constraint)) }
 }
 
 user.register = async (req, res, next) => {
@@ -204,49 +206,49 @@ user.register = async (req, res, next) => {
         if (!user.username) return next(new Err(message.user.missing_username, 400))
         else if (!user.password) return next(new Err(message.user.missing_password, 400))
         else if (!user.email) return next(new Err(message.user.missing_email, 400))
-        
+
         user = await UserModule.add(user)
-        if (user) next({message: message.user.registed_success})
+        if (user) next({ message: message.user.registed_success })
         else next(new Err(message.user.registed_fail, 500))
-    } catch (e) {next(new Err(e.message, 500,  e.constraint))}
+    } catch (e) { next(new Err(e.message, 500, e.constraint)) }
 }
 
 user.sendMailVerify = async (req, res, next) => {
     var user = req.user
     try {
         if (!user.username) return next(new Err(message.user.missing_username, 400))
-        
+
 
         const token = uuidv4()
-        await TokenModule.add({token: token, username: user.username})
+        await TokenModule.add({ token: token, username: user.username })
         mail.sendVerification(user.email, 'http://localhost:3000/user/verify-email?token=' + token)
-        next({message: message.auth.verify_email})
-    } catch (e) {next(new Err(e.message, 500,  e.constraint))}
+        next({ message: message.auth.verify_email })
+    } catch (e) { next(new Err(e.message, 500, e.constraint)) }
 }
 
 user.followBook = async (req, res, next) => {
     try {
         if (!await BookModule.get(req.params.book_endpoint)) return next(new Err(message.book.not_found, 404))
         if (await UserModule.follow_book(req.params.book_endpoint, req.user.username))
-            next({message: message.user.followed_book})
+            next({ message: message.user.followed_book })
         else next(new Err(message.user.can_not_follow_book, 500))
-    } catch (e) {next(new Err(e.message, 500,  e.constraint))}
+    } catch (e) { next(new Err(e.message, 500, e.constraint)) }
 }
 
 user.unfollowBook = async (req, res, next) => {
     try {
         if (!await BookModule.get(req.params.book_endpoint)) return next(new Err(message.book.not_found, 404))
         if (await UserModule.unfollow_book(req.params.book_endpoint, req.user.username))
-            next({message: message.user.unfollowed_book})
+            next({ message: message.user.unfollowed_book })
         else next(new Err(message.user.can_not_unfollow_book, 500))
-    } catch (e) {next(new Err(e.message, 500,  e.constraint))}
+    } catch (e) { next(new Err(e.message, 500, e.constraint)) }
 }
 
 user.banUser = async (req, res, next) => {
     var isSendData = false
     try {
         if (req.user.username == req.params.username) return next(new Err(message.user.can_not_ban_user, 403))
-        var user = await UserModule.update({username: req.params.username, status: -1})
+        var user = await UserModule.update({ username: req.params.username, status: -1 })
         if (user) {
             let notify = {
                 endpoint: `+ban+${user.username}`,
@@ -255,12 +257,12 @@ user.banUser = async (req, res, next) => {
             }
             NotifyModule.add(notify)
             isSendData = true
-            next({data: [user], message: message.user.user_banned})
+            next({ data: [user], message: message.user.user_banned })
         } else next(new Err(message.user.not_found, 404))
     } catch (e) {
-        if (e.constraint == 'notify_pk' && !isSendData) 
-            return next({data: [user], message: message.user.user_banned})
-        next(new Err(e.message, 500,  e.constraint))
+        if (e.constraint == 'notify_pk' && !isSendData)
+            return next({ data: [user], message: message.user.user_banned })
+        next(new Err(e.message, 500, e.constraint))
     }
 }
 
@@ -268,7 +270,7 @@ user.unbanUser = async (req, res, next) => {
     var isSendData = false
     try {
         if (req.user.username == req.params.username) return next(new Err(message.user.can_not_unban_user, 403))
-        var user = await UserModule.update({username: req.params.username, status: 0})
+        var user = await UserModule.update({ username: req.params.username, status: 0 })
         if (user) {
             let notify = {
                 endpoint: `+unban+${user.username}`,
@@ -277,12 +279,12 @@ user.unbanUser = async (req, res, next) => {
             }
             NotifyModule.add(notify)
             isSendData = true
-            next({data: [user], message: message.user.user_unbanned})
+            next({ data: [user], message: message.user.user_unbanned })
         } else next(new Err(message.user.not_found, 404))
     } catch (e) {
-        if (e.constraint == 'notify_pk' && !isSendData) 
-            return next({data: [user], message: message.user.user_unbanned})
-        next(new Err(e.message, 500,  e.constraint))
+        if (e.constraint == 'notify_pk' && !isSendData)
+            return next({ data: [user], message: message.user.user_unbanned })
+        next(new Err(e.message, 500, e.constraint))
     }
 }
 
@@ -295,13 +297,13 @@ user.updateUser = async (req, res, next) => {
     try {
         if (req.files && req.files.length > 0 && req.files[0].fieldname == 'avatar') {
             if (!req.files[0]['mimetype'].includes('image')) return next(new Err(message.user.avatar_invalid, 400))
-            user.avatar = await FileModule.upload_single(req.files[0], 
+            user.avatar = await FileModule.upload_single(req.files[0],
                 'user/' + user.username + '/', 'avatar')
         }
         user = await UserModule.update(user)
-        if (user) next({data: [user], message: message.user.update_success})
+        if (user) next({ data: [user], message: message.user.update_success })
         else next(new Err(message.user.not_found, 404))
-    } catch (e) {next(new Err(e.message, 500,  e.constraint))}
+    } catch (e) { next(new Err(e.message, 500, e.constraint)) }
 }
 
 user.updateRole = async (req, res, next) => {
@@ -312,9 +314,9 @@ user.updateRole = async (req, res, next) => {
     try {
         if (!user.role) return next(new Err(message.user.missing_role, 400))
         user = await UserModule.update(user)
-        if (user) next({data: [user], message: message.user.update_success})
+        if (user) next({ data: [user], message: message.user.update_success })
         else next(new Err(message.user.not_found, 404))
-    } catch (e) {next(new Err(e.message, 500,  e.constraint))}
+    } catch (e) { next(new Err(e.message, 500, e.constraint)) }
 }
 
 user.updatePassword = async (req, res, next) => {
@@ -325,9 +327,9 @@ user.updatePassword = async (req, res, next) => {
     try {
         if (!user.password) return next(new Err(message.user.missing_password, 400))
         user = await UserModule.update(user)
-        if (user) next({data: [user], message: message.user.password_updated})
+        if (user) next({ data: [user], message: message.user.password_updated })
         else next(new Err(message.user.not_found, 404))
-    } catch (e) {next(new Err(e.message, 500,  e.constraint))}
+    } catch (e) { next(new Err(e.message, 500, e.constraint)) }
 }
 
 user.deleteUser = async (req, res, next) => {
@@ -335,26 +337,26 @@ user.deleteUser = async (req, res, next) => {
         var user = await UserModule.delete(req.user.username)
         if (user) {
             await FileModule.delete('user/' + user.username + '/')
-            next({data: [user], message: message.user.password_updated})
+            next({ data: [user], message: message.user.password_updated })
         } else next(new Err(message.user.not_found, 404))
-    } catch (e) {next(new Err(e.message, 500,  e.constraint))}
+    } catch (e) { next(new Err(e.message, 500, e.constraint)) }
 }
 
 user.deleteAllHistoryRead = async (req, res, next) => {
     try {
         if (!await UserModule.get(req.user.username)) return next(new Err(message.user.not_found, 404))
-        await HistoryModule.delete_all({username: req.user.username})
-        next({message: message.history.delete_all})
-    } catch (e) {next(new Err(e.message, 500,  e.constraint))}
+        await HistoryModule.delete_all({ username: req.user.username })
+        next({ message: message.history.delete_all })
+    } catch (e) { next(new Err(e.message, 500, e.constraint)) }
 }
 
 user.deleteSingleHistoryRead = async (req, res, next) => {
     try {
         if (!await UserModule.get(req.user.username)) return next(new Err(message.user.not_found, 404))
         else if (!await BookModule.get(req.params.book_endpoint)) return next(new Err(message.book.not_found, 404))
-        await HistoryModule.delete({username: req.user.username, book_endpoint: req.params.book_endpoint})
-        next({message: message.history.delete_success})
-    } catch (e) {next(new Err(e.message, 500,  e.constraint))}
+        await HistoryModule.delete({ username: req.user.username, book_endpoint: req.params.book_endpoint })
+        next({ message: message.history.delete_success })
+    } catch (e) { next(new Err(e.message, 500, e.constraint)) }
 }
 
 

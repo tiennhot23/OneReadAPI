@@ -21,8 +21,8 @@ const options = {
             description: 'A simple api for reader'
         },
         servers: [
-            {url: 'http://localhost:3000'},
-            {url: 'https://one-read-v2.herokuapp.com'}
+            { url: 'http://localhost:3000' },
+            { url: 'https://one-read-v2.herokuapp.com' }
         ]
     },
     apis: ['./swagger/*.js']
@@ -35,17 +35,17 @@ const app = express()
 const port = process.env.PORT || 3000
 
 app.use(cors())
-app.use(express.urlencoded({extended: true}))
+app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 
 function postTrimmer(req, res, next) {
     for (const [key, value] of Object.entries(req.body)) {
-        if (typeof(value) === 'string')
+        if (typeof (value) === 'string')
             req.body[key] = value.trim()
     }
     next()
 }
-  
+
 app.use(postTrimmer)
 
 process.env.TZ = 'Asia/Ho_Chi_Minh'
@@ -60,7 +60,7 @@ app.use('/comment', comment)
 app.use('/chapter', chapter)
 app.use('/file', upload)
 app.use('/', (req, res, next) => {
-    res.json({message: 'ONE'})
+    res.json({ message: 'ONE' })
 })
 
 app.listen(port, () => console.log(`Listening on port ${port}`))
