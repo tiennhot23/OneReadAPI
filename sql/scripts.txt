@@ -1,0 +1,167 @@
+create table if not exists "Book"
+(
+	endpoint varchar(255) not null
+		constraint book_pk
+			primary key,
+	title text not null,
+	author text default 'unknown'::text not null,
+	thumb varchar(255) default 'https://lh3.googleusercontent.com/proxy/2tSbUwA5fzMnQ7Jh85LXp4_QwOCwYQtv1yrqoW7Fpgvav1WXRJPqFNXClbRFOMIKtP6mDAgJG1y1pac0sxENIA78BrntCd5DrlQnCPxwzvM8QHoYipIc8X62T3-o'::character varying not null,
+	theme varchar(255) default 'https://lh3.googleusercontent.com/proxy/2tSbUwA5fzMnQ7Jh85LXp4_QwOCwYQtv1yrqoW7Fpgvav1WXRJPqFNXClbRFOMIKtP6mDAgJG1y1pac0sxENIA78BrntCd5DrlQnCPxwzvM8QHoYipIc8X62T3-o'::character varying not null,
+	description text default 'Không có mô tả nào'::text not null,
+	type varchar(100) not null
+		constraint type_constraint
+			check ((type)::text = ANY (('{Comic,Novel,Literature}'::character varying[])::text[])),
+	rating double precision default 0.0 not null,
+	rate_count integer default 0 not null,
+	status smallint default 0 not null
+		constraint status_constraint
+			check (status = ANY ('{-1,0,1}'::smallint[])),
+	search_number integer default 0 not null
+);
+
+create table if not exists "Genre"
+(
+	endpoint varchar(255) not null
+		constraint genre_pk
+			primary key,
+	title text not null,
+	description text default 'Không có mô tả nào'::text not null
+);
+
+create table if not exists "BookGenres"
+(
+	book_endpoint varchar(255) not null
+		constraint book_fk
+			references "Book"
+				on update cascade,
+	genre_endpoint varchar(255) not null
+		constraint genre_fk
+			references "Genre"
+				on update cascade on delete cascade,
+	constraint book_genres_pk
+		primary key (genre_endpoint, book_endpoint)
+);
+
+create table if not exists "Account"
+(
+	username varchar(50) not null
+		constraint account_pk
+			primary key,
+	password varchar(100) not null,
+	avatar varchar(255) default 'https://thumbs.dreamstime.com/b/default-avatar-profile-icon-social-media-user-vector-default-avatar-profile-icon-social-media-user-vector-portrait-176194876.jpg'::character varying not null,
+	status smallint default 0 not null
+		constraint status_constraint
+			check (status = ANY ('{1,0,-1}'::smallint[])),
+	email varchar(100) not null
+		constraint "Account_email_key"
+			unique,
+	role smallint default 0 not null
+		constraint role_constraint
+			check (role = ANY ('{0,1}'::smallint[]))
+);
+
+create table if not exists "BookFollows"
+(
+	book_endpoint varchar(255) not null
+		constraint book_fk
+			references "Book"
+				on update cascade,
+	username varchar(50) not null
+		constraint username_fk
+			references "Account"
+				on update cascade on delete cascade,
+	constraint book_follows_pk
+		primary key (book_endpoint, username)
+);
+
+create table if not exists "Chapter"
+(
+	chapter_endpoint varchar(255) not null,
+	book_endpoint varchar(255) not null
+		constraint book_fk
+			references "Book"
+				on update cascade,
+	title text not null,
+	time timestamp default timezone('GMT+7'::text, LOCALTIMESTAMP) not null,
+	images text[] not null,
+	constraint chapter_pk
+		primary key (chapter_endpoint, book_endpoint)
+);
+
+create table if not exists "Notify"
+(
+	endpoint varchar(255) not null,
+	username varchar(50) not null
+		constraint username_fk
+			references "Account"
+				on update cascade on delete cascade,
+	content text not null,
+	status smallint default 0 not null
+		constraint status_constraint
+			check (status = ANY ('{0,1}'::smallint[])),
+	time timestamp default timezone('GMT+7'::text, LOCALTIMESTAMP) not null,
+	constraint notify_pk
+		primary key (endpoint, username)
+);
+
+create table if not exists "Token"
+(
+	token text not null
+		constraint "Token_pkey"
+			primary key,
+	username varchar(50) not null
+		constraint username_fk
+			references "Account"
+				on update cascade,
+	createat timestamp default timezone('GMT+7'::text, LOCALTIMESTAMP) not null
+);
+
+create table if not exists "Comment"
+(
+	id bigserial not null
+		constraint comment_pk
+			primary key,
+	username varchar(50) not null
+		constraint username_fk
+			references "Account"
+				on update cascade on delete cascade,
+	endpoint varchar(255) not null
+		constraint book_fk
+			references "Book"
+				on update cascade on delete cascade,
+	id_root integer
+		constraint reply_constraint
+			references "Comment"
+				on update cascade on delete cascade,
+	content text not null,
+	time timestamp default timezone('GMT+7'::text, LOCALTIMESTAMP) not null,
+	files character varying[]
+);
+
+create table if not exists "History"
+(
+	book_endpoint varchar(255) not null,
+	username varchar(50) not null
+		constraint username_fk
+			references "Account"
+				on update cascade on delete cascade,
+	chapter_endpoint varchar(255) not null,
+	time timestamp default timezone('GMT+7'::text, LOCALTIMESTAMP) not null,
+	constraint history_pk
+		primary key (book_endpoint, username),
+	constraint chapter_fk
+		foreign key (book_endpoint, chapter_endpoint) references "Chapter" (book_endpoint, chapter_endpoint)
+			on update cascade on delete cascade
+);
+
+create table if not exists "BookViews"
+(
+	time date default date(timezone('GMT+7'::text, LOCALTIMESTAMP)) not null,
+	book_endpoint varchar(255) not null
+		constraint book_fk
+			references "Book"
+				on update cascade,
+	view integer default 0 not null,
+	constraint view_statistic_pk
+		primary key (time, book_endpoint)
+);
