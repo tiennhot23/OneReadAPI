@@ -21,7 +21,7 @@ notify.get_all = (username, page) => {
         query += ' limit ' + constants.limit_element + ' offset ' + (constants.limit_element * (page - 1))
         var params = [username]
         conn.query(query, params, (err, res) => {
-            if(err) return reject(err)
+            if (err) return reject(err)
             else return resolve(res.rows)
         })
     })
@@ -59,9 +59,9 @@ notify.deleteRead = () => {
 
         conn.query(query, (err, res) => {
             if (err) return reject(err)
-            else return resolve(res.rows[0])
+            else return resolve(res.rows)
         })
     })
 }
 
-module.exports = notify;
+module.exports = notify
